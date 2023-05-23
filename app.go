@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"github.com/fedeveron01/golang-base/entities"
 )
 
 func recorrerLista(lista []string) []string {
