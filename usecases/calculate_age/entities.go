@@ -22,6 +22,6 @@ type Clock interface {
 type ClockImplementation struct {
 }
 
-func (c *ClockImplementation) Now() time.Time {
+func (c ClockImplementation) Now() time.Time {
 	return time.Now()
 }

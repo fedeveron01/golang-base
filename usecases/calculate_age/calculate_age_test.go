@@ -14,7 +14,9 @@ func TestCalculateAgeWhenBornDateIsValidShouldReturnAValidAge(t *testing.T) {
 	mockClock.On("Now").Return(time.Date(2023, 2, 19, 14, 0, 0, 0, time.Local))
 
 	person := Person{BornDate: time.Date(2000, 2, 19, 14, 0, 0, 0, time.Local)}
-	person.CalculateAge(mockClock)
 
-	assert.Equal(t, 23, person.BornDate)
+	expectedAge := 23
+	actualAge := person.CalculateAge(mockClock)
+
+	assert.Equal(t, expectedAge, actualAge)
 }
