@@ -10,7 +10,3 @@ type Person struct {
 }
 
 // getter and setters by default
-
-func (p *Person) CalculateAge() int {
-	return 1
-}

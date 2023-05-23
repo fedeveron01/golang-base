@@ -3,44 +3,28 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/fedeveron01/golang-base/calculate_age"
 	"github.com/fedeveron01/golang-base/entities"
+	person_gateway "github.com/fedeveron01/golang-base/entrypoints/gateways/person"
+	"github.com/fedeveron01/golang-base/usecases/calculate_age"
 )
 
-func recorrerLista(lista []string) []string {
-	for _, element := range lista {
+func travelArray(array []string) []string {
+	for _, element := range array {
 		fmt.Println(element)
 	}
 
-	return lista
+	return array
 }
 
 func main() {
-	a := 2
-	b := 3
-	c := a * b
+	useCaseImplementation := calculate_age.Implementation{}
+	gatewayImplementation := person_gateway.Gateway{}
 
-	if a < b && b <= 2 {
-		fmt.Println("a es menor a b y b es menor igual a 2")
-	} else {
-		fmt.Println("ok", c)
-	}
+	person := entities.Person{1, "fede", "veron", time.Date(2000, 2, 19, 14, 0, 0, 0, time.Local)}
 
-	switch a {
-	case 1:
-		fmt.Println("1")
-	case 2:
-		fmt.Println("2")
-	default:
-		fmt.Println("otro")
-	}
-
-	lista := []string{
-		"hola", "chau",
-	}
-
-	persona := Person{1, "fede", "fede", time.Now()}
-	fmt.Println("edad", persona.CalculateAge())
-
-	recorrerLista(lista)
-
+	useCasePerson := gatewayImplementation.MapEntitiePersonToPersonUseCase(person)
+	res := useCaseImplementation.CalculateAge(useCasePerson)
+	fmt.Print(res)
 }
