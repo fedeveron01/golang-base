@@ -7,7 +7,7 @@ type CalculateAgeUseCase interface {
 type Implementation struct {
 }
 
-func CalculateAge(person Person) int {
-	clock := Clock{}
+func (c *Implementation) CalculateAge(person Person) int {
+	clock := ClockImplementation{}
 	return person.CalculateAge(clock)
 }
