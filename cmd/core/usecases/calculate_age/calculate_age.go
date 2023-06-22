@@ -1,7 +1,7 @@
 package calculate_age
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/internal/clock"
 )
 
