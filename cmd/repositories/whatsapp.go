@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/mdp/qrterminal"
 	"go.mau.fi/whatsmeow"
@@ -17,8 +19,6 @@ type WhatsappRepository struct {
 }
 
 func NewWhatsappRepository(client *whatsmeow.Client) *WhatsappRepository {
-	connectClient(client)
-
 	return &WhatsappRepository{client: client}
 }
 
@@ -41,11 +41,11 @@ func (r *WhatsappRepository) SendText(to string, text string) error {
 	return nil
 }
 
-func connectClient(client *whatsmeow.Client) {
-	if client.Store.ID == nil {
+func (wr WhatsappRepository) ConnectClient() {
+	if wr.client.Store.ID == nil {
 		// No ID stored, new login
-		qrChan, _ := client.GetQRChannel(context.Background())
-		err := client.Connect()
+		qrChan, _ := wr.client.GetQRChannel(context.Background())
+		err := wr.client.Connect()
 		if err != nil {
 			panic(err)
 		}
@@ -62,10 +62,15 @@ func connectClient(client *whatsmeow.Client) {
 		}
 	} else {
 		// Already logged in, just connect
-		err := client.Connect()
+		err := wr.client.Connect()
 		if err != nil {
 			panic(err)
 		}
 	}
+	// Listen to Ctrl+C (you can also do something else that prevents the program from exiting)
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	<-c
+	wr.client.Disconnect()
 
 }

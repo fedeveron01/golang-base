@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fedeveron01/golang-base/cmd/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/stretchr/testify/assert"
 )
 

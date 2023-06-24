@@ -2,6 +2,7 @@ package subscription
 
 import (
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/providers"
 )
 
 type SubscriptionUseCase interface {
@@ -9,6 +10,13 @@ type SubscriptionUseCase interface {
 }
 
 type Implementation struct {
+	whatsappNotifications providers.WhatsappNotifications
+}
+
+func NewUseCase(whatsappNotifications providers.WhatsappNotifications) Implementation {
+	return Implementation{
+		whatsappNotifications: whatsappNotifications,
+	}
 }
 
 func (c Implementation) CreateSubscription(subscription entities.Subscription) (entities.Subscription, error) {
