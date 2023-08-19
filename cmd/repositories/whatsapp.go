@@ -41,7 +41,7 @@ func (r *WhatsappRepository) SendText(to string, text string) error {
 	return nil
 }
 
-func (wr WhatsappRepository) ConnectClient() {
+func (wr WhatsappRepository) ConnectClient(c chan os.Signal) {
 	if wr.client.Store.ID == nil {
 		// No ID stored, new login
 		qrChan, _ := wr.client.GetQRChannel(context.Background())
@@ -68,7 +68,6 @@ func (wr WhatsappRepository) ConnectClient() {
 		}
 	}
 	// Listen to Ctrl+C (you can also do something else that prevents the program from exiting)
-	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 	wr.client.Disconnect()

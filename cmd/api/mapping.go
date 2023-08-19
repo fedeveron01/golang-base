@@ -10,7 +10,7 @@ import (
 )
 
 func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer) {
-	app.HandleFunc("/api", handlers.CalculateAge.Handle).Methods("GET")
+	app.HandleFunc("/api/{phone}/{message}", handlers.CalculateAge.Handle).Methods("GET")
 	app.HandleFunc("/whatsappServer", handlers.Whatsapp.Handle).Methods("GET")
 	app.HandleFunc("/api/subscriptions", handlers.GetAllSubscription.Handle).Methods("GET")
 	app.HandleFunc("/api/subscriptions/{id}", handlers.GetSubscription.Handle).Methods("GET")

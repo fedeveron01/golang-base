@@ -70,7 +70,7 @@ func Start() HandlerContainer {
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
-	handlerContainer.CalculateAge = handler_person.NewPersonGetAllHandler(calculateAgeUseCase)
+	handlerContainer.CalculateAge = handler_person.NewPersonGetAllHandler(calculateAgeUseCase, *whatsappRepository)
 	handlerContainer.Whatsapp = handler_whatsapp.NewWhatsappHandlerHandler(*whatsappRepository)
 	handlerContainer.GetAllSubscription = handler_subscriptions.NewGetAllSubscriptionHandler(*subscriptionRepository)
 	handlerContainer.GetSubscription = handler_subscriptions.NewGetSubscriptionHandler(*subscriptionRepository)

@@ -3,6 +3,7 @@ package handler_whatsapp
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 )
@@ -23,7 +24,8 @@ func NewWhatsappHandlerHandler(whatsappRepository repositories.WhatsappRepositor
 func (wh WhatsappHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Starting whatsapp server")
 	fmt.Fprint(w, "whatsapp server")
-	wh.WhatsappRepository.ConnectClient()
+	c := make(chan os.Signal)
+	wh.WhatsappRepository.ConnectClient(c)
 	//p.CalculateAge.CalculateAge()
 
 }
