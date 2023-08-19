@@ -31,8 +31,15 @@ func (p PersonGetAllHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	phone := params["phone"]
 	message := params["message"]
 
-	p.WhatsappRepository.SendText(phone, message)
-	fmt.Fprint(w, "Sending message "+message+" to "+phone)
+	err := p.WhatsappRepository.SendText(phone, message)
+	if err != nil {
+		fmt.Errorf(err.Error())
+		w.WriteHeader(500)
+
+	} else {
+		fmt.Fprint(w, "Sending message "+message+" to "+phone)
+
+	}
 
 	//p.CalculateAge.CalculateAge()
 
