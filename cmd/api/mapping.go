@@ -10,13 +10,10 @@ import (
 )
 
 func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer) {
-	app.HandleFunc("/api/{phone}/{message}", handlers.CalculateAge.Handle).Methods("GET")
-	app.HandleFunc("/whatsappServer", handlers.Whatsapp.Handle).Methods("GET")
-	app.HandleFunc("/api/subscriptions", handlers.GetAllSubscription.Handle).Methods("GET")
-	app.HandleFunc("/api/subscriptions/{id}", handlers.GetSubscription.Handle).Methods("GET")
-	app.HandleFunc("/api/subscriptions/{id}", handlers.EditSubscription.Handle).Methods("PUT")
-	app.HandleFunc("/api/subscriptions/{id}", handlers.DeleteSubscription.Handle).Methods("DELETE")
-	app.HandleFunc("/api/subscriptions", handlers.CreateSubscription.Handle).Methods("POST")
+
+	//material
+	app.HandleFunc("/api/material", handlers.GetAllMaterial.Handle).Methods("GET")
+	app.HandleFunc("/api/material", handlers.CreateMaterial.Handle).Methods("POST")
 
 	fmt.Println("Starting app in localhost:8080")
 

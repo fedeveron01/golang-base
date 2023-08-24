@@ -2,7 +2,6 @@ package handler_person
 
 import (
 	"fmt"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"github.com/gorilla/mux"
 	"net/http"
 
@@ -15,14 +14,12 @@ import (
 
 type PersonGetAllHandler struct {
 	// use cases
-	CalculateAge       calculate_age.CalculateAgeUseCase
-	WhatsappRepository repositories.WhatsappRepository
+	CalculateAge calculate_age.CalculateAgeUseCase
 }
 
-func NewPersonGetAllHandler(calculateAge calculate_age.CalculateAgeUseCase, whatsappRepository repositories.WhatsappRepository) PersonGetAllHandler {
+func NewPersonGetAllHandler(calculateAge calculate_age.CalculateAgeUseCase) PersonGetAllHandler {
 	return PersonGetAllHandler{
-		CalculateAge:       calculateAge,
-		WhatsappRepository: whatsappRepository,
+		CalculateAge: calculateAge,
 	}
 }
 
@@ -31,15 +28,7 @@ func (p PersonGetAllHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	phone := params["phone"]
 	message := params["message"]
 
-	err := p.WhatsappRepository.SendText(phone, message)
-	if err != nil {
-		fmt.Errorf(err.Error())
-		w.WriteHeader(500)
-
-	} else {
-		fmt.Fprint(w, "Sending message "+message+" to "+phone)
-
-	}
+	fmt.Println(phone, message)
 
 	//p.CalculateAge.CalculateAge()
 
