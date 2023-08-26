@@ -6,7 +6,6 @@ import (
 	material_usecase "github.com/fedeveron01/golang-base/cmd/core/usecases/material"
 	"github.com/fedeveron01/golang-base/cmd/entrypoints"
 	material_handler "github.com/fedeveron01/golang-base/cmd/entrypoints/handlers/material"
-	handler_subscriptions "github.com/fedeveron01/golang-base/cmd/entrypoints/handlers/subscriptions"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -15,12 +14,8 @@ import (
 //inject dependencies..
 
 type HandlerContainer struct {
-	CalculateAge       entrypoints.Handler
-	EditSubscription   entrypoints.Handler
-	DeleteSubscription entrypoints.Handler
-	CreateSubscription entrypoints.Handler
-	GetAllMaterial     entrypoints.Handler
-	CreateMaterial     entrypoints.Handler
+	GetAllMaterial entrypoints.Handler
+	CreateMaterial entrypoints.Handler
 }
 
 func Start() HandlerContainer {
@@ -32,7 +27,10 @@ func Start() HandlerContainer {
 		panic("failed to connect database")
 	}
 	err = db.AutoMigrate(
-		entities.Material{},
+		entities.User{}, entities.Charge{}, entities.Employee{}, entities.Material{},
+		entities.MaterialProduct{}, entities.MaterialType{}, entities.MeasurementUnit{},
+		entities.Product{}, entities.ProductionOrder{}, entities.ProductionOrderDetail{},
+		entities.PurchaseOrder{}, entities.PurchaseOrderDetail{}, entities.Session{},
 	)
 	if err != nil {
 		panic("failed to migrate database")
@@ -41,7 +39,6 @@ func Start() HandlerContainer {
 
 	// inject repositories
 
-	subscriptionRepository := repositories.NewSubscriptionRepository(db)
 	materialRepository := repositories.NewMaterialRepository(db)
 
 	// inject use cases
@@ -49,9 +46,6 @@ func Start() HandlerContainer {
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
-	handlerContainer.EditSubscription = handler_subscriptions.NewEditSubscriptionHandler(*subscriptionRepository)
-	handlerContainer.DeleteSubscription = handler_subscriptions.NewDeleteSubscriptionHandler(*subscriptionRepository)
-	handlerContainer.CreateSubscription = handler_subscriptions.NewCreateSubscriptionHandler(*subscriptionRepository)
 
 	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(*materialUseCase)
 	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(*materialUseCase)
