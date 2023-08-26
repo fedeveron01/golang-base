@@ -8,6 +8,8 @@ type Employee struct {
 	DNI              string
 	UserId           uint
 	User             User
+	ChargeId         uint
+	Charge           Charge
 	ProductionOrders []ProductionOrder
 	PurchaseOrders   []PurchaseOrder
 }
