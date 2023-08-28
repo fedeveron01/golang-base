@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/usecases/material"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -24,12 +24,13 @@ func NewCreateMaterialHandler(materialUsecase material_usecase.Implementation) C
 }
 
 func (p CreateMaterialHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	var material entities.Material
 	json.Unmarshal(reqBody, &material)
 	err := p.materialUsecase.CreateMaterial(material)
 	if err != nil {
-		fmt.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err)
 	}
 }
 

@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	material_usecase "github.com/fedeveron01/golang-base/cmd/core/usecases/material"
+	user_usecase "github.com/fedeveron01/golang-base/cmd/core/usecases/user"
 	"github.com/fedeveron01/golang-base/cmd/entrypoints"
 	material_handler "github.com/fedeveron01/golang-base/cmd/entrypoints/handlers/material"
+	user_handler "github.com/fedeveron01/golang-base/cmd/entrypoints/handlers/user"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,8 +16,12 @@ import (
 //inject dependencies..
 
 type HandlerContainer struct {
+	//material
 	GetAllMaterial entrypoints.Handler
 	CreateMaterial entrypoints.Handler
+	//user
+	CreateUser entrypoints.Handler
+	LoginUser  entrypoints.Handler
 }
 
 func Start() HandlerContainer {
@@ -38,17 +44,23 @@ func Start() HandlerContainer {
 	fmt.Println("OK")
 
 	// inject repositories
-
 	materialRepository := repositories.NewMaterialRepository(db)
+	userRepository := repositories.NewUserRepository(db)
+	sessionRepository := repositories.NewSessionRepository(db)
+	employeeRepository := repositories.NewEmployeeRepository(db)
 
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialRepository)
+	userUseCase := user_usecase.NewUserUsecase(userRepository, sessionRepository, employeeRepository)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
 
 	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(*materialUseCase)
 	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(*materialUseCase)
+
+	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(*userUseCase)
+	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(*userUseCase)
 
 	//handlerContainer.CalculateAge = calculateAgeHandler
 	return handlerContainer
