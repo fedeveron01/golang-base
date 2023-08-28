@@ -100,8 +100,9 @@ func generateToken(employee entities.Employee) (string, error) {
 	var role string
 	if employee.ID == 0 {
 		role = "none"
+	} else {
+		role = employee.Charge.Name
 	}
-	role = employee.Charge.Name
 	t.Claims = &internal_jwt.Claims{
 		StandardClaims: &jwt.StandardClaims{
 
