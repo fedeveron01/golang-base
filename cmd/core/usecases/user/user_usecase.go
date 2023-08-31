@@ -2,7 +2,7 @@ package user_usecase
 
 import (
 	"errors"
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	entities2 "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/providers"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/golang-jwt/jwt"
@@ -11,9 +11,9 @@ import (
 )
 
 type UserUsecase interface {
-	CreateUser(user entities.User) error
-	FindUserByUsernameAndPassword(username string, password string) (entities.User, error)
-	UpdateUser(user entities.Material) error
+	CreateUser(user entities2.User) error
+	FindUserByUsernameAndPassword(username string, password string) (entities2.User, error)
+	UpdateUser(user entities2.Material) error
 	DeleteUser(id string) error
 }
 type Implementation struct {
@@ -32,7 +32,7 @@ func NewUserUsecase(userProvider providers.UserProvider,
 	}
 }
 
-func (i *Implementation) CreateUser(user entities.User) (string, error) {
+func (i *Implementation) CreateUser(user entities2.User) (string, error) {
 	if user.UserName == "" || user.Password == "" {
 		return "", errors.New("username or password is empty")
 	}
@@ -74,7 +74,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 		return "", errors.New("username or password is incorrect")
 	}
 	// create session
-	session := entities.Session{
+	session := entities2.Session{
 		User: user,
 	}
 	err := i.sessionProvider.CreateSession(session)
@@ -88,14 +88,14 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 	}
 	return generateToken(employee)
 }
-func (i *Implementation) UpdateUser(user entities.User) error {
+func (i *Implementation) UpdateUser(user entities2.User) error {
 	return i.userProvider.UpdateUser(user)
 }
 func (i *Implementation) DeleteUser(id string) error {
 	return i.userProvider.DeleteUser(id)
 }
 
-func generateToken(employee entities.Employee) (string, error) {
+func generateToken(employee entities2.Employee) (string, error) {
 	t := jwt.New(jwt.SigningMethodHS256)
 	var role string
 	if employee.ID == 0 {

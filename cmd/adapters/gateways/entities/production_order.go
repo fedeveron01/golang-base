@@ -1,13 +1,14 @@
-package entities
+package gateway_entities
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/core"
+	"gorm.io/gorm"
 	"time"
 )
 
 type ProductionOrder struct {
-	core.EntitiesBase
+	gorm.Model
 	StartDateTime         time.Time
 	EndDateTime           time.Time
 	ProductionOrderDetail []ProductionOrderDetail
+	EmployeeID            uint
 }

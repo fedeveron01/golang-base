@@ -2,7 +2,7 @@ package infrastructure
 
 import (
 	"fmt"
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	entities2 "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	material_usecase "github.com/fedeveron01/golang-base/cmd/core/usecases/material"
 	user_usecase "github.com/fedeveron01/golang-base/cmd/core/usecases/user"
 	"github.com/fedeveron01/golang-base/cmd/entrypoints"
@@ -33,10 +33,10 @@ func Start() HandlerContainer {
 		panic("failed to connect database")
 	}
 	err = db.AutoMigrate(
-		entities.User{}, entities.Charge{}, entities.Employee{}, entities.Material{},
-		entities.MaterialProduct{}, entities.MaterialType{}, entities.MeasurementUnit{},
-		entities.Product{}, entities.ProductionOrder{}, entities.ProductionOrderDetail{},
-		entities.PurchaseOrder{}, entities.PurchaseOrderDetail{}, entities.Session{},
+		entities2.User{}, entities2.Charge{}, entities2.Employee{}, entities2.Material{},
+		entities2.MaterialProduct{}, entities2.MaterialType{}, entities2.MeasurementUnit{},
+		entities2.Product{}, entities2.ProductionOrder{}, entities2.ProductionOrderDetail{},
+		entities2.PurchaseOrder{}, entities2.PurchaseOrderDetail{}, entities2.Session{},
 	)
 	if err != nil {
 		panic("failed to migrate database")

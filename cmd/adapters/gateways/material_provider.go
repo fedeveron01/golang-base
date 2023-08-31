@@ -1,4 +1,4 @@
-package providers
+package gateways
 
 import (
 	"github.com/fedeveron01/golang-base/cmd/core/entities"

@@ -1,15 +1,13 @@
 package entities
 
-import "gorm.io/gorm"
+import "github.com/fedeveron01/golang-base/cmd/core"
 
 type Material struct {
-	gorm.Model
-	Name              string
-	Description       string
-	Price             float64
-	Stock             int
-	MaterialTypeId    uint
-	MaterialType      MaterialType
-	MeasurementUnitId uint
-	MeasurementUnit   MeasurementUnit
+	core.EntitiesBase
+	Name            string
+	Description     string
+	Price           float64
+	Stock           int
+	MaterialType    MaterialType
+	MeasurementUnit MeasurementUnit
 }

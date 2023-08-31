@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +15,7 @@ func NewSessionRepository(database *gorm.DB) *SessionRepository {
 	}
 }
 
-func (r *SessionRepository) CreateSession(session entities.Session) error {
+func (r *SessionRepository) CreateSession(session gateway_entities.Session) error {
 	id := r.db.Create(&session)
 	if id.Error != nil {
 		return id.Error
@@ -23,18 +23,18 @@ func (r *SessionRepository) CreateSession(session entities.Session) error {
 	return nil
 }
 
-func (r *SessionRepository) FindAll() ([]entities.Session, error) {
-	var sessions []entities.Session
+func (r *SessionRepository) FindAll() ([]gateway_entities.Session, error) {
+	var sessions []gateway_entities.Session
 	r.db.Find(&sessions)
 	return sessions, nil
 }
 
-func (r *SessionRepository) UpdateSession(session entities.Session) error {
+func (r *SessionRepository) UpdateSession(session gateway_entities.Session) error {
 	r.db.Save(&session)
 	return nil
 }
 
 func (r *SessionRepository) DeleteSession(id string) error {
-	r.db.Delete(&entities.Session{}, id)
+	r.db.Delete(&gateway_entities.Session{}, id)
 	return nil
 }

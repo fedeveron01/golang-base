@@ -3,7 +3,6 @@ package material_handler
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/usecases/material"
 	"io"
 	"net/http"

@@ -1,7 +1,6 @@
 package material_usecase
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/providers"
 )
 

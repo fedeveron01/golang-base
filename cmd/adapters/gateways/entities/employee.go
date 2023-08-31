@@ -1,12 +1,14 @@
-package entities
+package gateway_entities
 
-import "github.com/fedeveron01/golang-base/cmd/core"
+import "gorm.io/gorm"
 
 type Employee struct {
-	core.EntitiesBase
+	gorm.Model
 	Name             string
 	DNI              string
+	UserId           uint
 	User             User
+	ChargeId         uint
 	Charge           Charge
 	ProductionOrders []ProductionOrder
 	PurchaseOrders   []PurchaseOrder

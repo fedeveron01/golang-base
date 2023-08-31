@@ -2,7 +2,6 @@ package user_handler
 
 import (
 	"encoding/json"
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/usecases/user"
 	"io"
 	"net/http"

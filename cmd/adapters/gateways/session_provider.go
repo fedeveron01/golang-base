@@ -1,6 +1,8 @@
-package providers
+package gateways
 
-import "github.com/fedeveron01/golang-base/cmd/core/entities"
+import (
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
+)
 
 type SessionProvider interface {
 	CreateSession(session entities.Session) error

@@ -1,9 +1,8 @@
 package entities
 
-import "gorm.io/gorm"
+import "github.com/fedeveron01/golang-base/cmd/core"
 
 type Session struct {
-	gorm.Model
-	UserId uint
-	User   User
+	core.EntitiesBase
+	User User
 }
