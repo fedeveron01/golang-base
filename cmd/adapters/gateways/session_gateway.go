@@ -20,10 +20,6 @@ func NewSessionGateway(sessionRepository repositories.SessionRepository) *Sessio
 func (i *SessionGatewayImpl) CreateSession(session entities.Session) error {
 	sessionDB := gateway_entities.Session{
 		UserId: session.User.ID,
-		User: gateway_entities.User{
-			UserName: session.User.UserName,
-			Password: session.User.Password,
-		},
 	}
 
 	err := i.sessionRepository.CreateSession(sessionDB)
