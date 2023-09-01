@@ -2,13 +2,14 @@ package infrastructure
 
 import (
 	"fmt"
-	entities2 "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
-	material_usecase "github.com/fedeveron01/golang-base/cmd/core/usecases/material"
-	user_usecase "github.com/fedeveron01/golang-base/cmd/core/usecases/user"
-	"github.com/fedeveron01/golang-base/cmd/entrypoints"
-	material_handler "github.com/fedeveron01/golang-base/cmd/entrypoints/handlers/material"
-	user_handler "github.com/fedeveron01/golang-base/cmd/entrypoints/handlers/user"
+	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
+	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
+	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/user"
+	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
+	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"github.com/fedeveron01/golang-base/cmd/usecases/material"
+	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -33,10 +34,10 @@ func Start() HandlerContainer {
 		panic("failed to connect database")
 	}
 	err = db.AutoMigrate(
-		entities2.User{}, entities2.Charge{}, entities2.Employee{}, entities2.Material{},
-		entities2.MaterialProduct{}, entities2.MaterialType{}, entities2.MeasurementUnit{},
-		entities2.Product{}, entities2.ProductionOrder{}, entities2.ProductionOrderDetail{},
-		entities2.PurchaseOrder{}, entities2.PurchaseOrderDetail{}, entities2.Session{},
+		gateway_entities.User{}, gateway_entities.Charge{}, gateway_entities.Employee{}, gateway_entities.Material{},
+		gateway_entities.MaterialProduct{}, gateway_entities.MaterialType{}, gateway_entities.MeasurementUnit{},
+		gateway_entities.Product{}, gateway_entities.ProductionOrder{}, gateway_entities.ProductionOrderDetail{},
+		gateway_entities.PurchaseOrder{}, gateway_entities.PurchaseOrderDetail{}, gateway_entities.Session{},
 	)
 	if err != nil {
 		panic("failed to migrate database")
@@ -49,20 +50,25 @@ func Start() HandlerContainer {
 	sessionRepository := repositories.NewSessionRepository(db)
 	employeeRepository := repositories.NewEmployeeRepository(db)
 
+	// inject gateways
+	materialGateway := gateways.NewMaterialGateway(*materialRepository)
+	userGateway := gateways.NewUserGateway(*userRepository)
+	sessionGateway := gateways.NewSessionGateway(*sessionRepository)
+	employeeGateway := gateways.NewEmployeeGateway(*employeeRepository)
+
 	// inject use cases
-	materialUseCase := material_usecase.NewMaterialUsecase(materialRepository)
-	userUseCase := user_usecase.NewUserUsecase(userRepository, sessionRepository, employeeRepository)
+	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
+	userUseCase := user_usecase.NewUserUsecase(userGateway, sessionGateway, employeeGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
 
-	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(*materialUseCase)
-	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(*materialUseCase)
+	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(materialUseCase)
+	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(materialUseCase)
 
-	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(*userUseCase)
-	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(*userUseCase)
+	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(userUseCase)
+	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(userUseCase)
 
-	//handlerContainer.CalculateAge = calculateAgeHandler
 	return handlerContainer
 
 }

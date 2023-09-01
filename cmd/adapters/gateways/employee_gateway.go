@@ -2,28 +2,55 @@ package gateways
 
 import (
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
+	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 )
 
-type EmployeeGateway interface {
-	CreateEmployee(employee entities.Employee) error
-	FindEmployeeByUserId(id uint) (entities.Employee, error)
-	FindAll() ([]entities.Employee, error)
-	UpdateEmployee(employee entities.Employee) error
-	DeleteEmployee(id string) error
-}
-
 type EmployeeGatewayImpl struct {
-	repository repositories.EmployeeRepository
+	employeeRepository repositories.EmployeeRepository
 }
 
-func (e EmployeeGatewayImpl) CreateEmployee(employee gateway_entities.Employee) error {
-	return e.repository.CreateEmployee(employee)
+func NewEmployeeGateway(employeeRepository repositories.EmployeeRepository) *EmployeeGatewayImpl {
+	return &EmployeeGatewayImpl{
+		employeeRepository: employeeRepository,
+	}
+}
+
+func (e EmployeeGatewayImpl) CreateEmployee(employee entities.Employee) error {
+	employeeDB := gateway_entities.Employee{
+		Name: employee.Name,
+		DNI:  employee.DNI,
+		User: gateway_entities.User{
+			UserName: employee.User.UserName,
+			Password: employee.User.Password,
+		},
+		Charge: gateway_entities.Charge{
+			Name: employee.Charge.Name,
+		},
+	}
+
+	return e.employeeRepository.CreateEmployee(employeeDB)
+}
+
+func (e EmployeeGatewayImpl) UpdateEmployee(employee entities.Employee) error {
+
+	employeeDB := gateway_entities.Employee{
+		Name: employee.Name,
+		DNI:  employee.DNI,
+		User: gateway_entities.User{
+			UserName: employee.User.UserName,
+			Password: employee.User.Password,
+		},
+		Charge: gateway_entities.Charge{
+			Name: employee.Charge.Name,
+		},
+	}
+	return e.employeeRepository.UpdateEmployee(employeeDB)
 }
 
 func (e EmployeeGatewayImpl) FindEmployeeByUserId(id uint) (entities.Employee, error) {
-	employeeDB, err := e.repository.FindEmployeeByUserId(id)
+	employeeDB, err := e.employeeRepository.FindEmployeeByUserId(id)
 
 	// map production orders
 	productionOrders := make([]entities.ProductionOrder, len(employeeDB.ProductionOrders))
@@ -65,6 +92,9 @@ func (e EmployeeGatewayImpl) FindEmployeeByUserId(id uint) (entities.Employee, e
 	}
 
 	employee := entities.Employee{
+		EntitiesBase: core.EntitiesBase{
+			ID: employeeDB.ID,
+		},
 		Name: employeeDB.Name,
 		DNI:  employeeDB.DNI,
 		User: entities.User{
@@ -82,13 +112,16 @@ func (e EmployeeGatewayImpl) FindEmployeeByUserId(id uint) (entities.Employee, e
 }
 
 func (e EmployeeGatewayImpl) FindAll() ([]entities.Employee, error) {
-	employeesDB, err := e.repository.FindAll()
+	employeesDB, err := e.employeeRepository.FindAll()
 	if err != nil {
 		return nil, err
 	}
 	employees := make([]entities.Employee, len(employeesDB))
 	for i, employeeDB := range employeesDB {
 		employees[i] = entities.Employee{
+			EntitiesBase: core.EntitiesBase{
+				ID: employeeDB.ID,
+			},
 			Name: employeeDB.Name,
 			DNI:  employeeDB.DNI,
 			User: entities.User{
@@ -101,4 +134,8 @@ func (e EmployeeGatewayImpl) FindAll() ([]entities.Employee, error) {
 		}
 	}
 	return employees, err
+}
+
+func (e EmployeeGatewayImpl) DeleteEmployee(id string) error {
+	return e.employeeRepository.DeleteEmployee(id)
 }

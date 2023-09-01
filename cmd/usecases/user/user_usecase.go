@@ -2,8 +2,7 @@ package user_usecase
 
 import (
 	"errors"
-	entities2 "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
-	"github.com/fedeveron01/golang-base/cmd/core/providers"
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -11,38 +10,62 @@ import (
 )
 
 type UserUsecase interface {
-	CreateUser(user entities2.User) error
-	FindUserByUsernameAndPassword(username string, password string) (entities2.User, error)
-	UpdateUser(user entities2.Material) error
+	CreateUser(user entities.User) (string, error)
+	UpdateUser(user entities.User) error
 	DeleteUser(id string) error
-}
-type Implementation struct {
-	userProvider     providers.UserProvider
-	sessionProvider  providers.SessionProvider
-	employeeProvider providers.EmployeeProvider
+	LoginUser(username string, password string) (string, error)
 }
 
-func NewUserUsecase(userProvider providers.UserProvider,
-	sessionProvider providers.SessionProvider,
-	employeeProvider providers.EmployeeProvider) *Implementation {
+type UserGateway interface {
+	CreateUser(user entities.User) error
+	FindUserByUsernameAndPassword(username string, password string) (entities.User, error)
+	FindUserByUsername(username string) entities.User
+	UpdateUser(user entities.User) error
+	DeleteUser(id string) error
+}
+
+type SessionGateway interface {
+	CreateSession(session entities.Session) error
+	FindAll() ([]entities.Session, error)
+	UpdateSession(session entities.Session) error
+	DeleteSession(id string) error
+}
+
+type EmployeeGateway interface {
+	CreateEmployee(employee entities.Employee) error
+	FindEmployeeByUserId(id uint) (entities.Employee, error)
+	FindAll() ([]entities.Employee, error)
+	UpdateEmployee(employee entities.Employee) error
+	DeleteEmployee(id string) error
+}
+
+type Implementation struct {
+	userGateway     UserGateway
+	sessionGateway  SessionGateway
+	employeeGateway EmployeeGateway
+}
+
+func NewUserUsecase(userGateway UserGateway,
+	sessionGateway SessionGateway,
+	employeeGateway EmployeeGateway) *Implementation {
 	return &Implementation{
-		userProvider:     userProvider,
-		sessionProvider:  sessionProvider,
-		employeeProvider: employeeProvider,
+		userGateway:     userGateway,
+		sessionGateway:  sessionGateway,
+		employeeGateway: employeeGateway,
 	}
 }
 
-func (i *Implementation) CreateUser(user entities2.User) (string, error) {
+func (i *Implementation) CreateUser(user entities.User) (string, error) {
 	if user.UserName == "" || user.Password == "" {
 		return "", errors.New("username or password is empty")
 	}
 	user.Password = encryptPassword(user.Password)
 
-	userRepeated := i.userProvider.FindUserByUsername(user.UserName)
+	userRepeated := i.userGateway.FindUserByUsername(user.UserName)
 	if userRepeated.ID != 0 {
 		return "", errors.New("username already exists")
 	}
-	err := i.userProvider.CreateUser(user)
+	err := i.userGateway.CreateUser(user)
 	if err != nil {
 		return "", err
 	}
@@ -66,7 +89,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 	if username == "" || password == "" {
 		return "", errors.New("username or password is empty")
 	}
-	user := i.userProvider.FindUserByUsername(username)
+	user := i.userGateway.FindUserByUsername(username)
 	if user.ID == 0 {
 		return "", errors.New("user not found")
 	}
@@ -74,28 +97,28 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 		return "", errors.New("username or password is incorrect")
 	}
 	// create session
-	session := entities2.Session{
+	session := entities.Session{
 		User: user,
 	}
-	err := i.sessionProvider.CreateSession(session)
+	err := i.sessionGateway.CreateSession(session)
 	if err != nil {
 		return "", err
 	}
 	// get employee
-	employee, err := i.employeeProvider.FindEmployeeByUserId(user.ID)
+	employee, err := i.employeeGateway.FindEmployeeByUserId(user.ID)
 	if err != nil {
 		return "", err
 	}
 	return generateToken(employee)
 }
-func (i *Implementation) UpdateUser(user entities2.User) error {
-	return i.userProvider.UpdateUser(user)
+func (i *Implementation) UpdateUser(user entities.User) error {
+	return i.userGateway.UpdateUser(user)
 }
 func (i *Implementation) DeleteUser(id string) error {
-	return i.userProvider.DeleteUser(id)
+	return i.userGateway.DeleteUser(id)
 }
 
-func generateToken(employee entities2.Employee) (string, error) {
+func generateToken(employee entities.Employee) (string, error) {
 	t := jwt.New(jwt.SigningMethodHS256)
 	var role string
 	if employee.ID == 0 {
