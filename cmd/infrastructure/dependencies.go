@@ -58,7 +58,7 @@ func Start() HandlerContainer {
 
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
-	userUseCase := user_usecase.NewUserUsecase(userGateway, sessionGateway, employeeGateway)
+	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}

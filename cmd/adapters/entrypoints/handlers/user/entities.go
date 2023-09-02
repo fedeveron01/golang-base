@@ -5,6 +5,15 @@ type LoginRequest struct {
 	Password string
 }
 
+type CreateUserRequest struct {
+	UserName string
+	Password string
+	Name     string
+	LastName string
+	DNI      string
+	Charge   string
+}
+
 type TokenResponse struct {
 	Token string
 }

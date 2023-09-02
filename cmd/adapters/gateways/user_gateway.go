@@ -18,16 +18,23 @@ func NewUserGateway(userRepository repositories.UserRepository) *UserGatewayImpl
 	}
 }
 
-func (i *UserGatewayImpl) CreateUser(user entities.User) error {
+func (i *UserGatewayImpl) CreateUser(user entities.User) (entities.User, error) {
 	userDB := gateway_entities.User{
 		UserName: user.UserName,
 		Password: user.Password,
 	}
-	err := i.userRepository.CreateUser(userDB)
+	created, err := i.userRepository.CreateUser(userDB)
 	if err != nil {
-		return err
+		return entities.User{}, err
 	}
-	return nil
+	user = entities.User{
+		EntitiesBase: core.EntitiesBase{
+			ID: created.ID,
+		},
+		UserName: created.UserName,
+		Password: created.Password,
+	}
+	return user, nil
 }
 
 func (i *UserGatewayImpl) FindUserByUsernameAndPassword(username string, password string) (entities.User, error) {

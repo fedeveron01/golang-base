@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-type UserUsecase interface {
-	CreateUser(user entities.User) (string, error)
+type UserUseCase interface {
+	CreateUser(user entities.User, employee entities.Employee) (string, error)
 	UpdateUser(user entities.User) error
 	DeleteUser(id string) error
 	LoginUser(username string, password string) (string, error)
@@ -45,7 +45,7 @@ type Implementation struct {
 	employeeGateway EmployeeGateway
 }
 
-func NewUserUsecase(userGateway UserGateway,
+func NewUserUseCase(userGateway UserGateway,
 	sessionGateway SessionGateway,
 	employeeGateway EmployeeGateway) *Implementation {
 	return &Implementation{
@@ -55,7 +55,7 @@ func NewUserUsecase(userGateway UserGateway,
 	}
 }
 
-func (i *Implementation) CreateUser(user entities.User) (string, error) {
+func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) (string, error) {
 	if user.UserName == "" || user.Password == "" {
 		return "", errors.New("username or password is empty")
 	}
@@ -69,6 +69,8 @@ func (i *Implementation) CreateUser(user entities.User) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	employee.User = user
+	err = i.employeeGateway.CreateEmployee(employee)
 	return i.LoginUser(user.UserName, user.Password)
 }
 
@@ -132,7 +134,7 @@ func generateToken(employee entities.Employee) (string, error) {
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
 		TokenType:  "level1",
-		EmployeeId: employee.ID,
+		EmployeeId: float64(employee.ID),
 		Role:       role,
 	}
 
