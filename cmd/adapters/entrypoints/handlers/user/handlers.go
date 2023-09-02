@@ -3,18 +3,18 @@ package user_handler
 import (
 	"encoding/json"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	"github.com/fedeveron01/golang-base/cmd/core/usecases/user"
+	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"io"
 	"net/http"
 )
 
 type CreateUserHandler struct {
-	userUsecase user_usecase.Implementation
+	userUsercase user_usecase.UserUsecase
 }
 
-func NewCreateUserHandler(userUsecase user_usecase.Implementation) CreateUserHandler {
+func NewCreateUserHandler(userUsecase user_usecase.UserUsecase) CreateUserHandler {
 	return CreateUserHandler{
-		userUsecase: userUsecase,
+		userUsercase: userUsecase,
 	}
 }
 
@@ -22,7 +22,7 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
 	var user entities.User
 	json.Unmarshal(reqBody, &user)
-	token, err := p.userUsecase.CreateUser(user)
+	token, err := p.userUsercase.CreateUser(user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err.Error())
@@ -33,10 +33,10 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 type LoginUserHandler struct {
-	userUsecase user_usecase.Implementation
+	userUsecase user_usecase.UserUsecase
 }
 
-func NewLoginUserHandler(userUsecase user_usecase.Implementation) LoginUserHandler {
+func NewLoginUserHandler(userUsecase user_usecase.UserUsecase) LoginUserHandler {
 	return LoginUserHandler{
 		userUsecase: userUsecase,
 	}

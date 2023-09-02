@@ -1,10 +1,9 @@
 package entities
 
-import "gorm.io/gorm"
+import "github.com/fedeveron01/golang-base/cmd/core"
 
 type PurchaseOrderDetail struct {
-	gorm.Model
-	Quantity   int
-	MaterialID uint
-	Material   Material
+	core.EntitiesBase
+	Quantity int
+	Material Material
 }

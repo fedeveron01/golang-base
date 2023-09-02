@@ -1,9 +1,9 @@
-package entities
+package gateway_entities
 
-import "github.com/fedeveron01/golang-base/cmd/core"
+import "gorm.io/gorm"
 
 type Product struct {
-	core.EntitiesBase
+	gorm.Model
 	Name            string
 	Description     string
 	Price           float64

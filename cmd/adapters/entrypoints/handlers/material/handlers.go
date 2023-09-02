@@ -4,20 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	"github.com/fedeveron01/golang-base/cmd/core/usecases/material"
+	"github.com/fedeveron01/golang-base/cmd/usecases/material"
 	"io"
 	"net/http"
 )
 
 type CreateMaterialHandler struct {
-	materialUsecase material_usecase.Implementation
+	materialUsecase material_usecase.MaterialUsecase
 }
 
 type GetAllMaterialHandler struct {
-	materialUsecase material_usecase.Implementation
+	materialUsecase material_usecase.MaterialUsecase
 }
 
-func NewCreateMaterialHandler(materialUsecase material_usecase.Implementation) CreateMaterialHandler {
+func NewCreateMaterialHandler(materialUsecase material_usecase.MaterialUsecase) CreateMaterialHandler {
 	return CreateMaterialHandler{
 		materialUsecase: materialUsecase,
 	}
@@ -34,7 +34,7 @@ func (p CreateMaterialHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func NewGetAllMaterialHandler(materialUsecase material_usecase.Implementation) GetAllMaterialHandler {
+func NewGetAllMaterialHandler(materialUsecase material_usecase.MaterialUsecase) GetAllMaterialHandler {
 	return GetAllMaterialHandler{
 		materialUsecase: materialUsecase,
 	}

@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +15,7 @@ func NewEmployeeRepository(database *gorm.DB) *EmployeeRepository {
 	}
 }
 
-func (r *EmployeeRepository) CreateEmployee(employee entities.Employee) error {
+func (r *EmployeeRepository) CreateEmployee(employee gateway_entities.Employee) error {
 	id := r.db.Create(&employee)
 	if id.Error != nil {
 		return id.Error
@@ -23,27 +23,27 @@ func (r *EmployeeRepository) CreateEmployee(employee entities.Employee) error {
 	return nil
 }
 
-func (r *EmployeeRepository) FindEmployeeByUserId(id uint) (entities.Employee, error) {
-	var employee entities.Employee
+func (r *EmployeeRepository) FindEmployeeByUserId(id uint) (gateway_entities.Employee, error) {
+	var employee gateway_entities.Employee
 	res := r.db.Where("user_id = ?", id).Find(&employee)
 	if res.Error != nil {
-		return entities.Employee{}, res.Error
+		return gateway_entities.Employee{}, res.Error
 	}
 	return employee, nil
 }
 
-func (r *EmployeeRepository) FindAll() ([]entities.Employee, error) {
-	var employees []entities.Employee
+func (r *EmployeeRepository) FindAll() ([]gateway_entities.Employee, error) {
+	var employees []gateway_entities.Employee
 	r.db.Find(&employees)
 	return employees, nil
 }
 
-func (r *EmployeeRepository) UpdateEmployee(employee entities.Employee) error {
+func (r *EmployeeRepository) UpdateEmployee(employee gateway_entities.Employee) error {
 	r.db.Save(&employee)
 	return nil
 }
 
 func (r *EmployeeRepository) DeleteEmployee(id string) error {
-	r.db.Delete(&entities.Employee{}, id)
+	r.db.Delete(&gateway_entities.Employee{}, id)
 	return nil
 }

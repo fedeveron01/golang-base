@@ -1,4 +1,4 @@
-package api
+package app
 
 import (
 	"github.com/fedeveron01/golang-base/cmd/infrastructure"
