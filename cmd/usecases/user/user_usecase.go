@@ -17,7 +17,7 @@ type UserUseCase interface {
 }
 
 type UserGateway interface {
-	CreateUser(user entities.User) error
+	CreateUser(user entities.User) (entities.User, error)
 	FindUserByUsernameAndPassword(username string, password string) (entities.User, error)
 	FindUserByUsername(username string) entities.User
 	UpdateUser(user entities.User) error
@@ -39,19 +39,28 @@ type EmployeeGateway interface {
 	DeleteEmployee(id string) error
 }
 
+type ChargeGateway interface {
+	FindByName(name string) (uint, error)
+	CreateCharge(charge entities.Charge) (entities.Charge, error)
+}
+
 type Implementation struct {
 	userGateway     UserGateway
 	sessionGateway  SessionGateway
 	employeeGateway EmployeeGateway
+	chargeGateway   ChargeGateway
 }
 
 func NewUserUseCase(userGateway UserGateway,
 	sessionGateway SessionGateway,
-	employeeGateway EmployeeGateway) *Implementation {
+	employeeGateway EmployeeGateway,
+	chargeGateway ChargeGateway,
+) *Implementation {
 	return &Implementation{
 		userGateway:     userGateway,
 		sessionGateway:  sessionGateway,
 		employeeGateway: employeeGateway,
+		chargeGateway:   chargeGateway,
 	}
 }
 
@@ -59,19 +68,30 @@ func (i *Implementation) CreateUser(user entities.User, employee entities.Employ
 	if user.UserName == "" || user.Password == "" {
 		return "", errors.New("username or password is empty")
 	}
+	decryptedPassword := user.Password
 	user.Password = encryptPassword(user.Password)
 
 	userRepeated := i.userGateway.FindUserByUsername(user.UserName)
 	if userRepeated.ID != 0 {
 		return "", errors.New("username already exists")
 	}
-	err := i.userGateway.CreateUser(user)
+	user, err := i.userGateway.CreateUser(user)
 	if err != nil {
 		return "", err
 	}
 	employee.User = user
+
+	chargeId, err := i.chargeGateway.FindByName(employee.Charge.Name)
+	if err != nil {
+		created, err := i.chargeGateway.CreateCharge(employee.Charge)
+		if err != nil {
+			return "", err
+		}
+		chargeId = created.ID
+	}
+	employee.Charge.ID = chargeId
 	err = i.employeeGateway.CreateEmployee(employee)
-	return i.LoginUser(user.UserName, user.Password)
+	return i.LoginUser(user.UserName, decryptedPassword)
 }
 
 func encryptPassword(password string) string {

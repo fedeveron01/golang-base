@@ -29,7 +29,10 @@ func (r UserRepository) CreateUser(user gateway_entities.User) (gateway_entities
 
 func (r *UserRepository) FindUserByUsername(username string) gateway_entities.User {
 	var user gateway_entities.User
-	r.db.Where("user_name = ?", username).First(&user)
+	res := r.db.Where("user_name = ?", username).First(&user)
+	if res.Error != nil {
+		return gateway_entities.User{}
+	}
 	return user
 }
 

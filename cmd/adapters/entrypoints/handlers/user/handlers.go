@@ -33,6 +33,9 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		Name:     userRequest.Name,
 		LastName: userRequest.LastName,
 		DNI:      userRequest.DNI,
+		Charge: entities.Charge{
+			Name: userRequest.Charge,
+		},
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

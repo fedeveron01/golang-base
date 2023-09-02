@@ -5,6 +5,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"gorm.io/gorm"
 )
 
 type EmployeeGatewayImpl struct {
@@ -22,10 +23,15 @@ func (e EmployeeGatewayImpl) CreateEmployee(employee entities.Employee) error {
 		Name:     employee.Name,
 		LastName: employee.LastName,
 		DNI:      employee.DNI,
+		UserId:   employee.User.ID,
 		User: gateway_entities.User{
+			Model: gorm.Model{
+				ID: employee.User.ID,
+			},
 			UserName: employee.User.UserName,
 			Password: employee.User.Password,
 		},
+		ChargeId: employee.Charge.ID,
 		Charge: gateway_entities.Charge{
 			Name: employee.Charge.Name,
 		},
