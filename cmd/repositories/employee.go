@@ -25,7 +25,7 @@ func (r *EmployeeRepository) CreateEmployee(employee gateway_entities.Employee) 
 
 func (r *EmployeeRepository) FindEmployeeByUserId(id uint) (gateway_entities.Employee, error) {
 	var employee gateway_entities.Employee
-	res := r.db.Where("user_id = ?", id).Find(&employee)
+	res := r.db.Where("user_id = ?", id).Joins("Charge").Find(&employee)
 	if res.Error != nil {
 		return gateway_entities.Employee{}, res.Error
 	}

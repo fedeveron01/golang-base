@@ -28,6 +28,7 @@ func ParseToken(tokenString string) (Claims, error) {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return Claims{
+			Role:       claims["Role"].(interface{}).(string),
 			EmployeeId: claims["EmployeeId"].(float64),
 		}, nil
 
