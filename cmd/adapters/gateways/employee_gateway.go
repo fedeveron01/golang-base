@@ -32,9 +32,6 @@ func (e EmployeeGatewayImpl) CreateEmployee(employee entities.Employee) error {
 			Password: employee.User.Password,
 		},
 		ChargeId: employee.Charge.ID,
-		Charge: gateway_entities.Charge{
-			Name: employee.Charge.Name,
-		},
 	}
 
 	return e.employeeRepository.CreateEmployee(employeeDB)
