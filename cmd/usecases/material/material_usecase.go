@@ -4,7 +4,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 )
 
-type MaterialUsecase interface {
+type MaterialUseCase interface {
 	CreateMaterial(material entities.Material) error
 	FindAll() ([]entities.Material, error)
 	UpdateMaterial(material entities.Material) error

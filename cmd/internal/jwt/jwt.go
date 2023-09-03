@@ -8,7 +8,7 @@ import (
 type Claims struct {
 	*jwt.StandardClaims
 	TokenType  string
-	EmployeeId uint
+	EmployeeId float64
 	Role       string
 }
 
@@ -20,12 +20,16 @@ func ParseToken(tokenString string) (Claims, error) {
 		}
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return []byte("secret"), nil
+		return []byte("test"), nil
 	})
+	if err != nil {
+		return Claims{}, err
+	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		return Claims{
-			EmployeeId: claims["EmployeeId"].(uint),
+			Role:       claims["Role"].(interface{}).(string),
+			EmployeeId: claims["EmployeeId"].(float64),
 		}, nil
 
 	} else {

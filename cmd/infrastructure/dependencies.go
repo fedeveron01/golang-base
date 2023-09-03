@@ -49,16 +49,18 @@ func Start() HandlerContainer {
 	userRepository := repositories.NewUserRepository(db)
 	sessionRepository := repositories.NewSessionRepository(db)
 	employeeRepository := repositories.NewEmployeeRepository(db)
+	chargeRepository := repositories.NewChargeRepository(db)
 
 	// inject gateways
 	materialGateway := gateways.NewMaterialGateway(*materialRepository)
 	userGateway := gateways.NewUserGateway(*userRepository)
 	sessionGateway := gateways.NewSessionGateway(*sessionRepository)
 	employeeGateway := gateways.NewEmployeeGateway(*employeeRepository)
+	chargeGateway := gateways.NewChargeGateway(*chargeRepository)
 
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
-	userUseCase := user_usecase.NewUserUsecase(userGateway, sessionGateway, employeeGateway)
+	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway, chargeGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}

@@ -16,17 +16,23 @@ func NewUserRepository(database *gorm.DB) *UserRepository {
 	}
 }
 
-func (r UserRepository) CreateUser(user gateway_entities.User) error {
+func (r UserRepository) CreateUser(user gateway_entities.User) (gateway_entities.User, error) {
+	var userDB gateway_entities.User
 	id := r.db.Create(&user)
-	if id.Error != nil {
-		return id.Error
+	if id.RowsAffected == 0 {
+		return gateway_entities.User{}, errors.New("user not created")
 	}
-	return nil
+	r.db.Where("user_name = ?", user.UserName).First(&userDB)
+
+	return userDB, nil
 }
 
 func (r *UserRepository) FindUserByUsername(username string) gateway_entities.User {
 	var user gateway_entities.User
-	r.db.Where("user_name = ?", username).First(&user)
+	res := r.db.Where("user_name = ?", username).First(&user)
+	if res.Error != nil {
+		return gateway_entities.User{}
+	}
 	return user
 }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"gorm.io/gorm"
 )
 
 type EmployeeGatewayImpl struct {
@@ -19,15 +20,18 @@ func NewEmployeeGateway(employeeRepository repositories.EmployeeRepository) *Emp
 
 func (e EmployeeGatewayImpl) CreateEmployee(employee entities.Employee) error {
 	employeeDB := gateway_entities.Employee{
-		Name: employee.Name,
-		DNI:  employee.DNI,
+		Name:     employee.Name,
+		LastName: employee.LastName,
+		DNI:      employee.DNI,
+		UserId:   employee.User.ID,
 		User: gateway_entities.User{
+			Model: gorm.Model{
+				ID: employee.User.ID,
+			},
 			UserName: employee.User.UserName,
 			Password: employee.User.Password,
 		},
-		Charge: gateway_entities.Charge{
-			Name: employee.Charge.Name,
-		},
+		ChargeId: employee.Charge.ID,
 	}
 
 	return e.employeeRepository.CreateEmployee(employeeDB)
@@ -36,8 +40,9 @@ func (e EmployeeGatewayImpl) CreateEmployee(employee entities.Employee) error {
 func (e EmployeeGatewayImpl) UpdateEmployee(employee entities.Employee) error {
 
 	employeeDB := gateway_entities.Employee{
-		Name: employee.Name,
-		DNI:  employee.DNI,
+		Name:     employee.Name,
+		LastName: employee.LastName,
+		DNI:      employee.DNI,
 		User: gateway_entities.User{
 			UserName: employee.User.UserName,
 			Password: employee.User.Password,
@@ -95,8 +100,9 @@ func (e EmployeeGatewayImpl) FindEmployeeByUserId(id uint) (entities.Employee, e
 		EntitiesBase: core.EntitiesBase{
 			ID: employeeDB.ID,
 		},
-		Name: employeeDB.Name,
-		DNI:  employeeDB.DNI,
+		Name:     employeeDB.Name,
+		LastName: employeeDB.LastName,
+		DNI:      employeeDB.DNI,
 		User: entities.User{
 			UserName: employeeDB.User.UserName,
 			Password: employeeDB.User.Password,

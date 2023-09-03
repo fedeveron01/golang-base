@@ -2,6 +2,7 @@ package user_handler
 
 import (
 	"encoding/json"
+	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"io"
@@ -9,23 +10,37 @@ import (
 )
 
 type CreateUserHandler struct {
-	userUsercase user_usecase.UserUsecase
+	entrypoints.HandlerBase
+	userUseCase user_usecase.UserUseCase
 }
 
-func NewCreateUserHandler(userUsecase user_usecase.UserUsecase) CreateUserHandler {
+func NewCreateUserHandler(userUseCase user_usecase.UserUseCase) CreateUserHandler {
 	return CreateUserHandler{
-		userUsercase: userUsecase,
+		HandlerBase: entrypoints.HandlerBase{},
+		userUseCase: userUseCase,
 	}
 }
 
 func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
-	var user entities.User
-	json.Unmarshal(reqBody, &user)
-	token, err := p.userUsercase.CreateUser(user)
+	var userRequest CreateUserRequest
+	json.Unmarshal(reqBody, &userRequest)
+	// call use case and convert request to entities
+	token, err := p.userUseCase.CreateUser(entities.User{
+		UserName: userRequest.UserName,
+		Password: userRequest.Password,
+	}, entities.Employee{
+		Name:     userRequest.Name,
+		LastName: userRequest.LastName,
+		DNI:      userRequest.DNI,
+		Charge: entities.Charge{
+			Name: userRequest.Charge,
+		},
+	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err.Error())
+		return
 	}
 	tokenResponse := TokenResponse{Token: token}
 	json.NewEncoder(w).Encode(tokenResponse)
@@ -33,28 +48,33 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 type LoginUserHandler struct {
-	userUsecase user_usecase.UserUsecase
+	entrypoints.HandlerBase
+	userUseCase user_usecase.UserUseCase
 }
 
-func NewLoginUserHandler(userUsecase user_usecase.UserUsecase) LoginUserHandler {
+func NewLoginUserHandler(userUseCase user_usecase.UserUseCase) LoginUserHandler {
 	return LoginUserHandler{
-		userUsecase: userUsecase,
+		HandlerBase: entrypoints.HandlerBase{},
+		userUseCase: userUseCase,
 	}
 }
 
 func (p LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
 	reqBody, _ := io.ReadAll(r.Body)
 	var loginRequest LoginRequest
 
 	err := json.Unmarshal(reqBody, &loginRequest)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		p.WriteInternalServerError(w, err)
+		return
 	}
-	token, err := p.userUsecase.LoginUser(loginRequest.UserName, loginRequest.Password)
+	token, err := p.userUseCase.LoginUser(loginRequest.UserName, loginRequest.Password)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		p.WriteInternalServerError(w, err)
+		return
 	}
 	tokenResponse := TokenResponse{Token: token}
 	json.NewEncoder(w).Encode(tokenResponse)
