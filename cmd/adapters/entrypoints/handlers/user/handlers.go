@@ -60,9 +60,6 @@ func NewLoginUserHandler(userUseCase user_usecase.UserUseCase) LoginUserHandler 
 }
 
 func (p LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	if !p.IsAuthorized(w, r) {
-		return
-	}
 	reqBody, _ := io.ReadAll(r.Body)
 	var loginRequest LoginRequest
 
