@@ -7,6 +7,7 @@ import (
 
 	"github.com/fedeveron01/golang-base/cmd/infrastructure"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer) {
@@ -20,7 +21,7 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/user/login", handlers.LoginUser.Handle).Methods("POST")
 
 	fmt.Println("Starting app in localhost:8080")
-
-	log.Fatal(http.ListenAndServe(":8080", &app))
+	handler := cors.AllowAll().Handler(&app)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 
 }
