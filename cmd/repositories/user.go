@@ -7,8 +7,7 @@ import (
 )
 
 type UserRepository struct {
-	db               *gorm.DB
-	chargeRepository *ChargeRepository
+	db *gorm.DB
 }
 
 func NewUserRepository(database *gorm.DB) *UserRepository {
