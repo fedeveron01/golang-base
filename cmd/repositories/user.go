@@ -7,20 +7,13 @@ import (
 )
 
 type UserRepository struct {
-	db                 *gorm.DB
-	chargeRepository   *ChargeRepository
-	employeeRepository *EmployeeRepository
+	db               *gorm.DB
+	chargeRepository *ChargeRepository
 }
 
-func NewUserRepository(
-	database *gorm.DB,
-	chargeRepository *ChargeRepository,
-	employeeRepository *EmployeeRepository,
-) *UserRepository {
+func NewUserRepository(database *gorm.DB) *UserRepository {
 	return &UserRepository{
-		db:                 database,
-		chargeRepository:   chargeRepository,
-		employeeRepository: employeeRepository,
+		db: database,
 	}
 }
 
@@ -30,8 +23,12 @@ func (r UserRepository) CreateCompleteUserWithEmployee(
 	employee gateway_entities.Employee) (gateway_entities.User, error) {
 	r.db.Transaction(func(tx *gorm.DB) error {
 		tx.Create(&user)
-		chargeDB, _ := r.chargeRepository.FindByName(charge.Name)
-		if chargeDB.ID == 0 {
+		// find charge
+		res := tx.Where("name = ?", charge.Name).Find(&charge)
+		if res.Error != nil {
+			return res.Error
+		}
+		if res.RowsAffected == 0 {
 			res := tx.Create(&charge)
 			if res.Error != nil {
 				return res.Error
@@ -39,9 +36,9 @@ func (r UserRepository) CreateCompleteUserWithEmployee(
 		}
 
 		employee.UserId = user.ID
-		employee.ChargeId = chargeDB.ID
+		employee.ChargeId = charge.ID
 
-		res := tx.Create(&employee)
+		res = tx.Create(&employee)
 		if res.Error != nil {
 			return res.Error
 		}
