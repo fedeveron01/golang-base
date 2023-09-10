@@ -17,7 +17,9 @@ type UserUseCase interface {
 }
 
 type UserGateway interface {
-	CreateUser(user entities.User) (entities.User, error)
+	CreateCompleteUserWithEmployee(user entities.User,
+		employee entities.Employee) (entities.User, error)
+
 	FindUserByUsernameAndPassword(username string, password string) (entities.User, error)
 	FindUserByUsername(username string) entities.User
 	UpdateUser(user entities.User) error
@@ -75,22 +77,13 @@ func (i *Implementation) CreateUser(user entities.User, employee entities.Employ
 	if userRepeated.ID != 0 {
 		return "", errors.New("username already exists")
 	}
-	user, err := i.userGateway.CreateUser(user)
+
+	user, err := i.userGateway.CreateCompleteUserWithEmployee(user, employee)
+
 	if err != nil {
 		return "", err
 	}
-	employee.User = user
 
-	chargeId, err := i.chargeGateway.FindByName(employee.Charge.Name)
-	if err != nil {
-		created, err := i.chargeGateway.CreateCharge(employee.Charge)
-		if err != nil {
-			return "", err
-		}
-		chargeId = created.ID
-	}
-	employee.Charge.ID = chargeId
-	err = i.employeeGateway.CreateEmployee(employee)
 	return i.LoginUser(user.UserName, decryptedPassword)
 }
 

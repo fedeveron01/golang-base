@@ -7,13 +7,51 @@ import (
 )
 
 type UserRepository struct {
-	db *gorm.DB
+	db                 *gorm.DB
+	chargeRepository   *ChargeRepository
+	employeeRepository *EmployeeRepository
 }
 
-func NewUserRepository(database *gorm.DB) *UserRepository {
+func NewUserRepository(
+	database *gorm.DB,
+	chargeRepository *ChargeRepository,
+	employeeRepository *EmployeeRepository,
+) *UserRepository {
 	return &UserRepository{
-		db: database,
+		db:                 database,
+		chargeRepository:   chargeRepository,
+		employeeRepository: employeeRepository,
 	}
+}
+
+func (r UserRepository) CreateCompleteUserWithEmployee(
+	user gateway_entities.User,
+	charge gateway_entities.Charge,
+	employee gateway_entities.Employee) (gateway_entities.User, error) {
+	r.db.Transaction(func(tx *gorm.DB) error {
+		tx.Create(&user)
+		chargeDB, _ := r.chargeRepository.FindByName(charge.Name)
+		if chargeDB.ID == 0 {
+			res := tx.Create(&charge)
+			if res.Error != nil {
+				return res.Error
+			}
+		}
+
+		employee.UserId = user.ID
+		employee.ChargeId = chargeDB.ID
+
+		res := tx.Create(&employee)
+		if res.Error != nil {
+			return res.Error
+		}
+		return nil
+
+	})
+
+	user = r.FindUserByUsername(user.UserName)
+	return user, nil
+
 }
 
 func (r UserRepository) CreateUser(user gateway_entities.User) (gateway_entities.User, error) {

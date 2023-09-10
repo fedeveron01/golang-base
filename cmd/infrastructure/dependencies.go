@@ -27,7 +27,7 @@ type HandlerContainer struct {
 
 func Start() HandlerContainer {
 	// inject mysql and gorm
-	dsn := "admin:software-factory-db12@tcp(20.226.85.196:3306)/factory?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:root@tcp(127.0.0.1:3306)/fabrica?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
@@ -45,10 +45,10 @@ func Start() HandlerContainer {
 
 	// inject repositories
 	materialRepository := repositories.NewMaterialRepository(db)
-	userRepository := repositories.NewUserRepository(db)
 	sessionRepository := repositories.NewSessionRepository(db)
 	employeeRepository := repositories.NewEmployeeRepository(db)
 	chargeRepository := repositories.NewChargeRepository(db)
+	userRepository := repositories.NewUserRepository(db, chargeRepository, employeeRepository)
 
 	// inject gateways
 	materialGateway := gateways.NewMaterialGateway(*materialRepository)
