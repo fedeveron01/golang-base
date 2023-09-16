@@ -21,6 +21,7 @@ func NewCreateUserHandler(userUseCase user_usecase.UserUseCase) CreateUserHandle
 	}
 }
 
+// Handle api/user/signup
 func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
 	var userRequest CreateUserRequest
@@ -59,6 +60,7 @@ func NewLoginUserHandler(userUseCase user_usecase.UserUseCase) LoginUserHandler 
 	}
 }
 
+// Handle api/user/login
 func (p LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
 	var loginRequest LoginRequest
