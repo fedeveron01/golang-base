@@ -18,6 +18,37 @@ func NewUserGateway(userRepository repositories.UserRepository) *UserGatewayImpl
 	}
 }
 
+func (i *UserGatewayImpl) CreateCompleteUserWithEmployee(user entities.User, employee entities.Employee) (entities.User, error) {
+	userDB := gateway_entities.User{
+		UserName: user.UserName,
+		Password: user.Password,
+	}
+	employeeDB := gateway_entities.Employee{
+		Name:     employee.Name,
+		LastName: employee.LastName,
+		DNI:      employee.DNI,
+		User: gateway_entities.User{
+			UserName: employee.User.UserName,
+			Password: employee.User.Password,
+		},
+	}
+	chargeDB := gateway_entities.Charge{
+		Name: employee.Charge.Name,
+	}
+	created, err := i.userRepository.CreateCompleteUserWithEmployee(userDB, chargeDB, employeeDB)
+	if err != nil {
+		return entities.User{}, err
+	}
+	user = entities.User{
+		EntitiesBase: core.EntitiesBase{
+			ID: created.ID,
+		},
+		UserName: created.UserName,
+		Password: created.Password,
+	}
+	return user, nil
+}
+
 func (i *UserGatewayImpl) CreateUser(user entities.User) (entities.User, error) {
 	userDB := gateway_entities.User{
 		UserName: user.UserName,
