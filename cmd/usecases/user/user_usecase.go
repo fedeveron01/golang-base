@@ -43,6 +43,7 @@ type EmployeeGateway interface {
 
 type ChargeGateway interface {
 	FindByName(name string) (uint, error)
+	FindById(id uint) (entities.Charge, error)
 	CreateCharge(charge entities.Charge) (entities.Charge, error)
 }
 
@@ -79,7 +80,7 @@ func (i *Implementation) CreateUser(user entities.User, employee entities.Employ
 	}
 
 	//validate charge
-	_, err := i.chargeGateway.FindByName(employee.Charge.Name)
+	_, err := i.chargeGateway.FindById(employee.Charge.ID)
 	if err != nil {
 		return "", err
 	}
