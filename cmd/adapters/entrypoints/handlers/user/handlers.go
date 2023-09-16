@@ -3,10 +3,12 @@ package user_handler
 import (
 	"encoding/json"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
+	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 type CreateUserHandler struct {
@@ -26,6 +28,12 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	var userRequest CreateUserRequest
 	json.Unmarshal(reqBody, &userRequest)
 	// call use case and convert request to entities
+	chargeId, err := strconv.ParseUint(userRequest.ChargeId, 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
 	token, err := p.userUseCase.CreateUser(entities.User{
 		UserName: userRequest.UserName,
 		Password: userRequest.Password,
@@ -34,7 +42,9 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		LastName: userRequest.LastName,
 		DNI:      userRequest.DNI,
 		Charge: entities.Charge{
-			Name: userRequest.Charge,
+			EntitiesBase: core.EntitiesBase{
+				ID: uint(chargeId),
+			},
 		},
 	})
 	if err != nil {
