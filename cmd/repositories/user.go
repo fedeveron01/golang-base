@@ -20,7 +20,7 @@ func (r UserRepository) CreateCompleteUserWithEmployee(
 	user gateway_entities.User,
 	chargeID uint,
 	employee gateway_entities.Employee) (gateway_entities.User, error) {
-	r.db.Transaction(func(tx *gorm.DB) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
 		tx.Create(&user)
 		employee.UserId = user.ID
 		employee.ChargeId = chargeID
@@ -32,7 +32,9 @@ func (r UserRepository) CreateCompleteUserWithEmployee(
 		return nil
 
 	})
-
+	if err != nil {
+		return gateway_entities.User{}, err
+	}
 	user = r.FindUserByUsername(user.UserName)
 	return user, nil
 

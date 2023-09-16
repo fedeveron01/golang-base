@@ -78,7 +78,12 @@ func (i *Implementation) CreateUser(user entities.User, employee entities.Employ
 		return "", errors.New("username already exists")
 	}
 
-	user, err := i.userGateway.CreateCompleteUserWithEmployee(user, employee)
+	//validate charge
+	_, err := i.chargeGateway.FindByName(employee.Charge.Name)
+	if err != nil {
+		return "", err
+	}
+	user, err = i.userGateway.CreateCompleteUserWithEmployee(user, employee)
 
 	if err != nil {
 		return "", err
