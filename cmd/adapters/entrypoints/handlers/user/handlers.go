@@ -38,7 +38,7 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
-	token, err := p.userUseCase.CreateUser(entities.User{
+	err = p.userUseCase.CreateUser(entities.User{
 		UserName: userRequest.UserName,
 		Password: userRequest.Password,
 	}, entities.Employee{
@@ -56,8 +56,8 @@ func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err.Error())
 		return
 	}
-	tokenResponse := TokenResponse{Token: token}
-	json.NewEncoder(w).Encode(tokenResponse)
+
+	json.NewEncoder(w).Encode("User created successfully")
 
 }
 

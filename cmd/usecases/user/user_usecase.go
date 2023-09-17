@@ -10,7 +10,7 @@ import (
 )
 
 type UserUseCase interface {
-	CreateUser(user entities.User, employee entities.Employee) (string, error)
+	CreateUser(user entities.User, employee entities.Employee) error
 	UpdateUser(user entities.User) error
 	DeleteUser(id string) error
 	LoginUser(username string, password string) (string, error)
@@ -67,30 +67,29 @@ func NewUserUseCase(userGateway UserGateway,
 	}
 }
 
-func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) (string, error) {
+func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) error {
 	if user.UserName == "" || user.Password == "" {
-		return "", errors.New("username or password is empty")
+		return errors.New("username or password is empty")
 	}
-	decryptedPassword := user.Password
 	user.Password = encryptPassword(user.Password)
 
 	userRepeated := i.userGateway.FindUserByUsername(user.UserName)
 	if userRepeated.ID != 0 {
-		return "", errors.New("username already exists")
+		return errors.New("username already exists")
 	}
 
 	//validate charge
 	_, err := i.chargeGateway.FindById(employee.Charge.ID)
 	if err != nil {
-		return "", err
+		return err
 	}
 	user, err = i.userGateway.CreateCompleteUserWithEmployee(user, employee)
 
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return i.LoginUser(user.UserName, decryptedPassword)
+	return nil
 }
 
 func encryptPassword(password string) string {
