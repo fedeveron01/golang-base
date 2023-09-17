@@ -24,6 +24,10 @@ func NewCreateUserHandler(userUseCase user_usecase.UserUseCase) CreateUserHandle
 }
 
 func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAdmin(w, r) {
+		return
+	}
+
 	reqBody, _ := io.ReadAll(r.Body)
 	var userRequest CreateUserRequest
 	json.Unmarshal(reqBody, &userRequest)
