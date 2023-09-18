@@ -6,4 +6,5 @@ type User struct {
 	gorm.Model
 	UserName string
 	Password string
+	Inactive bool `gorm:"default:false"`
 }

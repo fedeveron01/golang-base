@@ -3,6 +3,7 @@ package user_usecase
 import (
 	"errors"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -102,14 +103,17 @@ func isCorrectPassword(encryptedPassword string, password string) bool {
 
 func (i *Implementation) LoginUser(username string, password string) (string, error) {
 	if username == "" || password == "" {
-		return "", errors.New("username or password is empty")
+		return "", core_errors.ErrUsernameOrPasswordIsEmpty
 	}
 	user := i.userGateway.FindUserByUsername(username)
+	if user.Inactive {
+		return "", core_errors.ErrInactiveUser
+	}
 	if user.ID == 0 {
 		return "", errors.New("user not found")
 	}
 	if !isCorrectPassword(user.Password, password) {
-		return "", errors.New("username or password is incorrect")
+		return "", core_errors.ErrUsernameOrPasswordIsIncorrect
 	}
 	// create session
 	session := entities.Session{
