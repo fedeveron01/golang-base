@@ -15,7 +15,5 @@ type CreateUserRequest struct {
 }
 
 type TokenResponse struct {
-	Token      string
-	EmployeeId float64
-	Charge     string
+	Token string
 }

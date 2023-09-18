@@ -2,11 +2,8 @@ package user_handler
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
-	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"io"
 	"net/http"
@@ -24,7 +21,6 @@ func NewCreateUserHandler(userUseCase user_usecase.UserUseCase) CreateUserHandle
 	}
 }
 
-// Handle api/user/signup
 func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
 	var userRequest CreateUserRequest
@@ -63,28 +59,20 @@ func NewLoginUserHandler(userUseCase user_usecase.UserUseCase) LoginUserHandler 
 	}
 }
 
-// Handle api/user/login
 func (p LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
 	var loginRequest LoginRequest
 
 	err := json.Unmarshal(reqBody, &loginRequest)
-
 	if err != nil {
 		p.WriteInternalServerError(w, err)
 		return
 	}
 	token, err := p.userUseCase.LoginUser(loginRequest.UserName, loginRequest.Password)
 	if err != nil {
-		if errors.Is(err, core_errors.ErrInactiveUser) {
-			p.WriteUnauthorizedError(w, err)
-			return
-		}
 		p.WriteInternalServerError(w, err)
 		return
 	}
-	claims, _ := internal_jwt.ParseToken(token)
-
-	tokenResponse := TokenResponse{Token: token, EmployeeId: claims.EmployeeId, Charge: claims.Role}
+	tokenResponse := TokenResponse{Token: token}
 	json.NewEncoder(w).Encode(tokenResponse)
 }

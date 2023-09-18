@@ -23,11 +23,6 @@ func (h *HandlerBase) WriteInternalServerError(w http.ResponseWriter, err error)
 	json.NewEncoder(w).Encode(err.Error())
 }
 
-func (h *HandlerBase) WriteUnauthorizedError(w http.ResponseWriter, err error) {
-	w.WriteHeader(http.StatusUnauthorized)
-	json.NewEncoder(w).Encode(err.Error())
-}
-
 func (h *HandlerBase) IsAuthorized(w http.ResponseWriter, r *http.Request) bool {
 	token := r.Header.Get("X-Auth-Token")
 	if token == "" {

@@ -79,7 +79,6 @@ func (i *UserGatewayImpl) FindUserByUsernameAndPassword(username string, passwor
 		},
 		UserName: userDB.UserName,
 		Password: userDB.Password,
-		Inactive: userDB.Inactive,
 	}
 	return user, nil
 }
@@ -92,7 +91,6 @@ func (i *UserGatewayImpl) FindUserByUsername(username string) entities.User {
 		},
 		UserName: userDB.UserName,
 		Password: userDB.Password,
-		Inactive: userDB.Inactive,
 	}
 	return user
 }
