@@ -2,6 +2,7 @@ package entrypoints
 
 import (
 	"encoding/json"
+	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"net/http"
 )
@@ -11,6 +12,7 @@ type Handler interface {
 }
 
 type HandlerBase struct {
+	gateways.SessionGateway
 }
 
 func (h *HandlerBase) writeUnauthorized(w http.ResponseWriter) {
@@ -40,6 +42,19 @@ func (h *HandlerBase) IsAuthorized(w http.ResponseWriter, r *http.Request) bool 
 			return false
 		}
 		if claims.Role == "none" {
+			h.writeUnauthorized(w)
+			return false
+		}
+
+		// validate if session is active
+
+		if claims.SessionId == 0 {
+			h.writeUnauthorized(w)
+			return false
+		}
+
+		expired := h.SessionGateway.SessionIsExpired(claims.SessionId)
+		if expired {
 			h.writeUnauthorized(w)
 			return false
 		}

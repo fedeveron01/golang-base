@@ -28,7 +28,7 @@ type UserGateway interface {
 }
 
 type SessionGateway interface {
-	CreateSession(session entities.Session) error
+	CreateSession(session entities.Session) (entities.Session, error)
 	FindAll() ([]entities.Session, error)
 	UpdateSession(session entities.Session) error
 	DeleteSession(id string) error
@@ -119,7 +119,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 	session := entities.Session{
 		User: user,
 	}
-	err := i.sessionGateway.CreateSession(session)
+	createdSession, err := i.sessionGateway.CreateSession(session)
 	if err != nil {
 		return "", err
 	}
@@ -128,7 +128,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 	if err != nil {
 		return "", err
 	}
-	return generateToken(employee)
+	return generateToken(employee, createdSession)
 }
 func (i *Implementation) UpdateUser(user entities.User) error {
 	return i.userGateway.UpdateUser(user)
@@ -137,7 +137,7 @@ func (i *Implementation) DeleteUser(id string) error {
 	return i.userGateway.DeleteUser(id)
 }
 
-func generateToken(employee entities.Employee) (string, error) {
+func generateToken(employee entities.Employee, session entities.Session) (string, error) {
 	t := jwt.New(jwt.SigningMethodHS256)
 	var role string
 	if employee.ID == 0 {
@@ -152,6 +152,7 @@ func generateToken(employee entities.Employee) (string, error) {
 		},
 		TokenType:  "level1",
 		EmployeeId: float64(employee.ID),
+		SessionId:  float64(session.ID),
 		Role:       role,
 	}
 
