@@ -64,8 +64,8 @@ func Start() HandlerContainer {
 	// inject handlers
 	handlerContainer := HandlerContainer{}
 
-	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(materialUseCase)
-	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(materialUseCase)
+	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(sessionGateway, materialUseCase)
+	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(sessionGateway, materialUseCase)
 
 	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(userUseCase)
 	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(userUseCase)

@@ -6,4 +6,5 @@ type User struct {
 	core.EntitiesBase
 	UserName string
 	Password string
+	Inactive bool
 }

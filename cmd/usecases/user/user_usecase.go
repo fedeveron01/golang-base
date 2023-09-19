@@ -3,6 +3,7 @@ package user_usecase
 import (
 	"errors"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -27,7 +28,7 @@ type UserGateway interface {
 }
 
 type SessionGateway interface {
-	CreateSession(session entities.Session) error
+	CreateSession(session entities.Session) (entities.Session, error)
 	FindAll() ([]entities.Session, error)
 	UpdateSession(session entities.Session) error
 	DeleteSession(id string) error
@@ -102,20 +103,23 @@ func isCorrectPassword(encryptedPassword string, password string) bool {
 
 func (i *Implementation) LoginUser(username string, password string) (string, error) {
 	if username == "" || password == "" {
-		return "", errors.New("username or password is empty")
+		return "", core_errors.ErrUsernameOrPasswordIsEmpty
 	}
 	user := i.userGateway.FindUserByUsername(username)
+	if user.Inactive {
+		return "", core_errors.ErrInactiveUser
+	}
 	if user.ID == 0 {
 		return "", errors.New("user not found")
 	}
 	if !isCorrectPassword(user.Password, password) {
-		return "", errors.New("username or password is incorrect")
+		return "", core_errors.ErrUsernameOrPasswordIsIncorrect
 	}
 	// create session
 	session := entities.Session{
 		User: user,
 	}
-	err := i.sessionGateway.CreateSession(session)
+	createdSession, err := i.sessionGateway.CreateSession(session)
 	if err != nil {
 		return "", err
 	}
@@ -124,7 +128,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 	if err != nil {
 		return "", err
 	}
-	return generateToken(employee)
+	return generateToken(employee, createdSession)
 }
 func (i *Implementation) UpdateUser(user entities.User) error {
 	return i.userGateway.UpdateUser(user)
@@ -133,7 +137,7 @@ func (i *Implementation) DeleteUser(id string) error {
 	return i.userGateway.DeleteUser(id)
 }
 
-func generateToken(employee entities.Employee) (string, error) {
+func generateToken(employee entities.Employee, session entities.Session) (string, error) {
 	t := jwt.New(jwt.SigningMethodHS256)
 	var role string
 	if employee.ID == 0 {
@@ -148,6 +152,7 @@ func generateToken(employee entities.Employee) (string, error) {
 		},
 		TokenType:  "level1",
 		EmployeeId: float64(employee.ID),
+		SessionId:  float64(session.ID),
 		Role:       role,
 	}
 

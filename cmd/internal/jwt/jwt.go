@@ -9,6 +9,7 @@ type Claims struct {
 	*jwt.StandardClaims
 	TokenType  string
 	EmployeeId float64
+	SessionId  float64
 	Role       string
 }
 
@@ -30,6 +31,7 @@ func ParseToken(tokenString string) (Claims, error) {
 		return Claims{
 			Role:       claims["Role"].(interface{}).(string),
 			EmployeeId: claims["EmployeeId"].(float64),
+			SessionId:  claims["SessionId"].(float64),
 		}, nil
 
 	} else {
