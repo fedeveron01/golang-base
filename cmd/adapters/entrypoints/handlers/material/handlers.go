@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
+	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/usecases/material"
 	"io"
@@ -20,8 +21,11 @@ type GetAllMaterialHandler struct {
 	materialUseCase material_usecase.MaterialUseCase
 }
 
-func NewCreateMaterialHandler(materialUseCase material_usecase.MaterialUseCase) CreateMaterialHandler {
+func NewCreateMaterialHandler(sessionGateway gateways.SessionGateway, materialUseCase material_usecase.MaterialUseCase) CreateMaterialHandler {
 	return CreateMaterialHandler{
+		HandlerBase: entrypoints.HandlerBase{
+			SessionGateway: sessionGateway,
+		},
 		materialUseCase: materialUseCase,
 	}
 }
@@ -41,8 +45,11 @@ func (p CreateMaterialHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func NewGetAllMaterialHandler(materialUseCase material_usecase.MaterialUseCase) GetAllMaterialHandler {
+func NewGetAllMaterialHandler(sessionGateway gateways.SessionGateway, materialUseCase material_usecase.MaterialUseCase) GetAllMaterialHandler {
 	return GetAllMaterialHandler{
+		HandlerBase: entrypoints.HandlerBase{
+			SessionGateway: sessionGateway,
+		},
 		materialUseCase: materialUseCase,
 	}
 }

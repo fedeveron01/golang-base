@@ -7,6 +7,15 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 )
 
+type SessionGateway interface {
+	CreateSession(session entities.Session) (entities.Session, error)
+	FindAll() ([]entities.Session, error)
+	FindSessionById(id float64) (entities.Session, error)
+	UpdateSession(session entities.Session) error
+	SessionIsExpired(id float64) bool
+	DeleteSession(id string) error
+}
+
 type SessionGatewayImpl struct {
 	sessionRepository repositories.SessionRepository
 }
@@ -17,16 +26,26 @@ func NewSessionGateway(sessionRepository repositories.SessionRepository) *Sessio
 	}
 }
 
-func (i *SessionGatewayImpl) CreateSession(session entities.Session) error {
+func (i *SessionGatewayImpl) CreateSession(session entities.Session) (entities.Session, error) {
 	sessionDB := gateway_entities.Session{
 		UserId: session.User.ID,
 	}
 
-	err := i.sessionRepository.CreateSession(sessionDB)
+	sessionDB, err := i.sessionRepository.CreateSession(sessionDB)
 	if err != nil {
-		return err
+		return entities.Session{}, err
 	}
-	return nil
+
+	session = entities.Session{
+		EntitiesBase: core.EntitiesBase{
+			ID: sessionDB.ID,
+		},
+		User: entities.User{
+			UserName: sessionDB.User.UserName,
+			Password: sessionDB.User.Password,
+		},
+	}
+	return session, nil
 }
 
 func (i *SessionGatewayImpl) FindAll() ([]entities.Session, error) {
@@ -48,6 +67,29 @@ func (i *SessionGatewayImpl) FindAll() ([]entities.Session, error) {
 		}
 	}
 	return sessions, nil
+}
+
+func (i *SessionGatewayImpl) FindSessionById(id float64) (entities.Session, error) {
+	sessionDB, err := i.sessionRepository.FindSessionById(id)
+	if err != nil {
+		return entities.Session{}, err
+	}
+
+	session := entities.Session{
+		EntitiesBase: core.EntitiesBase{
+			ID: sessionDB.ID,
+		},
+		User: entities.User{
+			UserName: sessionDB.User.UserName,
+			Password: sessionDB.User.Password,
+		},
+	}
+	return session, nil
+}
+
+func (i *SessionGatewayImpl) SessionIsExpired(id float64) bool {
+	return i.sessionRepository.SessionIsExpired(id)
+
 }
 
 func (i *SessionGatewayImpl) UpdateSession(session entities.Session) error {
