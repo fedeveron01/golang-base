@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
+	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
@@ -19,9 +20,11 @@ type CreateUserHandler struct {
 	userUseCase user_usecase.UserUseCase
 }
 
-func NewCreateUserHandler(userUseCase user_usecase.UserUseCase) CreateUserHandler {
+func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) CreateUserHandler {
 	return CreateUserHandler{
-		HandlerBase: entrypoints.HandlerBase{},
+		HandlerBase: entrypoints.HandlerBase{
+			SessionGateway: sessionGateway,
+		},
 		userUseCase: userUseCase,
 	}
 }

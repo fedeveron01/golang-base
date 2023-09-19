@@ -1,7 +1,6 @@
 package user_usecase
 
 import (
-	"errors"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
@@ -70,13 +69,18 @@ func NewUserUseCase(userGateway UserGateway,
 
 func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) error {
 	if user.UserName == "" || user.Password == "" {
-		return errors.New("username or password is empty")
+		return core_errors.ErrUsernameOrPasswordIsEmpty
 	}
+
+	if len(user.Password) < 5 {
+		return core_errors.ErrPasswordTooShort
+	}
+
 	user.Password = encryptPassword(user.Password)
 
 	userRepeated := i.userGateway.FindUserByUsername(user.UserName)
 	if userRepeated.ID != 0 {
-		return errors.New("username already exists")
+		return core_errors.ErrUsernameAlreadyExists
 	}
 
 	//validate charge
@@ -115,7 +119,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 		return "", core_errors.ErrInactiveUser
 	}
 	if user.ID == 0 {
-		return "", errors.New("user not found")
+		return "", core_errors.ErrUserNotFound
 	}
 	if !isCorrectPassword(user.Password, password) {
 		return "", core_errors.ErrUsernameOrPasswordIsIncorrect
