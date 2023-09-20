@@ -13,7 +13,7 @@ type SessionGateway interface {
 	FindSessionById(id float64) (entities.Session, error)
 	UpdateSession(session entities.Session) error
 	SessionIsExpired(id float64) bool
-	DeleteSession(id string) error
+	DeleteSession(id float64) error
 }
 
 type SessionGatewayImpl struct {
@@ -104,6 +104,6 @@ func (i *SessionGatewayImpl) UpdateSession(session entities.Session) error {
 	return i.sessionRepository.UpdateSession(sessionDB)
 }
 
-func (i *SessionGatewayImpl) DeleteSession(id string) error {
+func (i *SessionGatewayImpl) DeleteSession(id float64) error {
 	return i.sessionRepository.DeleteSession(id)
 }

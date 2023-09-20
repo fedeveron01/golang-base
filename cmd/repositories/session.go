@@ -52,7 +52,10 @@ func (r *SessionRepository) UpdateSession(session gateway_entities.Session) erro
 	return nil
 }
 
-func (r *SessionRepository) DeleteSession(id string) error {
-	r.db.Delete(&gateway_entities.Session{}, id)
+func (r *SessionRepository) DeleteSession(id float64) error {
+	res := r.db.Delete(&gateway_entities.Session{}, id)
+	if res.Error != nil {
+		return res.Error
+	}
 	return nil
 }
