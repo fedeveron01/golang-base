@@ -2,14 +2,15 @@ package infrastructure
 
 import (
 	"fmt"
+
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
-	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
-	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/user"
+	material_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
+	user_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/user"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
-	"github.com/fedeveron01/golang-base/cmd/usecases/material"
-	"github.com/fedeveron01/golang-base/cmd/usecases/user"
+	material_usecase "github.com/fedeveron01/golang-base/cmd/usecases/material"
+	user_usecase "github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -24,6 +25,7 @@ type HandlerContainer struct {
 	CreateUser entrypoints.Handler
 	LoginUser  entrypoints.Handler
 	LogoutUser entrypoints.Handler
+	GetAllUser entrypoints.Handler
 }
 
 func Start() HandlerContainer {
@@ -71,6 +73,7 @@ func Start() HandlerContainer {
 	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(sessionGateway, userUseCase)
 	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(sessionGateway, userUseCase)
 	handlerContainer.LogoutUser = user_handler.NewLogoutUserHandler(sessionGateway, userUseCase)
+	handlerContainer.GetAllUser = user_handler.NewGetAllUserHandler(sessionGateway, userUseCase)
 
 	return handlerContainer
 

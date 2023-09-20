@@ -3,14 +3,15 @@ package user_handler
 import (
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
-	"github.com/fedeveron01/golang-base/cmd/usecases/user"
-	"io"
-	"net/http"
+	user_usecase "github.com/fedeveron01/golang-base/cmd/usecases/user"
 )
 
 type CreateUserHandler struct {
@@ -126,4 +127,32 @@ func (p *LogoutUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+type GetAllUsersHandler struct {
+	entrypoints.HandlerBase
+	userUseCase user_usecase.UserUseCase
+}
+
+func NewGetAllUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *GetAllUsersHandler {
+	return &GetAllUsersHandler{
+		HandlerBase: entrypoints.HandlerBase{
+			SessionGateway: sessionGateway,
+		},
+		userUseCase: userUseCase,
+	}
+}
+
+// Handle api/user
+func (p *GetAllUsersHandler) Handle(w http.ResponseWriter, r *http.Request) {
+
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	users, err := p.userUseCase.GetAll()
+	if err != nil {
+		p.WriteInternalServerError(w, err)
+		return
+	}
+	json.NewEncoder(w).Encode(users)
 }

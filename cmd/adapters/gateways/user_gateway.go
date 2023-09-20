@@ -17,6 +17,24 @@ func NewUserGateway(userRepository repositories.UserRepository) *UserGatewayImpl
 		userRepository: userRepository,
 	}
 }
+func (i *UserGatewayImpl) GetAll() ([]entities.User, error) {
+	userDB, err := i.userRepository.GetAllUser()
+	if err != nil {
+		return nil, err
+	}
+	users := make([]entities.User, len(userDB))
+	for i, userDB := range userDB {
+		users[i] = entities.User{
+			EntitiesBase: core.EntitiesBase{
+				ID: userDB.ID,
+			},
+			UserName: userDB.UserName,
+			Password: userDB.Password,
+			Inactive: userDB.Inactive,
+		}
+	}
+	return users, nil
+}
 
 func (i *UserGatewayImpl) CreateCompleteUserWithEmployee(user entities.User, employee entities.Employee) (entities.User, error) {
 	userDB := gateway_entities.User{

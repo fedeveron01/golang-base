@@ -2,12 +2,13 @@ package user_usecase
 
 import (
 	"errors"
+	"time"
+
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type UserUseCase interface {
@@ -16,12 +17,12 @@ type UserUseCase interface {
 	DeleteUser(id string) error
 	LoginUser(username string, password string) (string, error)
 	LogoutUser(sessionId float64) error
+	GetAll() ([]entities.User, error)
 }
 
 type UserGateway interface {
-	CreateCompleteUserWithEmployee(user entities.User,
-		employee entities.Employee) (entities.User, error)
-
+	GetAll() ([]entities.User, error)
+	CreateCompleteUserWithEmployee(user entities.User, employee entities.Employee) (entities.User, error)
 	FindUserByUsernameAndPassword(username string, password string) (entities.User, error)
 	FindUserByUsername(username string) entities.User
 	UpdateUser(user entities.User) error
@@ -66,6 +67,11 @@ func NewUserUseCase(userGateway UserGateway,
 		employeeGateway: employeeGateway,
 		chargeGateway:   chargeGateway,
 	}
+}
+
+func (i *Implementation) GetAll() ([]entities.User, error) {
+
+	return i.userGateway.GetAll()
 }
 
 func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) (string, error) {

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"gorm.io/gorm"
 )
@@ -14,6 +15,15 @@ func NewUserRepository(database *gorm.DB) *UserRepository {
 	return &UserRepository{
 		db: database,
 	}
+}
+
+func (r *UserRepository) GetAllUser() ([]gateway_entities.User, error) {
+	var users []gateway_entities.User
+	res := r.db.Find(&users)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return users, nil
 }
 
 func (r UserRepository) CreateCompleteUserWithEmployee(
