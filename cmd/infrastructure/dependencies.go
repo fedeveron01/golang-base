@@ -77,7 +77,7 @@ func Start() HandlerContainer {
 	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(sessionGateway, userUseCase)
 	handlerContainer.LogoutUser = user_handler.NewLogoutUserHandler(sessionGateway, userUseCase)
 
-	handlerContainer.CreateCharge = charge_handler.NewCreateChargeHandler(chargeUseCase)
+	handlerContainer.CreateCharge = charge_handler.NewCreateChargeHandler(sessionGateway, chargeUseCase)
 	return handlerContainer
 
 }
