@@ -10,4 +10,6 @@ var (
 	ErrUsernameOrPasswordIsEmpty     = errors.New("username or password is empty")
 	ErrUsernameAlreadyExists         = errors.New("username already exists")
 	ErrInactiveUser                  = errors.New("user is inactive, please contact with the administrator")
+
+	ErrPasswordTooShort = errors.New("password too short , must be at least 5 characters")
 )

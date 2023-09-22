@@ -26,6 +26,9 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	//employee
 	app.HandleFunc("/api/employee", handlers.GetAllEmployee.Handle).Methods("GET")
 
+	//charge
+	app.HandleFunc("/api/charge", handlers.CreateCharge.Handle).Methods("POST")
+
 	fmt.Println("Starting app in localhost:8080")
 	handler := cors.AllowAll().Handler(&app)
 	log.Fatal(http.ListenAndServe(":8080", handler))

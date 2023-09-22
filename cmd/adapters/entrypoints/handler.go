@@ -80,3 +80,23 @@ func (h *HandlerBase) IsAuthorized(w http.ResponseWriter, r *http.Request) bool 
 		return true
 	}
 }
+
+func (h *HandlerBase) IsAdmin(w http.ResponseWriter, r *http.Request) bool {
+	token := r.Header.Get("X-Auth-Token")
+	if token == "" {
+		h.WriteUnauthorized(w)
+		return false
+	} else {
+		claims, err := internal_jwt.ParseToken(token)
+		if err != nil {
+			h.WriteUnauthorized(w)
+			return false
+		}
+		if claims.Role != "admin" {
+			h.WriteUnauthorized(w)
+			return false
+		}
+
+		return true
+	}
+}

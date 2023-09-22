@@ -1,7 +1,6 @@
 package user_usecase
 
 import (
-	"errors"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
@@ -11,7 +10,7 @@ import (
 )
 
 type UserUseCase interface {
-	CreateUser(user entities.User, employee entities.Employee) (string, error)
+	CreateUser(user entities.User, employee entities.Employee) error
 	UpdateUser(user entities.User) error
 	DeleteUser(id string) error
 	LoginUser(username string, password string) (string, error)
@@ -45,6 +44,7 @@ type EmployeeGateway interface {
 
 type ChargeGateway interface {
 	FindByName(name string) (uint, error)
+	FindById(id uint) (entities.Charge, error)
 	CreateCharge(charge entities.Charge) (entities.Charge, error)
 }
 
@@ -68,25 +68,34 @@ func NewUserUseCase(userGateway UserGateway,
 	}
 }
 
-func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) (string, error) {
+func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) error {
 	if user.UserName == "" || user.Password == "" {
-		return "", errors.New("username or password is empty")
+		return core_errors.ErrUsernameOrPasswordIsEmpty
 	}
-	decryptedPassword := user.Password
+
+	if len(user.Password) < 5 {
+		return core_errors.ErrPasswordTooShort
+	}
+
 	user.Password = encryptPassword(user.Password)
 
 	userRepeated := i.userGateway.FindUserByUsername(user.UserName)
 	if userRepeated.ID != 0 {
-		return "", errors.New("username already exists")
+		return core_errors.ErrUsernameAlreadyExists
 	}
 
-	user, err := i.userGateway.CreateCompleteUserWithEmployee(user, employee)
+	//validate charge
+	_, err := i.chargeGateway.FindById(employee.Charge.ID)
+	if err != nil {
+		return err
+	}
+	user, err = i.userGateway.CreateCompleteUserWithEmployee(user, employee)
 
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return i.LoginUser(user.UserName, decryptedPassword)
+	return nil
 }
 
 func encryptPassword(password string) string {
@@ -111,7 +120,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 		return "", core_errors.ErrInactiveUser
 	}
 	if user.ID == 0 {
-		return "", errors.New("user not found")
+		return "", core_errors.ErrUserNotFound
 	}
 	if !isCorrectPassword(user.Password, password) {
 		return "", core_errors.ErrUsernameOrPasswordIsIncorrect

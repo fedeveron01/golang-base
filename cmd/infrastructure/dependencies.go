@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"fmt"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
+	charge_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/charge"
 	employee_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/employee"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
 	ping_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/ping"
@@ -10,6 +11,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	charge_usecase "github.com/fedeveron01/golang-base/cmd/usecases/charge"
 	employee_usecase "github.com/fedeveron01/golang-base/cmd/usecases/employee"
 	"github.com/fedeveron01/golang-base/cmd/usecases/material"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
@@ -29,6 +31,8 @@ type HandlerContainer struct {
 	CreateUser entrypoints.Handler
 	LoginUser  entrypoints.Handler
 	LogoutUser entrypoints.Handler
+	//charge
+	CreateCharge entrypoints.Handler
 	//employee
 	GetAllEmployee entrypoints.Handler
 }
@@ -68,6 +72,7 @@ func Start() HandlerContainer {
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
 	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway, chargeGateway)
+	chargeUseCase := charge_usecase.NewChargeUsecase(chargeGateway)
 	employeeUseCase := employee_usecase.NewEmployeeUsecase(employeeGateway)
 
 	// inject handlers
@@ -80,6 +85,8 @@ func Start() HandlerContainer {
 	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(sessionGateway, userUseCase)
 	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(sessionGateway, userUseCase)
 	handlerContainer.LogoutUser = user_handler.NewLogoutUserHandler(sessionGateway, userUseCase)
+
+	handlerContainer.CreateCharge = charge_handler.NewCreateChargeHandler(sessionGateway, chargeUseCase)
 
 	handlerContainer.GetAllEmployee = employee_handler.NewGetAllEmployeeHandler(sessionGateway, employeeUseCase)
 

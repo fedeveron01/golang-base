@@ -28,6 +28,18 @@ func (r *ChargeRepository) FindByName(name string) (gateway_entities.Charge, err
 	return charge, nil
 }
 
+func (r *ChargeRepository) FindById(id uint) (gateway_entities.Charge, error) {
+	var charge gateway_entities.Charge
+	res := r.db.Where("id = ?", id).Find(&charge)
+	if res.Error != nil {
+		return gateway_entities.Charge{}, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return gateway_entities.Charge{}, errors.New("charge not found")
+	}
+	return charge, nil
+}
+
 func (r *ChargeRepository) CreateCharge(charge gateway_entities.Charge) (gateway_entities.Charge, error) {
 	id := r.db.Create(&charge)
 	if id.Error != nil {
