@@ -5,6 +5,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	employee_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/employee"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
+	ping_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/ping"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/user"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
@@ -19,6 +20,8 @@ import (
 //inject dependencies..
 
 type HandlerContainer struct {
+	//ping
+	Ping entrypoints.Handler
 	//material
 	GetAllMaterial entrypoints.Handler
 	CreateMaterial entrypoints.Handler
@@ -70,6 +73,7 @@ func Start() HandlerContainer {
 	// inject handlers
 	handlerContainer := HandlerContainer{}
 
+	handlerContainer.Ping = ping_handler.NewPingHandler()
 	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(sessionGateway, materialUseCase)
 	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(sessionGateway, materialUseCase)
 

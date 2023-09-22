@@ -11,6 +11,8 @@ import (
 )
 
 func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer) {
+	//ping
+	app.HandleFunc("/ping", handlers.Ping.Handle).Methods("GET")
 
 	//material
 	app.HandleFunc("/api/material", handlers.GetAllMaterial.Handle).Methods("GET")
