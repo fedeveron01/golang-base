@@ -18,33 +18,23 @@ func NewUserRepository(database *gorm.DB) *UserRepository {
 
 func (r UserRepository) CreateCompleteUserWithEmployee(
 	user gateway_entities.User,
-	charge gateway_entities.Charge,
+	chargeID uint,
 	employee gateway_entities.Employee) (gateway_entities.User, error) {
-	r.db.Transaction(func(tx *gorm.DB) error {
+	err := r.db.Transaction(func(tx *gorm.DB) error {
 		tx.Create(&user)
-		// find charge
-		res := tx.Where("name = ?", charge.Name).Find(&charge)
-		if res.Error != nil {
-			return res.Error
-		}
-		if res.RowsAffected == 0 {
-			res := tx.Create(&charge)
-			if res.Error != nil {
-				return res.Error
-			}
-		}
-
 		employee.UserId = user.ID
-		employee.ChargeId = charge.ID
+		employee.ChargeId = chargeID
 
-		res = tx.Create(&employee)
+		res := tx.Create(&employee)
 		if res.Error != nil {
 			return res.Error
 		}
 		return nil
 
 	})
-
+	if err != nil {
+		return gateway_entities.User{}, err
+	}
 	user = r.FindUserByUsername(user.UserName)
 	return user, nil
 

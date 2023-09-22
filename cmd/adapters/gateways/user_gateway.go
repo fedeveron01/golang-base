@@ -32,10 +32,9 @@ func (i *UserGatewayImpl) CreateCompleteUserWithEmployee(user entities.User, emp
 			Password: employee.User.Password,
 		},
 	}
-	chargeDB := gateway_entities.Charge{
-		Name: employee.Charge.Name,
-	}
-	created, err := i.userRepository.CreateCompleteUserWithEmployee(userDB, chargeDB, employeeDB)
+	chargeID := employee.Charge.ID
+
+	created, err := i.userRepository.CreateCompleteUserWithEmployee(userDB, chargeID, employeeDB)
 	if err != nil {
 		return entities.User{}, err
 	}

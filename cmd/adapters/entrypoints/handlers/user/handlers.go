@@ -5,12 +5,14 @@ import (
 	"errors"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
+	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 type CreateUserHandler struct {
@@ -29,11 +31,21 @@ func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase us
 
 // Handle api/user/signup
 func (p *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAdmin(w, r) {
+		return
+	}
+
 	reqBody, _ := io.ReadAll(r.Body)
 	var userRequest CreateUserRequest
 	json.Unmarshal(reqBody, &userRequest)
 	// call use case and convert request to entities
-	token, err := p.userUseCase.CreateUser(entities.User{
+	chargeId, err := strconv.ParseUint(userRequest.ChargeId, 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+	err = p.userUseCase.CreateUser(entities.User{
 		UserName: userRequest.UserName,
 		Password: userRequest.Password,
 	}, entities.Employee{
@@ -41,16 +53,17 @@ func (p *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		LastName: userRequest.LastName,
 		DNI:      userRequest.DNI,
 		Charge: entities.Charge{
-			Name: userRequest.Charge,
+			EntitiesBase: core.EntitiesBase{
+				ID: uint(chargeId),
+			},
 		},
 	})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		p.WriteInternalServerError(w, err)
 		return
 	}
-	tokenResponse := TokenResponse{Token: token}
-	json.NewEncoder(w).Encode(tokenResponse)
+
+	json.NewEncoder(w).Encode("User created successfully")
 
 }
 
