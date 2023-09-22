@@ -29,8 +29,6 @@ func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase us
 	}
 }
 
-
-
 // Handle api/user/signup
 func (p *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAdmin(w, r) {
@@ -61,8 +59,7 @@ func (p *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		p.WriteInternalServerError(w, err)
 		return
 	}
 
@@ -98,7 +95,7 @@ func (p *LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	token, err := p.userUseCase.LoginUser(loginRequest.UserName, loginRequest.Password)
 	if err != nil {
 		if errors.Is(err, core_errors.ErrInactiveUser) {
-			p.WriteUnauthorizedError(w, err)
+			p.WriteUnauthorized(w)
 			return
 		}
 		p.WriteInternalServerError(w, err)
@@ -131,7 +128,7 @@ func (p *LogoutUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 	sessionId, err := p.GetSessionId(r)
 	if err != nil {
-		p.WriteUnauthorizedError(w, err)
+		p.WriteUnauthorized(w)
 		return
 	}
 
