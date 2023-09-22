@@ -15,6 +15,7 @@ type UserUseCase interface {
 	UpdateUser(user entities.User) error
 	DeleteUser(id string) error
 	LoginUser(username string, password string) (string, error)
+	LogoutUser(sessionId float64) error
 }
 
 type UserGateway interface {
@@ -31,7 +32,7 @@ type SessionGateway interface {
 	CreateSession(session entities.Session) (entities.Session, error)
 	FindAll() ([]entities.Session, error)
 	UpdateSession(session entities.Session) error
-	DeleteSession(id string) error
+	DeleteSession(id float64) error
 }
 
 type EmployeeGateway interface {
@@ -135,6 +136,16 @@ func (i *Implementation) UpdateUser(user entities.User) error {
 }
 func (i *Implementation) DeleteUser(id string) error {
 	return i.userGateway.DeleteUser(id)
+}
+
+func (i *Implementation) LogoutUser(sessionId float64) error {
+
+	err := i.sessionGateway.DeleteSession(sessionId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func generateToken(employee entities.Employee, session entities.Session) (string, error) {

@@ -19,6 +19,7 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	//user
 	app.HandleFunc("/api/user/signup", handlers.CreateUser.Handle).Methods("POST")
 	app.HandleFunc("/api/user/login", handlers.LoginUser.Handle).Methods("POST")
+	app.HandleFunc("/api/user/logout", handlers.LogoutUser.Handle).Methods("POST")
 
 	//charge
 	app.HandleFunc("/api/charge", handlers.CreateCharge.Handle).Methods("POST")
