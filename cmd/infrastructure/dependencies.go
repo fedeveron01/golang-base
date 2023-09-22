@@ -3,11 +3,13 @@ package infrastructure
 import (
 	"fmt"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
+	charge_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/charge"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/user"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	charge_usecase "github.com/fedeveron01/golang-base/cmd/usecases/charge"
 	"github.com/fedeveron01/golang-base/cmd/usecases/material"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"gorm.io/driver/mysql"
@@ -24,6 +26,8 @@ type HandlerContainer struct {
 	CreateUser entrypoints.Handler
 	LoginUser  entrypoints.Handler
 	LogoutUser entrypoints.Handler
+	//charge
+	CreateCharge entrypoints.Handler
 }
 
 func Start() HandlerContainer {
@@ -61,6 +65,7 @@ func Start() HandlerContainer {
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
 	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway, chargeGateway)
+	chargeUseCase := charge_usecase.NewChargeUsecase(chargeGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
@@ -72,6 +77,7 @@ func Start() HandlerContainer {
 	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(sessionGateway, userUseCase)
 	handlerContainer.LogoutUser = user_handler.NewLogoutUserHandler(sessionGateway, userUseCase)
 
+	handlerContainer.CreateCharge = charge_handler.NewCreateChargeHandler(sessionGateway, chargeUseCase)
 	return handlerContainer
 
 }
