@@ -20,8 +20,8 @@ type CreateUserHandler struct {
 	userUseCase user_usecase.UserUseCase
 }
 
-func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) CreateUserHandler {
-	return CreateUserHandler{
+func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *CreateUserHandler {
+	return &CreateUserHandler{
 		HandlerBase: entrypoints.HandlerBase{
 			SessionGateway: sessionGateway,
 		},
@@ -29,8 +29,10 @@ func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase us
 	}
 }
 
+
+
 // Handle api/user/signup
-func (p CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAdmin(w, r) {
 		return
 	}
@@ -73,15 +75,17 @@ type LoginUserHandler struct {
 	userUseCase user_usecase.UserUseCase
 }
 
-func NewLoginUserHandler(userUseCase user_usecase.UserUseCase) LoginUserHandler {
-	return LoginUserHandler{
-		HandlerBase: entrypoints.HandlerBase{},
+func NewLoginUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *LoginUserHandler {
+	return &LoginUserHandler{
+		HandlerBase: entrypoints.HandlerBase{
+			SessionGateway: sessionGateway,
+		},
 		userUseCase: userUseCase,
 	}
 }
 
 // Handle api/user/login
-func (p LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
 	var loginRequest LoginRequest
 
@@ -104,4 +108,38 @@ func (p LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 
 	tokenResponse := TokenResponse{Token: token, EmployeeId: claims.EmployeeId, Charge: claims.Role}
 	json.NewEncoder(w).Encode(tokenResponse)
+}
+
+type LogoutUserHandler struct {
+	entrypoints.HandlerBase
+	userUseCase user_usecase.UserUseCase
+}
+
+func NewLogoutUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *LogoutUserHandler {
+	return &LogoutUserHandler{
+		HandlerBase: entrypoints.HandlerBase{
+			SessionGateway: sessionGateway,
+		},
+		userUseCase: userUseCase,
+	}
+}
+
+// Handle api/user/logout
+func (p *LogoutUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	sessionId, err := p.GetSessionId(r)
+	if err != nil {
+		p.WriteUnauthorizedError(w, err)
+		return
+	}
+
+	err = p.userUseCase.LogoutUser(sessionId)
+
+	if err != nil {
+		p.WriteInternalServerError(w, err)
+		return
+	}
+
 }

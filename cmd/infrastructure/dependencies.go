@@ -23,6 +23,7 @@ type HandlerContainer struct {
 	//user
 	CreateUser entrypoints.Handler
 	LoginUser  entrypoints.Handler
+	LogoutUser entrypoints.Handler
 }
 
 func Start() HandlerContainer {
@@ -68,7 +69,8 @@ func Start() HandlerContainer {
 	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(sessionGateway, materialUseCase)
 
 	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(sessionGateway, userUseCase)
-	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(userUseCase)
+	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(sessionGateway, userUseCase)
+	handlerContainer.LogoutUser = user_handler.NewLogoutUserHandler(sessionGateway, userUseCase)
 
 	return handlerContainer
 
