@@ -27,20 +27,7 @@ func NewMaterialGateway(materialRepository repositories.MaterialRepository) *Mat
 
 func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) error {
 
-	materialTypeDB := gateway_entities.MaterialType{
-		Name: material.MaterialType.Name,
-	}
-	measurementUnitDB := gateway_entities.MeasurementUnit{
-		Name: material.MeasurementUnit.Name,
-	}
-	materialDB := gateway_entities.Material{
-		Name:            material.Name,
-		Description:     material.Description,
-		Price:           material.Price,
-		Stock:           material.Stock,
-		MaterialType:    materialTypeDB,
-		MeasurementUnit: measurementUnitDB,
-	}
+	materialDB := i.ToServiceEntity(material)
 	err := i.materialRepository.CreateMaterial(materialDB)
 	if err != nil {
 		return err
@@ -54,41 +41,46 @@ func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
 		return nil, err
 	}
 	materials := make([]entities.Material, len(materialsDB))
-	for i, materialDB := range materialsDB {
-		materials[i] = entities.Material{
-			EntitiesBase: core.EntitiesBase{
-				ID: materialDB.ID,
-			},
-			Name:            materialDB.Name,
-			Description:     materialDB.Description,
-			Price:           materialDB.Price,
-			Stock:           materialDB.Stock,
-			MaterialType:    entities.MaterialType{Name: materialDB.MaterialType.Name},
-			MeasurementUnit: entities.MeasurementUnit{Name: materialDB.MeasurementUnit.Name},
-		}
+	for index, materialDB := range materialsDB {
+		materials[index] = i.ToBusinessEntity(materialDB)
 
 	}
 	return materials, err
 }
 
 func (i *MaterialGatewayImpl) UpdateMaterial(material entities.Material) error {
-	materialTypeDB := gateway_entities.MaterialType{
-		Name: material.MaterialType.Name,
-	}
-	measurementUnitDB := gateway_entities.MeasurementUnit{
-		Name: material.MeasurementUnit.Name,
-	}
-	materialDB := gateway_entities.Material{
-		Name:            material.Name,
-		Description:     material.Description,
-		Price:           material.Price,
-		Stock:           material.Stock,
-		MaterialType:    materialTypeDB,
-		MeasurementUnit: measurementUnitDB,
-	}
+	materialDB := i.ToServiceEntity(material)
 	return i.materialRepository.UpdateMaterial(materialDB)
 }
 
 func (i *MaterialGatewayImpl) DeleteMaterial(id string) error {
 	return i.materialRepository.DeleteMaterial(id)
+}
+
+func (i *MaterialGatewayImpl) ToBusinessEntity(materialDB gateway_entities.Material) entities.Material {
+
+	material := entities.Material{
+		EntitiesBase: core.EntitiesBase{
+			ID: materialDB.ID,
+		},
+		Name:            materialDB.Name,
+		Description:     materialDB.Description,
+		Price:           materialDB.Price,
+		Stock:           materialDB.Stock,
+		MaterialType:    entities.MaterialType{Name: materialDB.MaterialType.Name},
+		MeasurementUnit: entities.MeasurementUnit{Name: materialDB.MeasurementUnit.Name},
+	}
+	return material
+}
+
+func (i *MaterialGatewayImpl) ToServiceEntity(material entities.Material) gateway_entities.Material {
+	materialDB := gateway_entities.Material{
+		Name:            material.Name,
+		Description:     material.Description,
+		Price:           material.Price,
+		Stock:           material.Stock,
+		MaterialType:    gateway_entities.MaterialType{Name: material.MaterialType.Name},
+		MeasurementUnit: gateway_entities.MeasurementUnit{Name: material.MeasurementUnit.Name},
+	}
+	return materialDB
 }

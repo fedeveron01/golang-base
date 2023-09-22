@@ -26,18 +26,26 @@ func (c ChargeGatewayImpl) FindByName(name string) (uint, error) {
 }
 
 func (c ChargeGatewayImpl) CreateCharge(charge entities.Charge) (entities.Charge, error) {
-	chargeDB := gateway_entities.Charge{
-		Name: charge.Name,
-	}
+	chargeDB := c.ToServiceEntity(charge)
 	created, err := c.chargeRepository.CreateCharge(chargeDB)
 	if err != nil {
 		return entities.Charge{}, err
 	}
-	charge = entities.Charge{
-		EntitiesBase: core.EntitiesBase{
-			ID: created.ID,
-		},
-		Name: created.Name,
-	}
+	charge = c.ToBusinessEntity(created)
 	return charge, nil
+}
+
+func (c ChargeGatewayImpl) ToBusinessEntity(chargeDB gateway_entities.Charge) entities.Charge {
+	return entities.Charge{
+		EntitiesBase: core.EntitiesBase{
+			ID: chargeDB.ID,
+		},
+		Name: chargeDB.Name,
+	}
+}
+
+func (c ChargeGatewayImpl) ToServiceEntity(charge entities.Charge) gateway_entities.Charge {
+	return gateway_entities.Charge{
+		Name: charge.Name,
+	}
 }
