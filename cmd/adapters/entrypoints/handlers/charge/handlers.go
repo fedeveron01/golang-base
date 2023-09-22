@@ -35,8 +35,7 @@ func (p CreateChargeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &charge)
 	err := p.chargeUseCase.CreateCharge(charge)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+		p.WriteInternalServerError(w, err)
 		return
 	}
 
