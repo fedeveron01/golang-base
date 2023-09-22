@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	charge_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/charge"
+	employee_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/employee"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
+	ping_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/ping"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/user"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 	charge_usecase "github.com/fedeveron01/golang-base/cmd/usecases/charge"
+	employee_usecase "github.com/fedeveron01/golang-base/cmd/usecases/employee"
 	"github.com/fedeveron01/golang-base/cmd/usecases/material"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"gorm.io/driver/mysql"
@@ -19,6 +22,8 @@ import (
 //inject dependencies..
 
 type HandlerContainer struct {
+	//ping
+	Ping entrypoints.Handler
 	//material
 	GetAllMaterial entrypoints.Handler
 	CreateMaterial entrypoints.Handler
@@ -28,6 +33,8 @@ type HandlerContainer struct {
 	LogoutUser entrypoints.Handler
 	//charge
 	CreateCharge entrypoints.Handler
+	//employee
+	GetAllEmployee entrypoints.Handler
 }
 
 func Start() HandlerContainer {
@@ -66,10 +73,12 @@ func Start() HandlerContainer {
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
 	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway, chargeGateway)
 	chargeUseCase := charge_usecase.NewChargeUsecase(chargeGateway)
+	employeeUseCase := employee_usecase.NewEmployeeUsecase(employeeGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
 
+	handlerContainer.Ping = ping_handler.NewPingHandler()
 	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(sessionGateway, materialUseCase)
 	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(sessionGateway, materialUseCase)
 
@@ -78,6 +87,9 @@ func Start() HandlerContainer {
 	handlerContainer.LogoutUser = user_handler.NewLogoutUserHandler(sessionGateway, userUseCase)
 
 	handlerContainer.CreateCharge = charge_handler.NewCreateChargeHandler(sessionGateway, chargeUseCase)
+
+	handlerContainer.GetAllEmployee = employee_handler.NewGetAllEmployeeHandler(sessionGateway, employeeUseCase)
+
 	return handlerContainer
 
 }

@@ -11,6 +11,8 @@ import (
 )
 
 func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer) {
+	//ping
+	app.HandleFunc("/ping", handlers.Ping.Handle).Methods("GET")
 
 	//material
 	app.HandleFunc("/api/material", handlers.GetAllMaterial.Handle).Methods("GET")
@@ -20,6 +22,9 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/user/signup", handlers.CreateUser.Handle).Methods("POST")
 	app.HandleFunc("/api/user/login", handlers.LoginUser.Handle).Methods("POST")
 	app.HandleFunc("/api/user/logout", handlers.LogoutUser.Handle).Methods("POST")
+
+	//employee
+	app.HandleFunc("/api/employee", handlers.GetAllEmployee.Handle).Methods("GET")
 
 	//charge
 	app.HandleFunc("/api/charge", handlers.CreateCharge.Handle).Methods("POST")

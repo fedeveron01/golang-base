@@ -15,6 +15,15 @@ func NewEmployeeRepository(database *gorm.DB) *EmployeeRepository {
 	}
 }
 
+func (r *EmployeeRepository) FindAll() ([]gateway_entities.Employee, error) {
+	var employees []gateway_entities.Employee
+	res := r.db.InnerJoins("User").InnerJoins("Charge").Find(&employees)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return employees, nil
+}
+
 func (r *EmployeeRepository) CreateEmployee(employee gateway_entities.Employee) error {
 	id := r.db.Create(&employee)
 	if id.Error != nil {
@@ -30,12 +39,6 @@ func (r *EmployeeRepository) FindEmployeeByUserId(id uint) (gateway_entities.Emp
 		return gateway_entities.Employee{}, res.Error
 	}
 	return employee, nil
-}
-
-func (r *EmployeeRepository) FindAll() ([]gateway_entities.Employee, error) {
-	var employees []gateway_entities.Employee
-	r.db.Find(&employees)
-	return employees, nil
 }
 
 func (r *EmployeeRepository) UpdateEmployee(employee gateway_entities.Employee) error {

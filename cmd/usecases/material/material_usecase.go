@@ -12,8 +12,8 @@ type MaterialUseCase interface {
 }
 
 type MaterialGateway interface {
-	CreateMaterial(material entities.Material) error
 	FindAll() ([]entities.Material, error)
+	CreateMaterial(material entities.Material) error
 	UpdateMaterial(material entities.Material) error
 	DeleteMaterial(id string) error
 }
