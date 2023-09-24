@@ -10,13 +10,18 @@ import (
 	"strconv"
 )
 
-type GetAllEmployeeHandler struct {
+type EmployeeHandlerInterface interface {
+	GetAll(w http.ResponseWriter, r *http.Request)
+	GetById(w http.ResponseWriter, r *http.Request)
+}
+
+type EmployeeHandler struct {
 	entrypoints.HandlerBase
 	employeeUseCase employee_usecase.EmployeeUseCase
 }
 
-func NewGetAllEmployeeHandler(sessionGateway gateways.SessionGateway, employeeUseCase employee_usecase.EmployeeUseCase) *GetAllEmployeeHandler {
-	return &GetAllEmployeeHandler{
+func NewEmployeeHandler(sessionGateway gateways.SessionGateway, employeeUseCase employee_usecase.EmployeeUseCase) *EmployeeHandler {
+	return &EmployeeHandler{
 		HandlerBase: entrypoints.HandlerBase{
 			SessionGateway: sessionGateway,
 		},
@@ -24,8 +29,8 @@ func NewGetAllEmployeeHandler(sessionGateway gateways.SessionGateway, employeeUs
 	}
 }
 
-// Handle api/employee
-func (p *GetAllEmployeeHandler) Handle(w http.ResponseWriter, r *http.Request) {
+// GetAll Handle api/employee
+func (p *EmployeeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}
@@ -38,22 +43,8 @@ func (p *GetAllEmployeeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(employeesResponse)
 }
 
-type GetByIdEmployeeHandler struct {
-	entrypoints.HandlerBase
-	employeeUseCase employee_usecase.EmployeeUseCase
-}
-
-func NewGetByIdEmployeeHandler(sessionGateway gateways.SessionGateway, employeeUseCase employee_usecase.EmployeeUseCase) *GetByIdEmployeeHandler {
-	return &GetByIdEmployeeHandler{
-		HandlerBase: entrypoints.HandlerBase{
-			SessionGateway: sessionGateway,
-		},
-		employeeUseCase: employeeUseCase,
-	}
-}
-
-// Handle api/employee/{id}
-func (g *GetByIdEmployeeHandler) Handle(w http.ResponseWriter, r *http.Request) {
+// GetById Handle api/employee/{id}
+func (g *EmployeeHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	if !g.IsAuthorized(w, r) {
 		return
 	}

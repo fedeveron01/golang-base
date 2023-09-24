@@ -30,7 +30,12 @@ func (e *EmployeeGatewayImpl) FindAll() ([]entities.Employee, error) {
 }
 
 func (e *EmployeeGatewayImpl) FindById(id int64) (entities.Employee, error) {
-	return entities.Employee{}, nil
+	employeeDB, err := e.employeeRepository.FindById(id)
+	if err != nil {
+		return entities.Employee{}, err
+	}
+	employee := e.ToBusinessEntity(employeeDB)
+	return employee, err
 }
 
 func (e *EmployeeGatewayImpl) CreateEmployee(employee entities.Employee) error {
@@ -126,13 +131,8 @@ func (e *EmployeeGatewayImpl) ToServiceEntity(employee entities.Employee) gatewa
 		Name:     employee.Name,
 		LastName: employee.LastName,
 		DNI:      employee.DNI,
-		User: gateway_entities.User{
-			UserName: employee.User.UserName,
-			Password: employee.User.Password,
-		},
-		Charge: gateway_entities.Charge{
-			Name: employee.Charge.Name,
-		},
+		UserId:   employee.User.ID,
+		ChargeId: employee.Charge.ID,
 	}
 	return employeeDB
 }

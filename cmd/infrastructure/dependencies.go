@@ -26,17 +26,13 @@ type HandlerContainer struct {
 	//ping
 	Ping entrypoints.Handler
 	//material
-	GetAllMaterial entrypoints.Handler
-	CreateMaterial entrypoints.Handler
+	MaterialHandler material_handler.MaterialHandlerInterface
 	//user
-	CreateUser entrypoints.Handler
-	LoginUser  entrypoints.Handler
-	LogoutUser entrypoints.Handler
+	UserHandler user_handler.UserHandlerInterface
 	//charge
-	GettAllCharges entrypoints.Handler
-	CreateCharge   entrypoints.Handler
+	ChargeHandler charge_handler.ChargeHandlerInterface
 	//employee
-	GetAllEmployee entrypoints.Handler
+	EmployeeHandler employee_handler.EmployeeHandlerInterface
 }
 
 func Start() HandlerContainer {
@@ -81,17 +77,12 @@ func Start() HandlerContainer {
 	handlerContainer := HandlerContainer{}
 
 	handlerContainer.Ping = ping_handler.NewPingHandler()
-	handlerContainer.CreateMaterial = material_handler.NewCreateMaterialHandler(sessionGateway, materialUseCase)
-	handlerContainer.GetAllMaterial = material_handler.NewGetAllMaterialHandler(sessionGateway, materialUseCase)
+	handlerContainer.MaterialHandler = material_handler.NewMaterialHandler(sessionGateway, materialUseCase)
 
-	handlerContainer.CreateUser = user_handler.NewCreateUserHandler(sessionGateway, userUseCase)
-	handlerContainer.LoginUser = user_handler.NewLoginUserHandler(sessionGateway, userUseCase)
-	handlerContainer.LogoutUser = user_handler.NewLogoutUserHandler(sessionGateway, userUseCase)
+	handlerContainer.UserHandler = user_handler.NewUserHandler(sessionGateway, userUseCase)
 
-	handlerContainer.GettAllCharges = charge_handler.NewGetAllChargesHandler(sessionGateway, chargeUseCase)
-	handlerContainer.CreateCharge = charge_handler.NewCreateChargeHandler(sessionGateway, chargeUseCase)
-
-	handlerContainer.GetAllEmployee = employee_handler.NewGetAllEmployeeHandler(sessionGateway, employeeUseCase)
+	handlerContainer.ChargeHandler = charge_handler.NewChargeHandler(sessionGateway, chargeUseCase)
+	handlerContainer.EmployeeHandler = employee_handler.NewEmployeeHandler(sessionGateway, employeeUseCase)
 
 	return handlerContainer
 

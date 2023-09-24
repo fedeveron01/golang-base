@@ -24,12 +24,13 @@ func (r *EmployeeRepository) FindAll() ([]gateway_entities.Employee, error) {
 	return employees, nil
 }
 
-func (r *EmployeeRepository) CreateEmployee(employee gateway_entities.Employee) error {
-	id := r.db.Create(&employee)
-	if id.Error != nil {
-		return id.Error
+func (r *EmployeeRepository) FindById(id int64) (gateway_entities.Employee, error) {
+	var employee gateway_entities.Employee
+	res := r.db.InnerJoins("User").InnerJoins("Charge").Find(&employee, id).First(&employee)
+	if res.Error != nil {
+		return gateway_entities.Employee{}, res.Error
 	}
-	return nil
+	return employee, nil
 }
 
 func (r *EmployeeRepository) FindEmployeeByUserId(id uint) (gateway_entities.Employee, error) {
@@ -39,6 +40,14 @@ func (r *EmployeeRepository) FindEmployeeByUserId(id uint) (gateway_entities.Emp
 		return gateway_entities.Employee{}, res.Error
 	}
 	return employee, nil
+}
+
+func (r *EmployeeRepository) CreateEmployee(employee gateway_entities.Employee) error {
+	id := r.db.Create(&employee)
+	if id.Error != nil {
+		return id.Error
+	}
+	return nil
 }
 
 func (r *EmployeeRepository) UpdateEmployee(employee gateway_entities.Employee) error {

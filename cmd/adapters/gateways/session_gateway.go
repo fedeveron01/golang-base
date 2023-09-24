@@ -106,10 +106,6 @@ func (s *SessionGatewayImpl) ToBusinessEntity(sessionDB gateway_entities.Session
 func (s *SessionGatewayImpl) ToServiceEntity(session entities.Session) gateway_entities.Session {
 	sessionDB := gateway_entities.Session{
 		UserId: session.User.ID,
-		User: gateway_entities.User{
-			UserName: session.User.UserName,
-			Password: session.User.Password,
-		},
 	}
 	return sessionDB
 }
