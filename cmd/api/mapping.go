@@ -27,6 +27,7 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/employee", handlers.GetAllEmployee.Handle).Methods("GET")
 
 	//charge
+	app.HandleFunc("/api/charge", handlers.GettAllCharges.Handle).Methods("GET")
 	app.HandleFunc("/api/charge", handlers.CreateCharge.Handle).Methods("POST")
 
 	fmt.Println("Starting app in localhost:8080")

@@ -16,6 +16,17 @@ func NewChargeGateway(chargeRepository repositories.ChargeRepository) *ChargeGat
 		chargeRepository: chargeRepository,
 	}
 }
+func (c ChargeGatewayImpl) FindAll() ([]entities.Charge, error) {
+	chargesDB, err := c.chargeRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	charges := make([]entities.Charge, len(chargesDB))
+	for i, chargesDB := range chargesDB {
+		charges[i] = c.ToBusinessEntity(chargesDB)
+	}
+	return charges, err
+}
 
 func (c ChargeGatewayImpl) FindByName(name string) (uint, error) {
 	charge, err := c.chargeRepository.FindByName(name)
