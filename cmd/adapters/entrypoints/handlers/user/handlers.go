@@ -15,13 +15,19 @@ import (
 	"strconv"
 )
 
-type CreateUserHandler struct {
+type UserHandlerInterface interface {
+	Signup(w http.ResponseWriter, r *http.Request)
+	Login(w http.ResponseWriter, r *http.Request)
+	Logout(w http.ResponseWriter, r *http.Request)
+}
+
+type UserHandler struct {
 	entrypoints.HandlerBase
 	userUseCase user_usecase.UserUseCase
 }
 
-func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *CreateUserHandler {
-	return &CreateUserHandler{
+func NewUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *UserHandler {
+	return &UserHandler{
 		HandlerBase: entrypoints.HandlerBase{
 			SessionGateway: sessionGateway,
 		},
@@ -30,7 +36,7 @@ func NewCreateUserHandler(sessionGateway gateways.SessionGateway, userUseCase us
 }
 
 // Handle api/user/signup
-func (p *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAdmin(w, r) {
 		return
 	}
@@ -63,26 +69,12 @@ func (p *CreateUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode("User created successfully")
+	p.WriteResponse(w, "user created", http.StatusCreated)
 
-}
-
-type LoginUserHandler struct {
-	entrypoints.HandlerBase
-	userUseCase user_usecase.UserUseCase
-}
-
-func NewLoginUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *LoginUserHandler {
-	return &LoginUserHandler{
-		HandlerBase: entrypoints.HandlerBase{
-			SessionGateway: sessionGateway,
-		},
-		userUseCase: userUseCase,
-	}
 }
 
 // Handle api/user/login
-func (p *LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := io.ReadAll(r.Body)
 	var loginRequest LoginRequest
 
@@ -107,22 +99,8 @@ func (p *LoginUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tokenResponse)
 }
 
-type LogoutUserHandler struct {
-	entrypoints.HandlerBase
-	userUseCase user_usecase.UserUseCase
-}
-
-func NewLogoutUserHandler(sessionGateway gateways.SessionGateway, userUseCase user_usecase.UserUseCase) *LogoutUserHandler {
-	return &LogoutUserHandler{
-		HandlerBase: entrypoints.HandlerBase{
-			SessionGateway: sessionGateway,
-		},
-		userUseCase: userUseCase,
-	}
-}
-
 // Handle api/user/logout
-func (p *LogoutUserHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}

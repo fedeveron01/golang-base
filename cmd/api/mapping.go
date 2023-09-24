@@ -15,20 +15,21 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/ping", handlers.Ping.Handle).Methods("GET")
 
 	//material
-	app.HandleFunc("/api/material", handlers.GetAllMaterial.Handle).Methods("GET")
-	app.HandleFunc("/api/material", handlers.CreateMaterial.Handle).Methods("POST")
+	app.HandleFunc("/api/material", handlers.MaterialHandler.GetAll).Methods("GET")
+	app.HandleFunc("/api/material", handlers.MaterialHandler.Create).Methods("POST")
 
 	//user
-	app.HandleFunc("/api/user/signup", handlers.CreateUser.Handle).Methods("POST")
-	app.HandleFunc("/api/user/login", handlers.LoginUser.Handle).Methods("POST")
-	app.HandleFunc("/api/user/logout", handlers.LogoutUser.Handle).Methods("POST")
+	app.HandleFunc("/api/user/signup", handlers.UserHandler.Signup).Methods("POST")
+	app.HandleFunc("/api/user/login", handlers.UserHandler.Login).Methods("POST")
+	app.HandleFunc("/api/user/logout", handlers.UserHandler.Logout).Methods("POST")
 
 	//employee
-	app.HandleFunc("/api/employee", handlers.GetAllEmployee.Handle).Methods("GET")
+	app.HandleFunc("/api/employee", handlers.EmployeeHandler.GetAll).Methods("GET")
+	app.HandleFunc("/api/employee/{id}", handlers.EmployeeHandler.GetById).Methods("GET")
 
 	//charge
-	app.HandleFunc("/api/charge", handlers.GettAllCharges.Handle).Methods("GET")
-	app.HandleFunc("/api/charge", handlers.CreateCharge.Handle).Methods("POST")
+	app.HandleFunc("/api/charge", handlers.ChargeHandler.GetAll).Methods("GET")
+	app.HandleFunc("/api/charge", handlers.ChargeHandler.Create).Methods("POST")
 
 	fmt.Println("Starting app in localhost:8080")
 	handler := cors.AllowAll().Handler(&app)

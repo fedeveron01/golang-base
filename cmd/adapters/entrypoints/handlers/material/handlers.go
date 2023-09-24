@@ -11,18 +11,17 @@ import (
 	"net/http"
 )
 
-type CreateMaterialHandler struct {
+type MaterialHandlerInterface interface {
+	Create(w http.ResponseWriter, r *http.Request)
+	GetAll(w http.ResponseWriter, r *http.Request)
+}
+type MaterialHandler struct {
 	entrypoints.HandlerBase
 	materialUseCase material_usecase.MaterialUseCase
 }
 
-type GetAllMaterialHandler struct {
-	entrypoints.HandlerBase
-	materialUseCase material_usecase.MaterialUseCase
-}
-
-func NewCreateMaterialHandler(sessionGateway gateways.SessionGateway, materialUseCase material_usecase.MaterialUseCase) *CreateMaterialHandler {
-	return &CreateMaterialHandler{
+func NewMaterialHandler(sessionGateway gateways.SessionGateway, materialUseCase material_usecase.MaterialUseCase) *MaterialHandler {
+	return &MaterialHandler{
 		HandlerBase: entrypoints.HandlerBase{
 			SessionGateway: sessionGateway,
 		},
@@ -30,7 +29,8 @@ func NewCreateMaterialHandler(sessionGateway gateways.SessionGateway, materialUs
 	}
 }
 
-func (p *CreateMaterialHandler) Handle(w http.ResponseWriter, r *http.Request) {
+// Create api/material
+func (p *MaterialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}
@@ -43,18 +43,11 @@ func (p *CreateMaterialHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
+	p.WriteResponse(w, "material created", http.StatusCreated)
+
 }
 
-func NewGetAllMaterialHandler(sessionGateway gateways.SessionGateway, materialUseCase material_usecase.MaterialUseCase) *GetAllMaterialHandler {
-	return &GetAllMaterialHandler{
-		HandlerBase: entrypoints.HandlerBase{
-			SessionGateway: sessionGateway,
-		},
-		materialUseCase: materialUseCase,
-	}
-}
-
-func (p *GetAllMaterialHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *MaterialHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}

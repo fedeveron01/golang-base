@@ -14,6 +14,7 @@ type EmployeeUseCase interface {
 
 type EmployeeGateway interface {
 	FindAll() ([]entities.Employee, error)
+	FindById(id int64) (entities.Employee, error)
 	CreateEmployee(employee entities.Employee) error
 	UpdateEmployee(employee entities.Employee) error
 	DeleteEmployee(id string) error
@@ -33,7 +34,7 @@ func (i *Implementation) FindAll() ([]entities.Employee, error) {
 	return i.employeeGateway.FindAll()
 }
 func (i *Implementation) FindById(id int64) (entities.Employee, error) {
-	return entities.Employee{}, nil
+	return i.employeeGateway.FindById(id)
 }
 func (i *Implementation) CreateEmployee(employee entities.Employee) error {
 	err := i.employeeGateway.CreateEmployee(employee)

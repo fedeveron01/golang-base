@@ -11,13 +11,18 @@ import (
 	charge_usecase "github.com/fedeveron01/golang-base/cmd/usecases/charge"
 )
 
-type GetAllChargeHandler struct {
+type ChargeHandlerInterface interface {
+	GetAll(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request)
+}
+
+type ChargeHandler struct {
 	entrypoints.HandlerBase
 	chargeUseCase charge_usecase.ChargeUseCase
 }
 
-func NewGetAllChargesHandler(sessionGateway gateways.SessionGateway, chargeUseCase charge_usecase.ChargeUseCase) *GetAllChargeHandler {
-	return &GetAllChargeHandler{
+func NewChargeHandler(sessionGateway gateways.SessionGateway, chargeUseCase charge_usecase.ChargeUseCase) *ChargeHandler {
+	return &ChargeHandler{
 		HandlerBase: entrypoints.HandlerBase{
 			SessionGateway: sessionGateway,
 		},
@@ -26,7 +31,7 @@ func NewGetAllChargesHandler(sessionGateway gateways.SessionGateway, chargeUseCa
 }
 
 // Handle api/charge
-func (p *GetAllChargeHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *ChargeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}
@@ -37,22 +42,8 @@ func (p *GetAllChargeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(charges)
 }
 
-type CreateChargeHandler struct {
-	entrypoints.HandlerBase
-	chargeUseCase charge_usecase.ChargeUseCase
-}
-
-func NewCreateChargeHandler(sessionGateway gateways.SessionGateway, chargeUseCase charge_usecase.ChargeUseCase) *CreateChargeHandler {
-	return &CreateChargeHandler{
-		HandlerBase: entrypoints.HandlerBase{
-			SessionGateway: sessionGateway,
-		},
-		chargeUseCase: chargeUseCase,
-	}
-}
-
 // Handle api/charge
-func (p *CreateChargeHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (p *ChargeHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}
@@ -68,6 +59,7 @@ func (p *CreateChargeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	p.WriteResponse(w, "charge created", http.StatusCreated)
 	w.WriteHeader(http.StatusCreated)
 
 }

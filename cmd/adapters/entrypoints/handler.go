@@ -16,27 +16,26 @@ type HandlerBase struct {
 	gateways.SessionGateway
 }
 
-type ErrorResponse struct {
+type MessageResponse struct {
 	Message string `json:"message"`
 	Status  int    `json:"status"`
 }
 
-func ToErrorResponse(w http.ResponseWriter, err error, status int) {
-	errorResponse := ErrorResponse{
-		Message: err.Error(),
+func (h *HandlerBase) WriteResponse(w http.ResponseWriter, message string, status int) {
+	w.WriteHeader(status)
+	response := MessageResponse{
+		Message: message,
 		Status:  status,
 	}
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(errorResponse)
+	json.NewEncoder(w).Encode(response)
 }
 
 func (h *HandlerBase) WriteUnauthorized(w http.ResponseWriter) {
-	ToErrorResponse(w, errors.New("unauthorized"), http.StatusUnauthorized)
+	h.WriteResponse(w, errors.New("unauthorized").Error(), http.StatusUnauthorized)
 }
 
 func (h *HandlerBase) WriteInternalServerError(w http.ResponseWriter, err error) {
-	ToErrorResponse(w, err, http.StatusInternalServerError)
-
+	h.WriteResponse(w, err.Error(), http.StatusInternalServerError)
 }
 
 func (h *HandlerBase) GetSessionId(r *http.Request) (float64, error) {
