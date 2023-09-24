@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"gorm.io/gorm"
 )
@@ -14,6 +15,14 @@ func NewChargeRepository(database *gorm.DB) *ChargeRepository {
 	return &ChargeRepository{
 		db: database,
 	}
+}
+func (r *ChargeRepository) FindAll() ([]gateway_entities.Charge, error) {
+	var charges []gateway_entities.Charge
+	res := r.db.Find(&charges)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	return charges, nil
 }
 
 func (r *ChargeRepository) FindByName(name string) (gateway_entities.Charge, error) {

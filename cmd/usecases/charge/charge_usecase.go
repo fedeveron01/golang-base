@@ -2,16 +2,19 @@ package charge_usecase
 
 import (
 	"errors"
+
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 )
 
 type ChargeUseCase interface {
+	FindAll() ([]entities.Charge, error)
 	CreateCharge(charge entities.Charge) error
 }
 
 type ChargeGateway interface {
-	CreateCharge(charge entities.Charge) (entities.Charge, error)
+	FindAll() ([]entities.Charge, error)
 	FindByName(name string) (uint, error)
+	CreateCharge(charge entities.Charge) (entities.Charge, error)
 }
 
 type Implementation struct {
@@ -22,6 +25,10 @@ func NewChargeUsecase(chargeGateway ChargeGateway) *Implementation {
 	return &Implementation{
 		chargeGateway: chargeGateway,
 	}
+}
+
+func (i *Implementation) FindAll() ([]entities.Charge, error) {
+	return i.chargeGateway.FindAll()
 }
 
 func (i *Implementation) CreateCharge(charge entities.Charge) error {
