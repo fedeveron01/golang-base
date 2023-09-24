@@ -34,8 +34,6 @@ func (p *GetAllChargeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.WriteInternalServerError(w, err)
 	}
-
-	//employeesResponse := ToEmployeeResponses(employees)
 	json.NewEncoder(w).Encode(charges)
 }
 
