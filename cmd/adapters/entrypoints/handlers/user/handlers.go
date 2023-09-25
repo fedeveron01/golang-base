@@ -12,7 +12,6 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"io"
 	"net/http"
-	"strconv"
 )
 
 type UserHandlerInterface interface {
@@ -45,13 +44,8 @@ func (p *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	var userRequest CreateUserRequest
 	json.Unmarshal(reqBody, &userRequest)
 	// call use case and convert request to entities
-	chargeId, err := strconv.ParseUint(userRequest.ChargeId, 10, 32)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
-		return
-	}
-	err = p.userUseCase.CreateUser(entities.User{
+
+	err := p.userUseCase.CreateUser(entities.User{
 		UserName: userRequest.UserName,
 		Password: userRequest.Password,
 	}, entities.Employee{
@@ -60,7 +54,7 @@ func (p *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		DNI:      userRequest.DNI,
 		Charge: entities.Charge{
 			EntitiesBase: core.EntitiesBase{
-				ID: uint(chargeId),
+				ID: uint(userRequest.ChargeId),
 			},
 		},
 	})

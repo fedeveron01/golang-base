@@ -11,7 +11,7 @@ type CreateUserRequest struct {
 	Name     string
 	LastName string
 	DNI      string
-	ChargeId string
+	ChargeId float64
 }
 
 type TokenResponse struct {

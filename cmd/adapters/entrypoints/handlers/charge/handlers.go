@@ -39,7 +39,9 @@ func (p *ChargeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		p.WriteInternalServerError(w, err)
 	}
-	json.NewEncoder(w).Encode(charges)
+	chargesResponse := ToChargesResponse(charges)
+
+	json.NewEncoder(w).Encode(chargesResponse)
 }
 
 // Handle api/charge
