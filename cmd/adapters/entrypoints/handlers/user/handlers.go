@@ -2,12 +2,10 @@ package user_handler
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"io"
@@ -59,7 +57,7 @@ func (p *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteErrorResponse(w, err)
 		return
 	}
 
@@ -80,12 +78,7 @@ func (p *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := p.userUseCase.LoginUser(loginRequest.UserName, loginRequest.Password)
 	if err != nil {
-		if errors.Is(err, core_errors.ErrInactiveUser) {
-			p.WriteUnauthorized(w)
-			return
-		}
-		p.WriteInternalServerError(w, err)
-		return
+		p.WriteErrorResponse(w, err)
 	}
 	claims, _ := internal_jwt.ParseToken(token)
 
@@ -107,7 +100,7 @@ func (p *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	err = p.userUseCase.LogoutUser(sessionId)
 
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

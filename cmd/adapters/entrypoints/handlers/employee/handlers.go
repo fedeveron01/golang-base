@@ -36,7 +36,7 @@ func (p *EmployeeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 	employees, err := p.employeeUseCase.FindAll()
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteErrorResponse(w, err)
 	}
 
 	employeesResponse := ToEmployeeResponses(employees)
@@ -53,7 +53,7 @@ func (g *EmployeeHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	intId, _ := strconv.ParseInt(id, 10, 64)
 	employee, err := g.employeeUseCase.FindById(intId)
 	if err != nil {
-		g.WriteInternalServerError(w, err)
+		g.WriteErrorResponse(w, err)
 		return
 	}
 	employeeResponse := ToEmployeeResponse(employee)

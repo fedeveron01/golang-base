@@ -70,18 +70,18 @@ func NewUserUseCase(userGateway UserGateway,
 
 func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) error {
 	if user.UserName == "" || user.Password == "" {
-		return core_errors.ErrUsernameOrPasswordIsEmpty
+		return core_errors.NewBadRequestError("username or password is empty")
 	}
 
 	if len(user.Password) < 5 {
-		return core_errors.ErrPasswordTooShort
+		return core_errors.NewBadRequestError("password must be at least 5 characters")
 	}
 
 	user.Password = encryptPassword(user.Password)
 
 	userRepeated := i.userGateway.FindUserByUsername(user.UserName)
 	if userRepeated.ID != 0 {
-		return core_errors.ErrUsernameAlreadyExists
+		return core_errors.NewInternalServerError("user already exists")
 	}
 
 	//validate charge
@@ -113,17 +113,14 @@ func isCorrectPassword(encryptedPassword string, password string) bool {
 
 func (i *Implementation) LoginUser(username string, password string) (string, error) {
 	if username == "" || password == "" {
-		return "", core_errors.ErrUsernameOrPasswordIsEmpty
+		return "", core_errors.NewBadRequestError("username or password is empty")
 	}
 	user := i.userGateway.FindUserByUsername(username)
-	if user.Inactive {
-		return "", core_errors.ErrInactiveUser
-	}
-	if user.ID == 0 {
-		return "", core_errors.ErrUserNotFound
+	if user.Inactive || user.ID == 0 {
+		return "", core_errors.NewNotFoundError("user not found")
 	}
 	if !isCorrectPassword(user.Password, password) {
-		return "", core_errors.ErrUsernameOrPasswordIsIncorrect
+		return "", core_errors.NewUnauthorizedError("incorrect password")
 	}
 	// create session
 	session := entities.Session{

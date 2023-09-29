@@ -39,8 +39,7 @@ func (p *MaterialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &material)
 	err := p.materialUseCase.CreateMaterial(material)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err)
+		p.WriteErrorResponse(w, err)
 		return
 	}
 	p.WriteResponse(w, "material created", http.StatusCreated)
