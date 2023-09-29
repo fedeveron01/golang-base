@@ -2,8 +2,8 @@ package entrypoints
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
+	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"net/http"
 )
@@ -30,12 +30,36 @@ func (h *HandlerBase) WriteResponse(w http.ResponseWriter, message string, statu
 	json.NewEncoder(w).Encode(response)
 }
 
+func (h *HandlerBase) WriteErrorResponse(w http.ResponseWriter, err error) {
+	var status int
+
+	switch err.(type) {
+	case *core_errors.NotFoundError:
+		{
+			status = http.StatusNotFound
+		}
+	case *core_errors.UnauthorizedError:
+		{
+			status = http.StatusUnauthorized
+		}
+	case *core_errors.BadRequestError:
+		{
+			status = http.StatusBadRequest
+		}
+	default:
+		{
+			status = http.StatusInternalServerError
+		}
+	}
+	h.WriteResponse(w, err.Error(), status)
+}
+
 func (h *HandlerBase) WriteUnauthorized(w http.ResponseWriter) {
-	h.WriteResponse(w, errors.New("unauthorized").Error(), http.StatusUnauthorized)
+	h.WriteErrorResponse(w, core_errors.NewUnauthorizedError("Unauthorized"))
 }
 
 func (h *HandlerBase) WriteInternalServerError(w http.ResponseWriter, err error) {
-	h.WriteResponse(w, err.Error(), http.StatusInternalServerError)
+	h.WriteErrorResponse(w, core_errors.NewInternalServerError(err.Error()))
 }
 
 func (h *HandlerBase) GetSessionId(r *http.Request) (float64, error) {

@@ -37,7 +37,7 @@ func (p *ChargeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 	charges, err := p.chargeUseCase.FindAll()
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteErrorResponse(w, err)
 	}
 	chargesResponse := ToChargesResponse(charges)
 
@@ -57,7 +57,7 @@ func (p *ChargeHandler) Create(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &charge)
 	err := p.chargeUseCase.CreateCharge(charge)
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteErrorResponse(w, err)
 		return
 	}
 
