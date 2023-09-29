@@ -2,6 +2,8 @@ package infrastructure
 
 import (
 	"fmt"
+	material_type_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material_type"
+	material_type_usecase "github.com/fedeveron01/golang-base/cmd/usecases/material_type"
 
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	charge_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/charge"
@@ -27,6 +29,8 @@ type HandlerContainer struct {
 	Ping entrypoints.Handler
 	//material
 	MaterialHandler material_handler.MaterialHandlerInterface
+	//material type
+	MaterialTypeHandler material_type_handler.MaterialTypeHandlerInterface
 	//user
 	UserHandler user_handler.UserHandlerInterface
 	//charge
@@ -59,6 +63,7 @@ func Start() HandlerContainer {
 	employeeRepository := repositories.NewEmployeeRepository(db)
 	chargeRepository := repositories.NewChargeRepository(db)
 	userRepository := repositories.NewUserRepository(db)
+	materialTypeRepository := repositories.NewMaterialTypeRepository(db)
 
 	// inject gateways
 	materialGateway := gateways.NewMaterialGateway(*materialRepository)
@@ -66,12 +71,14 @@ func Start() HandlerContainer {
 	sessionGateway := gateways.NewSessionGateway(*sessionRepository)
 	employeeGateway := gateways.NewEmployeeGateway(*employeeRepository)
 	chargeGateway := gateways.NewChargeGateway(*chargeRepository)
+	materialTypeGateway := gateways.NewMaterialTypeGateway(*materialTypeRepository)
 
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
 	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway, chargeGateway)
 	chargeUseCase := charge_usecase.NewChargeUsecase(chargeGateway)
 	employeeUseCase := employee_usecase.NewEmployeeUsecase(employeeGateway)
+	materialTypeUseCase := material_type_usecase.NewMaterialTypeUsecase(materialTypeGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
@@ -83,6 +90,8 @@ func Start() HandlerContainer {
 
 	handlerContainer.ChargeHandler = charge_handler.NewChargeHandler(sessionGateway, chargeUseCase)
 	handlerContainer.EmployeeHandler = employee_handler.NewEmployeeHandler(sessionGateway, employeeUseCase)
+
+	handlerContainer.MaterialTypeHandler = material_type_handler.NewMaterialTypeHandler(sessionGateway, materialTypeUseCase)
 
 	return handlerContainer
 
