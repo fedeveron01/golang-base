@@ -31,11 +31,11 @@ jobs:
           port: 22
           script: |
             # Detener y eliminar el contenedor existente
-            docker stop factory || true
-            docker rm factory || true
+            sudo docker stop factory || true
+            sudo docker rm factory || true
 
             # Descargar la nueva versión de la imagen
-            docker pull fedeveron2/factory:latest
+            sudo docker pull fedeveron2/factory:latest
 
             # Crear y ejecutar el contenedor en el puerto 8080
-            docker run -d -p 8080:8080 --name factory fedeveron2/factory:latest
+            sudo docker run -d -p 8080:8080 --name factory fedeveron2/factory:latest
