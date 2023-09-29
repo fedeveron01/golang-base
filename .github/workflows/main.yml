@@ -31,11 +31,11 @@ jobs:
           port: 22
           script: |
             # Detener y eliminar el contenedor existente
-            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker stop nombre_del_contenedor || true
-            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker rm nombre_del_contenedor || true
+            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker stop factory || true
+            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker rm factory || true
       
             # Descargar la nueva versión de la imagen
-            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker pull nombre_de_tu_imagen:latest
+            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker pull fedeveron2/factory:latest
       
             # Crear y ejecutar el contenedor en el puerto 8080
-            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker run -d -p 8080:8080 --name nombre_del_contenedor nombre_de_tu_imagen:latest
+            echo ${{ secrets.VPS_PASSWORD }} | sudo -S docker run -d -p 8080:8080 --name factory fedeveron2/factory:latest
