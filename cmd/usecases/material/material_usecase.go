@@ -13,7 +13,7 @@ type MaterialUseCase interface {
 }
 
 type MaterialTypeGateway interface {
-	FindByName(name string) *entities.MaterialType
+	FindById(id uint) *entities.MaterialType
 }
 type MaterialGateway interface {
 	FindAll() ([]entities.Material, error)
@@ -40,7 +40,7 @@ func (i *Implementation) CreateMaterial(material entities.Material) (entities.Ma
 	if repeated != nil {
 		return entities.Material{}, core_errors.NewInternalServerError("Material already exists")
 	}
-	materialType := i.materialTypeGateway.FindByName(material.MaterialType.Name)
+	materialType := i.materialTypeGateway.FindById(material.MaterialType.ID)
 	if materialType == nil {
 		return entities.Material{}, core_errors.NewInternalServerError("Material Type not found")
 	}
