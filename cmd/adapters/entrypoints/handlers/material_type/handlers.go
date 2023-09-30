@@ -14,6 +14,7 @@ import (
 )
 
 type MaterialTypeHandlerInterface interface {
+	GetAll(w http.ResponseWriter, r *http.Request)
 	Create(w http.ResponseWriter, r *http.Request)
 }
 
@@ -29,6 +30,20 @@ func NewMaterialTypeHandler(sessionGateway gateways.SessionGateway, materialType
 		},
 		materialTypeUseCase: materialTypeUseCase,
 	}
+}
+
+func (p *MaterialTypeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	materialTypes, err := p.materialTypeUseCase.FindAll()
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+	materials := ToMaterialTypesResponse(materialTypes)
+
+	json.NewEncoder(w).Encode(materials)
 }
 
 // Handle api/materialType
