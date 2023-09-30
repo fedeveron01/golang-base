@@ -6,7 +6,7 @@ import (
 )
 
 func TestStringToUnitOfMeasurementEnumWhenEnumIsValidShouldReturnEmptyEnum(t *testing.T) {
-	result := StringToUnitOfMeasurementEnum("litros")
+	result := StringToUnitOfMeasurementEnum("invalid")
 	assert.Equal(t, result, Enum(""))
 }
 
