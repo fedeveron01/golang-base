@@ -25,14 +25,16 @@ func NewMaterialGateway(materialRepository repositories.MaterialRepository) *Mat
 	}
 }
 
-func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) error {
+func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) (entities.Material, error) {
 
 	materialDB := i.ToServiceEntity(material)
-	err := i.materialRepository.CreateMaterial(materialDB)
+	materialDBCreated, err := i.materialRepository.CreateMaterial(materialDB)
 	if err != nil {
-		return err
+		return entities.Material{}, err
 	}
-	return nil
+	materialCreated := i.ToBusinessEntity(materialDBCreated)
+
+	return materialCreated, nil
 }
 
 func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
@@ -46,6 +48,15 @@ func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
 
 	}
 	return materials, err
+}
+
+func (i *MaterialGatewayImpl) FindByName(name string) *entities.Material {
+	materialDB := i.materialRepository.FindByName(name)
+	if materialDB == nil {
+		return nil
+	}
+	material := i.ToBusinessEntity(*materialDB)
+	return &material
 }
 
 func (i *MaterialGatewayImpl) UpdateMaterial(material entities.Material) error {
@@ -63,24 +74,26 @@ func (i *MaterialGatewayImpl) ToBusinessEntity(materialDB gateway_entities.Mater
 		EntitiesBase: core.EntitiesBase{
 			ID: materialDB.ID,
 		},
-		Name:            materialDB.Name,
-		Description:     materialDB.Description,
-		Price:           materialDB.Price,
-		Stock:           materialDB.Stock,
-		MaterialType:    entities.MaterialType{Name: materialDB.MaterialType.Name},
-		MeasurementUnit: entities.MeasurementUnit{Name: materialDB.MeasurementUnit.Name},
+		Name:        materialDB.Name,
+		Description: materialDB.Description,
+		Price:       materialDB.Price,
+		Stock:       materialDB.Stock,
+		MaterialType: entities.MaterialType{
+			EntitiesBase: core.EntitiesBase{
+				ID: materialDB.MaterialType.ID,
+			},
+			Name: materialDB.MaterialType.Name},
 	}
 	return material
 }
 
 func (i *MaterialGatewayImpl) ToServiceEntity(material entities.Material) gateway_entities.Material {
 	materialDB := gateway_entities.Material{
-		Name:              material.Name,
-		Description:       material.Description,
-		Price:             material.Price,
-		Stock:             material.Stock,
-		MaterialTypeId:    material.MaterialType.ID,
-		MeasurementUnitId: material.MeasurementUnit.ID,
+		Name:           material.Name,
+		Description:    material.Description,
+		Price:          material.Price,
+		Stock:          material.Stock,
+		MaterialTypeId: material.MaterialType.ID,
 	}
 	return materialDB
 }
