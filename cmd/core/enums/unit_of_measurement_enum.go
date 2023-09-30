@@ -23,6 +23,19 @@ var mapUnitOfMeasurementEnumInSpanish = map[string]Enum{
 	"kilogramos": Kilograms,
 }
 
+func GetSymbolByUnitOfMeasurementEnum(enum Enum) string {
+	switch enum {
+	case Liters:
+		return "L"
+	case Meters:
+		return "m"
+	case Units:
+		return "u"
+	case Kilograms:
+		return "kg"
+	}
+	return ""
+}
 func StringToUnitOfMeasurementEnum(enum string) Enum {
 	enum = strings.ToLower(enum)
 

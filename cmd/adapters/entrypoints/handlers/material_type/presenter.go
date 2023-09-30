@@ -1,6 +1,9 @@
 package material_type_handler
 
-import "github.com/fedeveron01/golang-base/cmd/core/entities"
+import (
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
+)
 
 func ToMaterialTypesResponse(materialType []entities.MaterialType, language string) []MaterialTypeResponse {
 	var materialTypeResponses []MaterialTypeResponse
@@ -18,7 +21,8 @@ func ToUnitsOfMeasurementResponse(unitsOfMeasurement []string) []UnitOfMeasureme
 	var unitsOfMeasurementResponses []UnitOfMeasurementResponse
 	for _, unitOfMeasurement := range unitsOfMeasurement {
 		unitsOfMeasurementResponses = append(unitsOfMeasurementResponses, UnitOfMeasurementResponse{
-			Name: unitOfMeasurement,
+			Name:   unitOfMeasurement,
+			Symbol: enums.GetSymbolByUnitOfMeasurementEnum(enums.StringToUnitOfMeasurementEnum(unitOfMeasurement)),
 		})
 	}
 	return unitsOfMeasurementResponses

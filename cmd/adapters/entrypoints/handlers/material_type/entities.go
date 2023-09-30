@@ -7,5 +7,6 @@ type MaterialTypeResponse struct {
 }
 
 type UnitOfMeasurementResponse struct {
-	Name string `json:"name"`
+	Name   string `json:"name"`
+	Symbol string `json:"symbol"`
 }
