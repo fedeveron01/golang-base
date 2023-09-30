@@ -25,6 +25,9 @@ func NewMaterialTypeUsecase(materialTypeTypeGateway MaterialTypeTypeGateway) *Im
 }
 
 func (i *Implementation) CreateMaterialType(materialType entities.MaterialType) error {
+	if len(materialType.Name) < 2 {
+		return core_errors.NewInternalServerError("materialType name must be at least 2 characters")
+	}
 	repeated := i.materialTypeGateway.FindByName(materialType.Name)
 	if repeated != nil {
 		return core_errors.NewInternalServerError("materialType already exists")

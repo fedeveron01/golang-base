@@ -36,6 +36,15 @@ func NewMaterialUsecase(materialGateway MaterialGateway, materialTypeGateway Mat
 }
 
 func (i *Implementation) CreateMaterial(material entities.Material) (entities.Material, error) {
+	if len(material.Name) < 2 {
+		return entities.Material{}, core_errors.NewInternalServerError("Material name must be at least 2 characters")
+	}
+	if material.Price <= 0 {
+		return entities.Material{}, core_errors.NewInternalServerError("Material price must be greater than or equal to 0")
+	}
+	if material.Stock < 0 {
+		return entities.Material{}, core_errors.NewInternalServerError("Material stock must be greater than or equal to 0")
+	}
 	repeated := i.materialGateway.FindByName(material.Name)
 	if repeated != nil {
 		return entities.Material{}, core_errors.NewInternalServerError("Material already exists")
