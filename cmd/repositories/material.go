@@ -25,7 +25,7 @@ func (r *MaterialRepository) CreateMaterial(material gateway_entities.Material) 
 
 func (r *MaterialRepository) FindAll() ([]gateway_entities.Material, error) {
 	var materials []gateway_entities.Material
-	r.db.Find(&materials)
+	r.db.InnerJoins("MaterialType").Find(&materials)
 	return materials, nil
 }
 

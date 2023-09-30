@@ -29,6 +29,20 @@ func NewMaterialHandler(sessionGateway gateways.SessionGateway, materialUseCase 
 	}
 }
 
+// Get api/material
+
+func (p *MaterialHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	materials, err := p.materialUseCase.FindAll()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	json.NewEncoder(w).Encode(ToMaterialsResponse(materials))
+}
+
 // Create api/material
 func (p *MaterialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
@@ -44,15 +58,4 @@ func (p *MaterialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	p.WriteResponse(w, "material created", http.StatusCreated)
 
-}
-
-func (p *MaterialHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	if !p.IsAuthorized(w, r) {
-		return
-	}
-	materials, err := p.materialUseCase.FindAll()
-	if err != nil {
-		fmt.Println(err)
-	}
-	json.NewEncoder(w).Encode(materials)
 }
