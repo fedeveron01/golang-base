@@ -7,10 +7,11 @@ import (
 
 func ToMaterialEntity(request MaterialRequest) entities.Material {
 	return entities.Material{
-		Name:        request.Name,
-		Description: request.Description,
-		Price:       request.Price,
-		Stock:       request.Stock,
+		Name:            request.Name,
+		Description:     request.Description,
+		Price:           request.Price,
+		Stock:           request.Stock,
+		RepositionPoint: request.RepositionPoint,
 		MaterialType: entities.MaterialType{
 			EntitiesBase: core.EntitiesBase{
 				ID: request.MaterialTypeId,
@@ -22,12 +23,13 @@ func ToMaterialEntity(request MaterialRequest) entities.Material {
 
 func ToMaterialResponse(material entities.Material) MaterialResponse {
 	return MaterialResponse{
-		ID:             material.ID,
-		Name:           material.Name,
-		Description:    material.Description,
-		Price:          material.Price,
-		Stock:          material.Stock,
-		MaterialType:   material.MaterialType.Name,
-		MaterialTypeId: material.MaterialType.ID,
+		ID:              material.ID,
+		Name:            material.Name,
+		Description:     material.Description,
+		Price:           material.Price,
+		Stock:           material.Stock,
+		RepositionPoint: material.RepositionPoint,
+		MaterialType:    material.MaterialType.Name,
+		MaterialTypeId:  material.MaterialType.ID,
 	}
 }
