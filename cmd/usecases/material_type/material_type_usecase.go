@@ -72,6 +72,9 @@ func (i *Implementation) UpdateMaterialType(materialType entities.MaterialType) 
 	if len(materialType.Name) < 2 {
 		return entities.MaterialType{}, core_errors.NewBadRequestError("materialType name must be at least 2 characters")
 	}
+	if len(materialType.Name) > 20 {
+		return entities.MaterialType{}, core_errors.NewBadRequestError("materialType name must be less than 20 characters")
+	}
 
 	materialType, err := i.materialTypeGateway.UpdateMaterialType(materialType)
 	if err != nil {
