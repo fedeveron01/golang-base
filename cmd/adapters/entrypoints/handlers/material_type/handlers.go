@@ -43,7 +43,8 @@ func (p *MaterialTypeHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var materialType entities.MaterialType
 	json.Unmarshal(reqBody, &materialType)
 	// validate enum
-	if enums.StringToUnitOfMeasurementEnum(materialType.UnitOfMeasurement.String()) == ("") {
+	materialType.UnitOfMeasurement = enums.StringToUnitOfMeasurementEnum(materialType.UnitOfMeasurement.String())
+	if materialType.UnitOfMeasurement == ("") {
 		p.WriteErrorResponse(w, core_errors.NewBadRequestError("unitOfMeasurement is not valid"))
 		return
 	}
