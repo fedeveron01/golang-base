@@ -15,9 +15,9 @@ import (
 
 type MaterialTypeHandlerInterface interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
-	Create(w http.ResponseWriter, r *http.Request)
-
 	GetUnitsOfMeasurement(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
 }
 
 type MaterialTypeHandler struct {
@@ -89,4 +89,36 @@ func (p *MaterialTypeHandler) Create(w http.ResponseWriter, r *http.Request) {
 	p.WriteResponse(w, "materialType created", http.StatusCreated)
 	w.WriteHeader(http.StatusCreated)
 
+}
+
+// Handle api/materialType
+func (p *MaterialTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	if !p.IsAdmin(w, r) {
+		return
+	}
+
+	language := r.Header.Get("Language")
+	if language == "" {
+		language = "en"
+	}
+
+	reqBody, _ := io.ReadAll(r.Body)
+	var materialType entities.MaterialType
+	json.Unmarshal(reqBody, &materialType)
+
+	// validate enum
+	if enums.StringToUnitOfMeasurementEnum(materialType.UnitOfMeasurement.String("")) == ("") {
+		p.WriteErrorResponse(w, core_errors.NewBadRequestError("unitOfMeasurement is not valid"))
+		return
+	}
+	materialType, err := p.materialTypeUseCase.UpdateMaterialType(materialType)
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(ToMaterialTypeResponse(materialType, language))
 }

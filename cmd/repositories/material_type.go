@@ -2,6 +2,7 @@ package repositories
 
 import (
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
+	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	"gorm.io/gorm"
 )
 
@@ -38,9 +39,15 @@ func (r *MaterialTypeRepository) FindByName(name string) *gateway_entities.Mater
 	return &materialType
 }
 
-func (r *MaterialTypeRepository) UpdateMaterialType(materialType gateway_entities.MaterialType) error {
-	r.db.Save(&materialType)
-	return nil
+func (r *MaterialTypeRepository) UpdateMaterialType(materialType gateway_entities.MaterialType) (gateway_entities.MaterialType, error) {
+	res := r.db.Save(&materialType)
+	if res.Error != nil {
+		return gateway_entities.MaterialType{}, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return gateway_entities.MaterialType{}, core_errors.NewInternalServerError("materialType update failed")
+	}
+	return materialType, nil
 }
 
 func (r *MaterialTypeRepository) DeleteMaterialType(id string) error {
