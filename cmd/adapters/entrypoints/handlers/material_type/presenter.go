@@ -9,10 +9,11 @@ func ToMaterialTypesResponse(materialType []entities.MaterialType, language stri
 	var materialTypeResponses []MaterialTypeResponse
 	for _, materialType := range materialType {
 		materialTypeResponses = append(materialTypeResponses, MaterialTypeResponse{
-			Id:                float64(materialType.ID),
-			Name:              materialType.Name,
-			Description:       materialType.Description,
-			UnitOfMeasurement: materialType.UnitOfMeasurement.String(language),
+			Id:                      float64(materialType.ID),
+			Name:                    materialType.Name,
+			Description:             materialType.Description,
+			UnitOfMeasurement:       materialType.UnitOfMeasurement.String(language),
+			UnitOfMeasurementSymbol: enums.GetSymbolByUnitOfMeasurementEnum(materialType.UnitOfMeasurement),
 		})
 	}
 	return materialTypeResponses
