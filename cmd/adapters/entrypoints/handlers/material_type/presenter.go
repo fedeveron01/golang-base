@@ -11,6 +11,7 @@ func ToMaterialTypesResponse(materialType []entities.MaterialType, language stri
 		materialTypeResponses = append(materialTypeResponses, MaterialTypeResponse{
 			Id:                float64(materialType.ID),
 			Name:              materialType.Name,
+			Description:       materialType.Description,
 			UnitOfMeasurement: materialType.UnitOfMeasurement.String(language),
 		})
 	}
