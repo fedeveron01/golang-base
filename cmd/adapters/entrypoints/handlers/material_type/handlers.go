@@ -17,7 +17,6 @@ type MaterialTypeHandlerInterface interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
 	GetUnitsOfMeasurement(w http.ResponseWriter, r *http.Request)
 	Create(w http.ResponseWriter, r *http.Request)
-
 }
 
 type MaterialTypeHandler struct {
@@ -72,23 +71,29 @@ func (p *MaterialTypeHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAdmin(w, r) {
 		return
 	}
+
+	language := r.Header.Get("Language")
+	if language == "" {
+		language = "en"
+	}
+
 	reqBody, _ := io.ReadAll(r.Body)
 	var materialType entities.MaterialType
 	json.Unmarshal(reqBody, &materialType)
 	// validate enum
-	materialType.UnitOfMeasurement = enums.StringToUnitOfMeasurementEnum(materialType.UnitOfMeasurement.String())
+	materialType.UnitOfMeasurement = enums.StringToUnitOfMeasurementEnum(materialType.UnitOfMeasurement.String(""))
 	if materialType.UnitOfMeasurement == ("") {
-	if enums.StringToUnitOfMeasurementEnum(materialType.UnitOfMeasurement.String("en")) == ("") {
 		p.WriteErrorResponse(w, core_errors.NewBadRequestError("unitOfMeasurement is not valid"))
 		return
 	}
-	err := p.materialTypeUseCase.CreateMaterialType(materialType)
+	var err error
+	materialType, err = p.materialTypeUseCase.CreateMaterialType(materialType)
 	if err != nil {
 		p.WriteErrorResponse(w, err)
 		return
 	}
 
-	p.WriteResponse(w, "materialType created", http.StatusCreated)
-	w.WriteHeader(http.StatusCreated)
+	materialTypeResponse := ToMaterialTypeResponse(materialType, language)
+	json.NewEncoder(w).Encode(materialTypeResponse)
 
 }
