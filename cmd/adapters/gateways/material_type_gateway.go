@@ -71,7 +71,7 @@ func (e *MaterialTypeGatewayImpl) ToServiceEntity(materialType entities.Material
 	materialTypeDB := gateway_entities.MaterialType{
 		Name:              materialType.Name,
 		Description:       materialType.Description,
-		UnitOfMeasurement: materialType.UnitOfMeasurement.String(),
+		UnitOfMeasurement: materialType.UnitOfMeasurement.String("en"),
 	}
 	return materialTypeDB
 }

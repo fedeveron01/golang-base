@@ -63,24 +63,22 @@ func (i *MaterialGatewayImpl) ToBusinessEntity(materialDB gateway_entities.Mater
 		EntitiesBase: core.EntitiesBase{
 			ID: materialDB.ID,
 		},
-		Name:            materialDB.Name,
-		Description:     materialDB.Description,
-		Price:           materialDB.Price,
-		Stock:           materialDB.Stock,
-		MaterialType:    entities.MaterialType{Name: materialDB.MaterialType.Name},
-		MeasurementUnit: entities.MeasurementUnit{Name: materialDB.MeasurementUnit.Name},
+		Name:         materialDB.Name,
+		Description:  materialDB.Description,
+		Price:        materialDB.Price,
+		Stock:        materialDB.Stock,
+		MaterialType: entities.MaterialType{Name: materialDB.MaterialType.Name},
 	}
 	return material
 }
 
 func (i *MaterialGatewayImpl) ToServiceEntity(material entities.Material) gateway_entities.Material {
 	materialDB := gateway_entities.Material{
-		Name:              material.Name,
-		Description:       material.Description,
-		Price:             material.Price,
-		Stock:             material.Stock,
-		MaterialTypeId:    material.MaterialType.ID,
-		MeasurementUnitId: material.MeasurementUnit.ID,
+		Name:           material.Name,
+		Description:    material.Description,
+		Price:          material.Price,
+		Stock:          material.Stock,
+		MaterialTypeId: material.MaterialType.ID,
 	}
 	return materialDB
 }

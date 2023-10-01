@@ -8,6 +8,6 @@ type Material struct {
 	Description     string
 	Price           float64
 	Stock           int
+	RepositionPoint int
 	MaterialType    MaterialType
-	MeasurementUnit MeasurementUnit
 }

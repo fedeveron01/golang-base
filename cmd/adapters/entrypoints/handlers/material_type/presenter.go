@@ -1,14 +1,31 @@
 package material_type_handler
 
-import "github.com/fedeveron01/golang-base/cmd/core/entities"
+import (
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
+)
 
-func ToChargesResponse(charge []entities.Charge) []ChargeResponse {
-	var chargeResponses []ChargeResponse
-	for _, charge := range charge {
-		chargeResponses = append(chargeResponses, ChargeResponse{
-			Id:   float64(charge.ID),
-			Name: charge.Name,
+func ToMaterialTypesResponse(materialType []entities.MaterialType, language string) []MaterialTypeResponse {
+	var materialTypeResponses []MaterialTypeResponse
+	for _, materialType := range materialType {
+		materialTypeResponses = append(materialTypeResponses, MaterialTypeResponse{
+			Id:                      float64(materialType.ID),
+			Name:                    materialType.Name,
+			Description:             materialType.Description,
+			UnitOfMeasurement:       materialType.UnitOfMeasurement.String(language),
+			UnitOfMeasurementSymbol: enums.GetSymbolByUnitOfMeasurementEnum(materialType.UnitOfMeasurement),
 		})
 	}
-	return chargeResponses
+	return materialTypeResponses
+}
+
+func ToUnitsOfMeasurementResponse(unitsOfMeasurement []string) []UnitOfMeasurementResponse {
+	var unitsOfMeasurementResponses []UnitOfMeasurementResponse
+	for _, unitOfMeasurement := range unitsOfMeasurement {
+		unitsOfMeasurementResponses = append(unitsOfMeasurementResponses, UnitOfMeasurementResponse{
+			Name:   unitOfMeasurement,
+			Symbol: enums.GetSymbolByUnitOfMeasurementEnum(enums.StringToUnitOfMeasurementEnum(unitOfMeasurement)),
+		})
+	}
+	return unitsOfMeasurementResponses
 }
