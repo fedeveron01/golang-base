@@ -8,6 +8,7 @@ func ToMaterialsResponse(materials []entities.Material) []MaterialResponse {
 		materialResponses = append(materialResponses, MaterialResponse{
 			Id:              float64(material.ID),
 			Name:            material.Name,
+			Description:     material.Description,
 			MaterialType:    material.MaterialType.Name,
 			Price:           material.Price,
 			Stock:           material.Stock,
