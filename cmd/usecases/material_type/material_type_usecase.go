@@ -65,6 +65,11 @@ func (i *Implementation) UpdateMaterialType(materialType entities.MaterialType) 
 		return entities.MaterialType{}, core_errors.NewInternalServerError("materialType not exist")
 	}
 
+	repeated := i.materialTypeGateway.FindByName(materialType.Name)
+	if repeated != nil && repeated.ID != materialType.ID {
+		return entities.MaterialType{}, core_errors.NewInternalServerError("materialType already exists")
+	}
+
 	if materialType.Name == "" {
 		return entities.MaterialType{}, core_errors.NewBadRequestError("materialType name is required")
 	}
