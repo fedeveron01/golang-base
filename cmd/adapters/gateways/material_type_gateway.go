@@ -60,7 +60,7 @@ func (e *MaterialTypeGatewayImpl) UpdateMaterialType(materialType entities.Mater
 	return e.materialTypeRepository.UpdateMaterialType(materialTypeDB)
 }
 
-func (e *MaterialTypeGatewayImpl) DeleteMaterialType(id string) error {
+func (e *MaterialTypeGatewayImpl) DeleteMaterialType(id uint) error {
 	return e.materialTypeRepository.DeleteMaterialType(id)
 }
 
@@ -80,7 +80,7 @@ func (e *MaterialTypeGatewayImpl) ToServiceEntity(materialType entities.Material
 	materialTypeDB := gateway_entities.MaterialType{
 		Name:              materialType.Name,
 		Description:       materialType.Description,
-		UnitOfMeasurement: materialType.UnitOfMeasurement.String(),
+		UnitOfMeasurement: materialType.UnitOfMeasurement.String("en"),
 	}
 	return materialTypeDB
 }

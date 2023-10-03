@@ -6,7 +6,7 @@ import (
 )
 
 func TestStringToUnitOfMeasurementEnumWhenEnumIsValidShouldReturnEmptyEnum(t *testing.T) {
-	result := StringToUnitOfMeasurementEnum("litros")
+	result := StringToUnitOfMeasurementEnum("litrs")
 	assert.Equal(t, result, Enum(""))
 }
 
@@ -21,6 +21,6 @@ func TestStringToUnitOfMeasurementEnumWhenEnumIsValidButNotLowercaseShouldReturn
 }
 
 func TestStringToUnitOfMeasurementEnumWhenEnumIsValidButHasUppercaseAndLowercaseShouldReturnEnum(t *testing.T) {
-	result := StringToUnitOfMeasurementEnum("LiTeRs")
+	result := StringToUnitOfMeasurementEnum("LiTros")
 	assert.Equal(t, result, Liters)
 }
