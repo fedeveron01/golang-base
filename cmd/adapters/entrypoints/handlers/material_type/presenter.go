@@ -19,6 +19,15 @@ func ToMaterialTypesResponse(materialType []entities.MaterialType, language stri
 	return materialTypeResponses
 }
 
+func ToMaterialTypeResponse(materialType entities.MaterialType, language string) MaterialTypeResponse {
+	return MaterialTypeResponse{
+		Id:                      float64(materialType.ID),
+		Name:                    materialType.Name,
+		Description:             materialType.Description,
+		UnitOfMeasurement:       materialType.UnitOfMeasurement.String(language),
+		UnitOfMeasurementSymbol: enums.GetSymbolByUnitOfMeasurementEnum(materialType.UnitOfMeasurement),
+	}
+}
 func ToUnitsOfMeasurementResponse(unitsOfMeasurement []string) []UnitOfMeasurementResponse {
 	var unitsOfMeasurementResponses []UnitOfMeasurementResponse
 	for _, unitOfMeasurement := range unitsOfMeasurement {
