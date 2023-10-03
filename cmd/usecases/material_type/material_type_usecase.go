@@ -9,6 +9,7 @@ type MaterialTypeUseCase interface {
 	FindAll() ([]entities.MaterialType, error)
 	CreateMaterialType(materialType entities.MaterialType) error
 	UpdateMaterialType(materialType entities.MaterialType) (entities.MaterialType, error)
+	DeleteMaterialType(id uint) error
 }
 
 type MaterialTypeTypeGateway interface {
@@ -17,6 +18,7 @@ type MaterialTypeTypeGateway interface {
 	FindByName(name string) *entities.MaterialType
 	CreateMaterialType(materialTypeType entities.MaterialType) error
 	UpdateMaterialType(materialTypeType entities.MaterialType) (entities.MaterialType, error)
+	DeleteMaterialType(id uint) error
 }
 
 type Implementation struct {
@@ -87,4 +89,12 @@ func (i *Implementation) UpdateMaterialType(materialType entities.MaterialType) 
 	}
 	return materialType, nil
 
+}
+
+func (i *Implementation) DeleteMaterialType(id uint) error {
+	err := i.materialTypeGateway.DeleteMaterialType(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

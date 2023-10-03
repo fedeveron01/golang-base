@@ -6,8 +6,10 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core/enums"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	material_type_usecase "github.com/fedeveron01/golang-base/cmd/usecases/material_type"
+	"github.com/gorilla/mux"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
@@ -18,6 +20,7 @@ type MaterialTypeHandlerInterface interface {
 	GetUnitsOfMeasurement(w http.ResponseWriter, r *http.Request)
 	Create(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
+	Delete(w http.ResponseWriter, r *http.Request)
 }
 
 type MaterialTypeHandler struct {
@@ -123,4 +126,28 @@ func (p *MaterialTypeHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(ToMaterialTypeResponse(materialType, language))
+}
+
+// Handle api/materialType/{id}
+func (p *MaterialTypeHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	if !p.IsAdmin(w, r) {
+		return
+	}
+	vars := mux.Vars(r)
+	id := vars["id"]
+	uid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		p.WriteErrorResponse(w, core_errors.NewBadRequestError("id is not valid"))
+		return
+	}
+	err = p.materialTypeUseCase.DeleteMaterialType(uint(uid))
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+	p.WriteResponse(w, "materialType deleted", http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 }

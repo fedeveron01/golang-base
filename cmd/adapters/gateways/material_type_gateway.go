@@ -68,7 +68,7 @@ func (e *MaterialTypeGatewayImpl) UpdateMaterialType(materialType entities.Mater
 
 }
 
-func (e *MaterialTypeGatewayImpl) DeleteMaterialType(id string) error {
+func (e *MaterialTypeGatewayImpl) DeleteMaterialType(id uint) error {
 	return e.materialTypeRepository.DeleteMaterialType(id)
 }
 

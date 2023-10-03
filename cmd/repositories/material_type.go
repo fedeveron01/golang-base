@@ -59,7 +59,7 @@ func (r *MaterialTypeRepository) UpdateMaterialType(materialType gateway_entitie
 	return materialType, nil
 }
 
-func (r *MaterialTypeRepository) DeleteMaterialType(id string) error {
+func (r *MaterialTypeRepository) DeleteMaterialType(id uint) error {
 	r.db.Delete(&gateway_entities.MaterialType{}, id)
 	return nil
 }
