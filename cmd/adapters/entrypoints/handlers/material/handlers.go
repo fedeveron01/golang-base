@@ -35,12 +35,16 @@ func (p *MaterialHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}
+	language := r.Header.Get("Language")
+	if language == "" {
+		language = "en"
+	}
 	materials, err := p.materialUseCase.FindAll()
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	json.NewEncoder(w).Encode(ToMaterialsResponse(materials))
+	json.NewEncoder(w).Encode(ToMaterialsResponse(materials, language))
 }
 
 // Create api/material
