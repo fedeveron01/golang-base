@@ -10,5 +10,4 @@ type Material struct {
 	Stock           int
 	RepositionPoint int
 	MaterialType    MaterialType
-	MeasurementUnit MeasurementUnit
 }
