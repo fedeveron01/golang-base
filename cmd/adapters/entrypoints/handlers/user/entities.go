@@ -6,8 +6,8 @@ type LoginRequest struct {
 }
 
 type CreateUserRequest struct {
-	UserName string 
-	Password string 
+	UserName string
+	Password string
 	Name     string
 	LastName string
 	DNI      string
