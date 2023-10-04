@@ -22,6 +22,8 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/user/signup", handlers.UserHandler.Signup).Methods("POST")
 	app.HandleFunc("/api/user/login", handlers.UserHandler.Login).Methods("POST")
 	app.HandleFunc("/api/user/logout", handlers.UserHandler.Logout).Methods("POST")
+	app.HandleFunc("/api/user/{id}", handlers.UserHandler.Logout).Methods("PUT")
+	app.HandleFunc("/api/user/activeDesactiveUser/{id}", handlers.UserHandler.ActiveDesactiveUser).Methods("PUT")
 
 	//employee
 	app.HandleFunc("/api/employee", handlers.EmployeeHandler.GetAll).Methods("GET")

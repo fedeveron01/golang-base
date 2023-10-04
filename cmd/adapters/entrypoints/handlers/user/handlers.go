@@ -3,21 +3,25 @@ package user_handler
 import (
 	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+	"strconv"
+
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
-	"github.com/fedeveron01/golang-base/cmd/usecases/user"
-	"io"
-	"net/http"
+	user_usecase "github.com/fedeveron01/golang-base/cmd/usecases/user"
+	"github.com/gorilla/mux"
 )
 
 type UserHandlerInterface interface {
 	Signup(w http.ResponseWriter, r *http.Request)
 	Login(w http.ResponseWriter, r *http.Request)
 	Logout(w http.ResponseWriter, r *http.Request)
+	ActiveDesactiveUser(w http.ResponseWriter, r *http.Request)
 }
 
 type UserHandler struct {
@@ -111,4 +115,29 @@ func (p *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+// Handle api/user/:id
+func (p *UserHandler) ActiveDesactiveUser(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	vars := mux.Vars(r)
+	id := vars["id"]
+	intId, _ := strconv.ParseInt(id, 10, 64)
+	reqBody, _ := io.ReadAll(r.Body)
+	var userRequest entities.User
+
+	err := json.Unmarshal(reqBody, &userRequest)
+	if err != nil {
+		p.WriteInternalServerError(w, err)
+		return
+	}
+
+	err = p.userUseCase.ActiveDesactiveUser(intId, userRequest.Inactive)
+	if err != nil {
+		p.WriteInternalServerError(w, err)
+		return
+	}
+	p.WriteResponse(w, "User updated", 200)
 }

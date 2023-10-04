@@ -49,6 +49,15 @@ func (i *UserGatewayImpl) CreateUser(user entities.User) (entities.User, error) 
 	return user, nil
 }
 
+func (i *UserGatewayImpl) FindUserById(id int64) (entities.User, error) {
+	userDB, err := i.userRepository.FindUserById(id)
+	if err != nil {
+		return entities.User{}, err
+	}
+	user := i.ToBusinessEntity(userDB)
+	return user, nil
+}
+
 func (i *UserGatewayImpl) FindUserByUsernameAndPassword(username string, password string) (entities.User, error) {
 	userDB, err := i.userRepository.FindUserByUsernameAndPassword(username, password)
 	if err != nil {
@@ -66,6 +75,8 @@ func (i *UserGatewayImpl) FindUserByUsername(username string) entities.User {
 
 func (i *UserGatewayImpl) UpdateUser(user entities.User) error {
 	userDB := i.ToServiceEntity(user)
+	userDB.ID = user.ID
+	userDB.Inactive = user.Inactive
 	return i.userRepository.UpdateUser(userDB)
 }
 
