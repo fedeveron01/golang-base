@@ -18,6 +18,13 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/material", handlers.MaterialHandler.GetAll).Methods("GET")
 	app.HandleFunc("/api/material", handlers.MaterialHandler.Create).Methods("POST")
 
+	//material type
+	app.HandleFunc("/api/materialType", handlers.MaterialTypeHandler.GetAll).Methods("GET")
+	app.HandleFunc("/api/materialType", handlers.MaterialTypeHandler.Create).Methods("POST")
+	app.HandleFunc("/api/materialType/units", handlers.MaterialTypeHandler.GetUnitsOfMeasurement).Methods("GET")
+	app.HandleFunc("/api/materialType", handlers.MaterialTypeHandler.Update).Methods("PUT")
+	app.HandleFunc("/api/materialType/{id}", handlers.MaterialTypeHandler.Delete).Methods("DELETE")
+
 	//user
 	app.HandleFunc("/api/user/signup", handlers.UserHandler.Signup).Methods("POST")
 	app.HandleFunc("/api/user/login", handlers.UserHandler.Login).Methods("POST")

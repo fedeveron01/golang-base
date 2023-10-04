@@ -6,6 +6,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	_ "github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"gorm.io/gorm"
 )
 
 type UserGatewayImpl struct {
@@ -75,8 +76,6 @@ func (i *UserGatewayImpl) FindUserByUsername(username string) entities.User {
 
 func (i *UserGatewayImpl) UpdateUser(user entities.User) error {
 	userDB := i.ToServiceEntity(user)
-	userDB.ID = user.ID
-	userDB.Inactive = user.Inactive
 	return i.userRepository.UpdateUser(userDB)
 }
 
@@ -98,6 +97,9 @@ func (i *UserGatewayImpl) ToBusinessEntity(userDB gateway_entities.User) entitie
 
 func (i *UserGatewayImpl) ToServiceEntity(user entities.User) gateway_entities.User {
 	userDB := gateway_entities.User{
+		Model: gorm.Model{
+			ID: user.ID,
+		},
 		UserName: user.UserName,
 		Password: user.Password,
 	}

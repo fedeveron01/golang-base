@@ -2,7 +2,6 @@ package user_handler
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -11,7 +10,6 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	user_usecase "github.com/fedeveron01/golang-base/cmd/usecases/user"
 	"github.com/gorilla/mux"
@@ -63,7 +61,7 @@ func (p *UserHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteErrorResponse(w, err)
 		return
 	}
 
@@ -84,12 +82,7 @@ func (p *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := p.userUseCase.LoginUser(loginRequest.UserName, loginRequest.Password)
 	if err != nil {
-		if errors.Is(err, core_errors.ErrInactiveUser) {
-			p.WriteUnauthorized(w)
-			return
-		}
-		p.WriteInternalServerError(w, err)
-		return
+		p.WriteErrorResponse(w, err)
 	}
 	claims, _ := internal_jwt.ParseToken(token)
 
@@ -111,7 +104,7 @@ func (p *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	err = p.userUseCase.LogoutUser(sessionId)
 
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -130,7 +123,7 @@ func (p *UserHandler) ActiveDesactiveUser(w http.ResponseWriter, r *http.Request
 
 	err := json.Unmarshal(reqBody, &userRequest)
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

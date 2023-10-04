@@ -84,8 +84,7 @@ func (r *UserRepository) FindUserByUsernameAndPassword(username string, password
 }
 
 func (r *UserRepository) UpdateUser(user gateway_entities.User) error {
-	r.db.Model(&user).Where("id = ?", user.ID).Updates(&user)
-	//r.db.Save(&user)
+	r.db.Save(&user)
 	return nil
 }
 

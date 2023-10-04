@@ -11,6 +11,9 @@ type MaterialUseCase interface {
 	DeleteMaterial(id string) error
 }
 
+type MaterialTypeGateway interface {
+	FindById(id uint) *entities.MaterialType
+}
 type MaterialGateway interface {
 	FindAll() ([]entities.Material, error)
 	CreateMaterial(material entities.Material) error
