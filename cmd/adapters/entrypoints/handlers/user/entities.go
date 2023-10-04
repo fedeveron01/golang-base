@@ -6,8 +6,8 @@ type LoginRequest struct {
 }
 
 type CreateUserRequest struct {
-	UserName string
-	Password string
+	UserName string `json:"username" required:"true"`
+	Password string `json:"password" required:"true"`
 	Name     string
 	LastName string
 	DNI      string
