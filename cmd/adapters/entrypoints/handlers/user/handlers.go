@@ -120,6 +120,10 @@ func (p *UserHandler) ActiveDesactiveUser(w http.ResponseWriter, r *http.Request
 	}
 	vars := mux.Vars(r)
 	id := vars["id"]
+	if p.IsYou(w, r, id) {
+		p.WriteResponse(w, "you can't deactivate yourself", 401)
+		return
+	}
 	intId, _ := strconv.ParseInt(id, 10, 64)
 	reqBody, _ := io.ReadAll(r.Body)
 

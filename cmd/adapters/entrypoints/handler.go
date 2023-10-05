@@ -2,10 +2,12 @@ package entrypoints
 
 import (
 	"encoding/json"
+	"net/http"
+	"strconv"
+
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
-	"net/http"
 )
 
 type Handler interface {
@@ -121,5 +123,22 @@ func (h *HandlerBase) IsAdmin(w http.ResponseWriter, r *http.Request) bool {
 		}
 
 		return true
+	}
+}
+func (h *HandlerBase) IsYou(w http.ResponseWriter, r *http.Request, userId string) bool {
+	token := r.Header.Get("X-Auth-Token")
+	if token == "" {
+		h.WriteUnauthorized(w)
+		return false
+	} else {
+		claims, err := internal_jwt.ParseToken(token)
+		if err != nil {
+			h.WriteUnauthorized(w)
+			return false
+		}
+		//convert userId to float64
+		id, _ := strconv.ParseFloat(userId, 64)
+		return claims.EmployeeId == id
+
 	}
 }
