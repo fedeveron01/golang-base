@@ -138,7 +138,12 @@ func (h *HandlerBase) IsYou(w http.ResponseWriter, r *http.Request, userId strin
 		}
 		//convert userId to float64
 		id, _ := strconv.ParseFloat(userId, 64)
-		return claims.EmployeeId == id
 
+		result, err := h.SessionGateway.FindSessionById(claims.SessionId)
+		if err != nil {
+			h.WriteErrorResponse(w, err)
+			return false
+		}
+		return float64(result.User.ID) == id
 	}
 }
