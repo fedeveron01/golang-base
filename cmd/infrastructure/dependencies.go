@@ -41,7 +41,7 @@ type HandlerContainer struct {
 
 func Start() HandlerContainer {
 	// inject mysql and gorm
-	dsn := "admin:software-factory-db12@tcp(20.226.85.196:3306)/factory?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "admin:software-factory-db12@tcp(20.55.53.24:3306)/factory?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
