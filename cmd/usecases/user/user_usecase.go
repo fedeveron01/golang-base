@@ -1,15 +1,17 @@
 package user_usecase
 
 import (
+	"time"
+
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	internal_jwt "github.com/fedeveron01/golang-base/cmd/internal/jwt"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 type UserUseCase interface {
+	ActiveDesactiveUser(id int64, inactive bool) error
 	CreateUser(user entities.User, employee entities.Employee) error
 	UpdateUser(user entities.User) error
 	DeleteUser(id string) error
@@ -18,9 +20,9 @@ type UserUseCase interface {
 }
 
 type UserGateway interface {
+	FindUserById(id int64) (entities.User, error)
 	CreateCompleteUserWithEmployee(user entities.User,
 		employee entities.Employee) (entities.User, error)
-
 	FindUserByUsernameAndPassword(username string, password string) (entities.User, error)
 	FindUserByUsername(username string) entities.User
 	UpdateUser(user entities.User) error
@@ -67,6 +69,18 @@ func NewUserUseCase(userGateway UserGateway,
 		chargeGateway:   chargeGateway,
 	}
 }
+func (i *Implementation) ActiveDesactiveUser(id int64, inactive bool) error {
+	user, err := i.userGateway.FindUserById(id)
+	if err != nil {
+		return err
+	}
+	user.Inactive = inactive
+	err = i.userGateway.UpdateUser(user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func (i *Implementation) CreateUser(user entities.User, employee entities.Employee) error {
 	if user.UserName == "" || user.Password == "" {
@@ -96,6 +110,10 @@ func (i *Implementation) CreateUser(user entities.User, employee entities.Employ
 	}
 
 	return nil
+}
+
+func (i *Implementation) UpdateUser(user entities.User) error {
+	return i.userGateway.UpdateUser(user)
 }
 
 func encryptPassword(password string) string {
@@ -137,9 +155,7 @@ func (i *Implementation) LoginUser(username string, password string) (string, er
 	}
 	return generateToken(employee, createdSession)
 }
-func (i *Implementation) UpdateUser(user entities.User) error {
-	return i.userGateway.UpdateUser(user)
-}
+
 func (i *Implementation) DeleteUser(id string) error {
 	return i.userGateway.DeleteUser(id)
 }
