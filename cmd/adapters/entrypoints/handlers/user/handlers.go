@@ -110,9 +110,12 @@ func (p *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Handle api/user/:id
+// Handle api/user/activeDesactiveUser/{id}
 func (p *UserHandler) ActiveDesactiveUser(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
+		return
+	}
+	if !p.IsAdmin(w, r) {
 		return
 	}
 	vars := mux.Vars(r)
@@ -129,7 +132,7 @@ func (p *UserHandler) ActiveDesactiveUser(w http.ResponseWriter, r *http.Request
 
 	err = p.userUseCase.ActiveDesactiveUser(intId, userRequest.Inactive)
 	if err != nil {
-		p.WriteInternalServerError(w, err)
+		p.WriteErrorResponse(w, err)
 		return
 	}
 	p.WriteResponse(w, "User updated", 200)

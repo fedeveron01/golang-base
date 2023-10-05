@@ -74,7 +74,6 @@ func (i *Implementation) ActiveDesactiveUser(id int64, inactive bool) error {
 	if err != nil {
 		return err
 	}
-	user.ID = uint(id)
 	user.Inactive = inactive
 	err = i.userGateway.UpdateUser(user)
 	if err != nil {

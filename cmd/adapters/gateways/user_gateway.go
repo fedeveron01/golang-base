@@ -102,6 +102,7 @@ func (i *UserGatewayImpl) ToServiceEntity(user entities.User) gateway_entities.U
 		},
 		UserName: user.UserName,
 		Password: user.Password,
+		Inactive: user.Inactive,
 	}
 	return userDB
 }
