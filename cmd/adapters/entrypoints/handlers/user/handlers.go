@@ -122,15 +122,16 @@ func (p *UserHandler) ActiveDesactiveUser(w http.ResponseWriter, r *http.Request
 	id := vars["id"]
 	intId, _ := strconv.ParseInt(id, 10, 64)
 	reqBody, _ := io.ReadAll(r.Body)
-	var userRequest entities.User
 
-	err := json.Unmarshal(reqBody, &userRequest)
+	var InactiveRequest ActiveDesactiveUserRequest
+
+	err := json.Unmarshal(reqBody, &InactiveRequest)
 	if err != nil {
 		p.WriteResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = p.userUseCase.ActiveDesactiveUser(intId, userRequest.Inactive)
+	err = p.userUseCase.ActiveDesactiveUser(intId, InactiveRequest.Inactive)
 	if err != nil {
 		p.WriteErrorResponse(w, err)
 		return
