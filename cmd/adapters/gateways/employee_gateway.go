@@ -115,6 +115,7 @@ func (e *EmployeeGatewayImpl) ToBusinessEntity(employeeDB gateway_entities.Emplo
 			},
 			UserName: employeeDB.User.UserName,
 			Password: employeeDB.User.Password,
+			Inactive: employeeDB.User.Inactive,
 		},
 		Charge: entities.Charge{
 			EntitiesBase: core.EntitiesBase{
