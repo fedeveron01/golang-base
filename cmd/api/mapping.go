@@ -22,6 +22,7 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/materialType", handlers.MaterialTypeHandler.GetAll).Methods("GET")
 	app.HandleFunc("/api/materialType", handlers.MaterialTypeHandler.Create).Methods("POST")
 	app.HandleFunc("/api/materialType/units", handlers.MaterialTypeHandler.GetUnitsOfMeasurement).Methods("GET")
+	app.HandleFunc("/api/materialType", handlers.MaterialTypeHandler.Update).Methods("PUT")
 	app.HandleFunc("/api/materialType/{id}", handlers.MaterialTypeHandler.Delete).Methods("DELETE")
 
 	//user

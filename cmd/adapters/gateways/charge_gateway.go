@@ -5,6 +5,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"gorm.io/gorm"
 )
 
 type ChargeGatewayImpl struct {
@@ -70,6 +71,9 @@ func (c ChargeGatewayImpl) ToBusinessEntity(chargeDB gateway_entities.Charge) en
 
 func (c ChargeGatewayImpl) ToServiceEntity(charge entities.Charge) gateway_entities.Charge {
 	return gateway_entities.Charge{
+		Model: gorm.Model{
+			ID: charge.ID,
+		},
 		Name: charge.Name,
 	}
 }
