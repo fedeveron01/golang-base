@@ -41,7 +41,7 @@ func (r *MaterialTypeRepository) FindByName(name string) *gateway_entities.Mater
 
 func (r *MaterialTypeRepository) FindById(id uint) *gateway_entities.MaterialType {
 	var materialType gateway_entities.MaterialType
-	r.db.First(&materialType, id)
+	r.db.Find(&materialType, id).First(&materialType)
 	if materialType.ID == 0 {
 		return nil
 	}

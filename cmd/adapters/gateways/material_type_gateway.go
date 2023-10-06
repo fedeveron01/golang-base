@@ -31,8 +31,8 @@ func (e *MaterialTypeGatewayImpl) FindAll() ([]entities.MaterialType, error) {
 	return materialTypes, err
 }
 
-func (e *MaterialTypeGatewayImpl) FindByName(name string) *entities.MaterialType {
-	materialTypeDB := e.materialTypeRepository.FindByName(name)
+func (e *MaterialTypeGatewayImpl) FindById(id uint) *entities.MaterialType {
+	materialTypeDB := e.materialTypeRepository.FindById(id)
 	if materialTypeDB == nil {
 		return nil
 	}
@@ -40,8 +40,8 @@ func (e *MaterialTypeGatewayImpl) FindByName(name string) *entities.MaterialType
 	return &materialType
 }
 
-func (e *MaterialTypeGatewayImpl) FindById(id uint) *entities.MaterialType {
-	materialTypeDB := e.materialTypeRepository.FindById(id)
+func (e *MaterialTypeGatewayImpl) FindByName(name string) *entities.MaterialType {
+	materialTypeDB := e.materialTypeRepository.FindByName(name)
 	if materialTypeDB == nil {
 		return nil
 	}

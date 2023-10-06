@@ -16,18 +16,30 @@ func NewMaterialRepository(database *gorm.DB) *MaterialRepository {
 	}
 }
 
-func (r *MaterialRepository) CreateMaterial(material gateway_entities.Material) error {
+func (r *MaterialRepository) CreateMaterial(material gateway_entities.Material) (gateway_entities.Material, error) {
 	id := r.db.Create(&material)
 	if id.Error != nil {
-		return id.Error
+		return gateway_entities.Material{}, id.Error
 	}
-	return nil
+	var materialType gateway_entities.MaterialType
+	r.db.First(&materialType, material.MaterialTypeId)
+	material.MaterialType = materialType
+	return material, nil
 }
 
 func (r *MaterialRepository) FindAll() ([]gateway_entities.Material, error) {
 	var materials []gateway_entities.Material
 	r.db.InnerJoins("MaterialType").Find(&materials)
 	return materials, nil
+}
+
+func (r *MaterialRepository) FindByName(name string) *gateway_entities.Material {
+	var material gateway_entities.Material
+	r.db.Where("name = ?", name).First(&material)
+	if material.ID == 0 {
+		return nil
+	}
+	return &material
 }
 
 func (r *MaterialRepository) UpdateMaterial(material gateway_entities.Material) error {

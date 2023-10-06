@@ -26,14 +26,16 @@ func NewMaterialGateway(materialRepository repositories.MaterialRepository) *Mat
 	}
 }
 
-func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) error {
+func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) (entities.Material, error) {
 
 	materialDB := i.ToServiceEntity(material)
-	err := i.materialRepository.CreateMaterial(materialDB)
+	materialDBCreated, err := i.materialRepository.CreateMaterial(materialDB)
 	if err != nil {
-		return err
+		return entities.Material{}, err
 	}
-	return nil
+	materialCreated := i.ToBusinessEntity(materialDBCreated)
+
+	return materialCreated, nil
 }
 
 func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
@@ -47,6 +49,15 @@ func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
 
 	}
 	return materials, err
+}
+
+func (i *MaterialGatewayImpl) FindByName(name string) *entities.Material {
+	materialDB := i.materialRepository.FindByName(name)
+	if materialDB == nil {
+		return nil
+	}
+	material := i.ToBusinessEntity(*materialDB)
+	return &material
 }
 
 func (i *MaterialGatewayImpl) UpdateMaterial(material entities.Material) error {
