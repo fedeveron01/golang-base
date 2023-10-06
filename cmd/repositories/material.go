@@ -41,7 +41,7 @@ func (r *MaterialRepository) DeleteMaterial(id string) error {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return core_errors.NewInternalServerError("Material Id not found")
+		return core_errors.NewBadRequestError("Material not found")
 	}
 	return nil
 }
