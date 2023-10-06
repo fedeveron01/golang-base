@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"gorm.io/gorm"
 )
@@ -49,6 +50,14 @@ func (r UserRepository) CreateUser(user gateway_entities.User) (gateway_entities
 	r.db.Where("user_name = ?", user.UserName).First(&userDB)
 
 	return userDB, nil
+}
+
+func (r *UserRepository) FindUserById(id int64) (user gateway_entities.User, err error) {
+	res := r.db.Where("id = ?", id).First(&user)
+	if res.Error != nil {
+		return user, res.Error
+	}
+	return user, nil
 }
 
 func (r *UserRepository) FindUserByUsername(username string) gateway_entities.User {

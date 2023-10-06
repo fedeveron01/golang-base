@@ -31,6 +31,15 @@ func (e *MaterialTypeGatewayImpl) FindAll() ([]entities.MaterialType, error) {
 	return materialTypes, err
 }
 
+func (e *MaterialTypeGatewayImpl) FindById(id uint) *entities.MaterialType {
+	materialTypeDB := e.materialTypeRepository.FindById(id)
+	if materialTypeDB == nil {
+		return nil
+	}
+	materialType := e.ToBusinessEntity(*materialTypeDB)
+	return &materialType
+}
+
 func (e *MaterialTypeGatewayImpl) FindByName(name string) *entities.MaterialType {
 	materialTypeDB := e.materialTypeRepository.FindByName(name)
 	if materialTypeDB == nil {
@@ -50,10 +59,17 @@ func (e *MaterialTypeGatewayImpl) CreateMaterialType(materialType entities.Mater
 	return materialType, nil
 }
 
-func (e *MaterialTypeGatewayImpl) UpdateMaterialType(materialType entities.MaterialType) error {
+func (e *MaterialTypeGatewayImpl) UpdateMaterialType(materialType entities.MaterialType) (entities.MaterialType, error) {
 
 	materialTypeDB := e.ToServiceEntity(materialType)
-	return e.materialTypeRepository.UpdateMaterialType(materialTypeDB)
+	var err error
+	materialTypeDB, err = e.materialTypeRepository.UpdateMaterialType(materialTypeDB)
+	if err != nil {
+		return entities.MaterialType{}, err
+	}
+	materialType = e.ToBusinessEntity(materialTypeDB)
+	return materialType, nil
+
 }
 
 func (e *MaterialTypeGatewayImpl) DeleteMaterialType(id uint) error {

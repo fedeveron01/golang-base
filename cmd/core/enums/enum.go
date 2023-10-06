@@ -8,6 +8,5 @@ func (e Enum) String(language string) string {
 	if language == "es" {
 		return EnumToUnitOfMeasurementStringInSpanish(e)
 	}
-
 	return strings.ToLower(string(e))
 }

@@ -5,6 +5,10 @@ type LoginRequest struct {
 	Password string
 }
 
+type ActiveDesactiveUserRequest struct {
+	Inactive bool `json:"inactive" required:"true"`
+}
+
 type CreateUserRequest struct {
 	UserName string
 	Password string

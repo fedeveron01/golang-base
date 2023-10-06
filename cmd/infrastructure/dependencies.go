@@ -41,14 +41,14 @@ type HandlerContainer struct {
 
 func Start() HandlerContainer {
 	// inject mysql and gorm
-	dsn := "admin:software-factory-db12@tcp(20.226.85.196:3306)/factory?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "admin:software-factory-db12@tcp(20.55.53.24:3306)/factory?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 	err = db.AutoMigrate(
 		gateway_entities.User{}, gateway_entities.Charge{}, gateway_entities.Employee{}, gateway_entities.Material{},
-		gateway_entities.MaterialProduct{}, gateway_entities.MaterialType{}, gateway_entities.MeasurementUnit{},
+		gateway_entities.MaterialProduct{}, gateway_entities.MaterialType{},
 		gateway_entities.Product{}, gateway_entities.ProductionOrder{}, gateway_entities.ProductionOrderDetail{},
 		gateway_entities.PurchaseOrder{}, gateway_entities.PurchaseOrderDetail{}, gateway_entities.Session{},
 	)
@@ -74,7 +74,7 @@ func Start() HandlerContainer {
 	materialTypeGateway := gateways.NewMaterialTypeGateway(*materialTypeRepository)
 
 	// inject use cases
-	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway)
+	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway, materialTypeGateway)
 	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway, chargeGateway)
 	chargeUseCase := charge_usecase.NewChargeUsecase(chargeGateway)
 	employeeUseCase := employee_usecase.NewEmployeeUsecase(employeeGateway)
