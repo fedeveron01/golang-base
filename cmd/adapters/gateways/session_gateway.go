@@ -62,8 +62,12 @@ func (s *SessionGatewayImpl) FindSessionById(id float64) (entities.Session, erro
 			ID: sessionDB.ID,
 		},
 		User: entities.User{
+			EntitiesBase: core.EntitiesBase{
+				ID: sessionDB.UserId,
+			},
 			UserName: sessionDB.User.UserName,
 			Password: sessionDB.User.Password,
+			Inactive: sessionDB.User.Inactive,
 		},
 	}
 	return session, nil

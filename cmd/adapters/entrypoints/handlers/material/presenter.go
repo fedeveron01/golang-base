@@ -1,9 +1,32 @@
 package material_handler
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
 )
+
+func ToMaterialsResponse(materials []entities.Material, language string) []MaterialResponse {
+	var materialResponses []MaterialResponse
+	for _, material := range materials {
+		materialResponses = append(materialResponses, MaterialResponse{
+			float64(material.ID),
+			material.Name,
+			material.Description,
+			MaterialTypeResponse{
+				Id:   float64(material.MaterialType.ID),
+				Name: material.MaterialType.Name,
+				UnitOfMeasurement: UnitOfMeasurementResponse{
+					Name:   material.MaterialType.UnitOfMeasurement.String(language),
+					Symbol: enums.GetSymbolByUnitOfMeasurementEnum(material.MaterialType.UnitOfMeasurement),
+				},
+			},
+			material.Price,
+			material.Stock,
+			material.RepositionPoint,
+		})
+	}
+	return materialResponses
+}
 
 func ToMaterialEntity(request MaterialRequest) entities.Material {
 	return entities.Material{
@@ -18,18 +41,5 @@ func ToMaterialEntity(request MaterialRequest) entities.Material {
 			},
 		},
 	}
-
 }
 
-func ToMaterialResponse(material entities.Material) MaterialResponse {
-	return MaterialResponse{
-		ID:              material.ID,
-		Name:            material.Name,
-		Description:     material.Description,
-		Price:           material.Price,
-		Stock:           material.Stock,
-		RepositionPoint: material.RepositionPoint,
-		MaterialType:    material.MaterialType.Name,
-		MaterialTypeId:  material.MaterialType.ID,
-	}
-}

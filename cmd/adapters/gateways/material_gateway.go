@@ -5,6 +5,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	_ "github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 )
 
@@ -74,16 +75,18 @@ func (i *MaterialGatewayImpl) ToBusinessEntity(materialDB gateway_entities.Mater
 		EntitiesBase: core.EntitiesBase{
 			ID: materialDB.ID,
 		},
-		Name:            materialDB.Name,
-		Description:     materialDB.Description,
-		Price:           materialDB.Price,
-		RepositionPoint: materialDB.RepositionPoint,
-		Stock:           materialDB.Stock,
+		Name:        materialDB.Name,
+		Description: materialDB.Description,
+		Price:       materialDB.Price,
+		Stock:       materialDB.Stock,
 		MaterialType: entities.MaterialType{
 			EntitiesBase: core.EntitiesBase{
 				ID: materialDB.MaterialType.ID,
 			},
-			Name: materialDB.MaterialType.Name},
+			Name:              materialDB.MaterialType.Name,
+			UnitOfMeasurement: enums.StringToUnitOfMeasurementEnum(materialDB.MaterialType.UnitOfMeasurement),
+		},
+		RepositionPoint: materialDB.RepositionPoint,
 	}
 	return material
 }
@@ -93,9 +96,9 @@ func (i *MaterialGatewayImpl) ToServiceEntity(material entities.Material) gatewa
 		Name:            material.Name,
 		Description:     material.Description,
 		Price:           material.Price,
-		RepositionPoint: material.RepositionPoint,
 		Stock:           material.Stock,
 		MaterialTypeId:  material.MaterialType.ID,
+		RepositionPoint: material.RepositionPoint,
 	}
 	return materialDB
 }

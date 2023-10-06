@@ -31,7 +31,7 @@ func (r *SessionRepository) FindAll() ([]gateway_entities.Session, error) {
 
 func (r *SessionRepository) FindSessionById(id float64) (gateway_entities.Session, error) {
 	var session gateway_entities.Session
-	r.db.First(&session, id)
+	r.db.Preload("User").First(&session, id)
 	return session, nil
 }
 
