@@ -16,12 +16,12 @@ func NewMaterialTypeRepository(database *gorm.DB) *MaterialTypeRepository {
 	}
 }
 
-func (r *MaterialTypeRepository) CreateMaterialType(materialType gateway_entities.MaterialType) error {
+func (r *MaterialTypeRepository) CreateMaterialType(materialType gateway_entities.MaterialType) (gateway_entities.MaterialType, error) {
 	id := r.db.Create(&materialType)
 	if id.Error != nil {
-		return id.Error
+		return gateway_entities.MaterialType{}, id.Error
 	}
-	return nil
+	return materialType, nil
 }
 
 func (r *MaterialTypeRepository) FindAll() ([]gateway_entities.MaterialType, error) {

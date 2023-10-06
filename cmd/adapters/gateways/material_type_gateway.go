@@ -49,10 +49,14 @@ func (e *MaterialTypeGatewayImpl) FindByName(name string) *entities.MaterialType
 	return &materialType
 }
 
-func (e *MaterialTypeGatewayImpl) CreateMaterialType(materialType entities.MaterialType) error {
+func (e *MaterialTypeGatewayImpl) CreateMaterialType(materialType entities.MaterialType) (entities.MaterialType, error) {
 	materialTypeDB := e.ToServiceEntity(materialType)
-
-	return e.materialTypeRepository.CreateMaterialType(materialTypeDB)
+	created, err := e.materialTypeRepository.CreateMaterialType(materialTypeDB)
+	if err != nil {
+		return entities.MaterialType{}, err
+	}
+	materialType = e.ToBusinessEntity(created)
+	return materialType, nil
 }
 
 func (e *MaterialTypeGatewayImpl) UpdateMaterialType(materialType entities.MaterialType) (entities.MaterialType, error) {
