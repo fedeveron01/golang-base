@@ -49,15 +49,6 @@ func (e *MaterialTypeGatewayImpl) FindByName(name string) *entities.MaterialType
 	return &materialType
 }
 
-func (e *MaterialTypeGatewayImpl) FindById(id uint) *entities.MaterialType {
-	materialTypeDB := e.materialTypeRepository.FindById(id)
-	if materialTypeDB == nil {
-		return nil
-	}
-	materialType := e.ToBusinessEntity(*materialTypeDB)
-	return &materialType
-}
-
 func (e *MaterialTypeGatewayImpl) CreateMaterialType(materialType entities.MaterialType) error {
 	materialTypeDB := e.ToServiceEntity(materialType)
 

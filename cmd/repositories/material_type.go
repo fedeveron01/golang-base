@@ -48,11 +48,6 @@ func (r *MaterialTypeRepository) FindById(id uint) *gateway_entities.MaterialTyp
 	return &materialType
 }
 
-func (r *MaterialTypeRepository) UpdateMaterialType(materialType gateway_entities.MaterialType) error {
-	r.db.Save(&materialType)
-	return nil
-}
-
 func (r *MaterialTypeRepository) UpdateMaterialType(materialType gateway_entities.MaterialType) (gateway_entities.MaterialType, error) {
 	res := r.db.Save(&materialType)
 	if res.Error != nil {

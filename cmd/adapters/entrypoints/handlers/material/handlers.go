@@ -9,7 +9,6 @@ import (
 
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	material_usecase "github.com/fedeveron01/golang-base/cmd/usecases/material"
 	"github.com/gorilla/mux"
@@ -57,6 +56,10 @@ func (p *MaterialHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
 	}
+	language := r.Header.Get("Language")
+	if language == "" {
+		language = "en"
+	}
 	reqBody, _ := io.ReadAll(r.Body)
 	var materialRequest MaterialRequest
 	json.Unmarshal(reqBody, &materialRequest)
@@ -66,7 +69,7 @@ func (p *MaterialHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := ToMaterialResponse(material)
+	response := ToMaterialResponse(material, language)
 	json.NewEncoder(w).Encode(response)
 
 }
