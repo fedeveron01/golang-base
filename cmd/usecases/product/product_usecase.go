@@ -11,9 +11,7 @@ type ProductUseCase interface {
 	CreateProduct(product entities.Product) (entities.Product, error)
 	UpdateProduct(product entities.Product) (entities.Product, error)
 	DeleteProduct(id uint) error
-	AssignMaterialToProduct(product entities.Product, material entities.MaterialType) (entities.Product, error)
-	UpdateMaterialFromProduct(product entities.Product, material entities.MaterialType) (entities.Product, error)
-	RemoveMaterialFromProduct(product entities.Product, material entities.MaterialType) (entities.Product, error)
+	AssignMaterialsToProduct(productId float64, materialsProduct []entities.MaterialProduct) ([]entities.MaterialProduct, error)
 }
 
 type ProductGateway interface {
@@ -23,15 +21,22 @@ type ProductGateway interface {
 	CreateProduct(productType entities.Product) (entities.Product, error)
 	UpdateProduct(productType entities.Product) (entities.Product, error)
 	DeleteProduct(id uint) error
+	UpdateMaterialProducts(productId uint, materialsProduct []entities.MaterialProduct) ([]entities.MaterialProduct, error)
+}
+
+type MaterialGateway interface {
+	FindById(id uint) *entities.Material
 }
 
 type Implementation struct {
-	productGateway ProductGateway
+	productGateway  ProductGateway
+	materialGateway MaterialGateway
 }
 
-func NewProductUsecase(productGateway ProductGateway) *Implementation {
+func NewProductUsecase(productGateway ProductGateway, materialGateway MaterialGateway) *Implementation {
 	return &Implementation{
-		productGateway: productGateway,
+		productGateway:  productGateway,
+		materialGateway: materialGateway,
 	}
 }
 
@@ -115,17 +120,31 @@ func (i *Implementation) DeleteProduct(id uint) error {
 	return nil
 }
 
-func (i *Implementation) AssignMaterialToProduct(product entities.Product, material entities.MaterialType) (entities.Product, error) {
-	//TODO: implement this
-	return entities.Product{}, nil
-}
+func (i *Implementation) AssignMaterialsToProduct(productId float64, materialsProduct []entities.MaterialProduct) ([]entities.MaterialProduct, error) {
+	product := i.productGateway.FindById(uint(productId))
+	if product == nil {
+		return nil, core_errors.NewNotFoundError("product not found")
+	}
+	uniqueMaterials := make(map[uint]entities.MaterialProduct)
 
-func (i *Implementation) UpdateMaterialFromProduct(product entities.Product, material entities.MaterialType) (entities.Product, error) {
-	//TODO: implement this
-	return entities.Product{}, nil
-}
+	for _, materialProduct := range materialsProduct {
 
-func (i *Implementation) RemoveMaterialFromProduct(product entities.Product, material entities.MaterialType) (entities.Product, error) {
-	//TODO: implement this
-	return entities.Product{}, nil
+		if materialProduct.Material.ID <= 0 {
+			return nil, core_errors.NewBadRequestError("material id is required")
+		}
+		material := i.materialGateway.FindById(materialProduct.Material.ID)
+		if material == nil {
+			return nil, core_errors.NewNotFoundError("material not found")
+		}
+		if materialProduct.Quantity <= 0 {
+			return nil, core_errors.NewBadRequestError("material quantity is required")
+		}
+		if uniqueMaterials[materialProduct.Material.ID].Material.ID > 0 {
+			return nil, core_errors.NewBadRequestError("material duplicated")
+		}
+		uniqueMaterials[materialProduct.Material.ID] = materialProduct
+	}
+
+	materialsProduct, err := i.productGateway.UpdateMaterialProducts(uint(productId), materialsProduct)
+	return materialsProduct, err
 }

@@ -1,6 +1,9 @@
 package product_handler
 
-import "github.com/fedeveron01/golang-base/cmd/core/entities"
+import (
+	"github.com/fedeveron01/golang-base/cmd/core"
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
+)
 
 func ToProductsResponse(products []entities.Product) []ProductResponse {
 	var productResponses []ProductResponse
@@ -47,7 +50,6 @@ func ToAssignationsResponse(materialProducts []entities.MaterialProduct, languag
 
 func ToAssignationResponse(materialProduct entities.MaterialProduct, language string) AssignationResponse {
 	return AssignationResponse{
-		Id:       float64(materialProduct.ID),
 		Quantity: materialProduct.Quantity,
 		Material: ToMaterialResponse(materialProduct.Material, language),
 	}
@@ -66,5 +68,24 @@ func ToMaterialTypeResponse(materialType entities.MaterialType, language string)
 		Id:                float64(materialType.ID),
 		Name:              materialType.Name,
 		UnitOfMeasurement: materialType.UnitOfMeasurement.String(language),
+	}
+}
+
+func ToMaterialsProductEntity(assignationsRequest []AssignationRequest) []entities.MaterialProduct {
+	var materialsProduct []entities.MaterialProduct
+	for _, assignationRequest := range assignationsRequest {
+		materialsProduct = append(materialsProduct, ToMaterialProductEntity(assignationRequest))
+	}
+	return materialsProduct
+}
+
+func ToMaterialProductEntity(assignationRequest AssignationRequest) entities.MaterialProduct {
+	return entities.MaterialProduct{
+		Material: entities.Material{
+			EntitiesBase: core.EntitiesBase{
+				ID: uint(assignationRequest.MaterialId),
+			},
+		},
+		Quantity: assignationRequest.Quantity,
 	}
 }
