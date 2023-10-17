@@ -75,7 +75,7 @@ func (r *ProductRepository) DeleteProduct(id uint) error {
 }
 
 func (r *ProductRepository) UpdateMaterialProducts(productId int64, materialProduct []gateway_entities.MaterialProduct) ([]gateway_entities.MaterialProduct, error) {
-	r.db.Where("product_id = ?", productId).Delete(&gateway_entities.MaterialProduct{})
+	r.db.Unscoped().Where("product_id = ?", productId).Delete(&gateway_entities.MaterialProduct{})
 	if len(materialProduct) == 0 {
 		return materialProduct, nil
 	}
