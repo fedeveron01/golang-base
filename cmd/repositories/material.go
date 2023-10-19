@@ -42,9 +42,15 @@ func (r *MaterialRepository) FindByName(name string) *gateway_entities.Material 
 	return &material
 }
 
-func (r *MaterialRepository) UpdateMaterial(material gateway_entities.Material) error {
-	r.db.Save(&material)
-	return nil
+func (r *MaterialRepository) UpdateMaterial(material gateway_entities.Material) (gateway_entities.Material, error) {
+	res := r.db.Save(&material)
+	if res.Error != nil {
+		return gateway_entities.Material{}, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return gateway_entities.Material{}, core_errors.NewInternalServerError("material update failed")
+	}
+	return material, nil
 }
 
 func (r *MaterialRepository) DeleteMaterial(id string) error {

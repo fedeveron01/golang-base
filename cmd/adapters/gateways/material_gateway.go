@@ -12,7 +12,7 @@ import (
 type MaterialGateway interface {
 	CreateMaterial(material entities.Material) error
 	FindAll() ([]entities.Material, error)
-	UpdateMaterial(material entities.Material) error
+	UpdateMaterial(material entities.Material) (entities.Material, error)
 	DeleteMaterial(id string) error
 }
 
@@ -60,9 +60,15 @@ func (i *MaterialGatewayImpl) FindByName(name string) *entities.Material {
 	return &material
 }
 
-func (i *MaterialGatewayImpl) UpdateMaterial(material entities.Material) error {
+func (i *MaterialGatewayImpl) UpdateMaterial(material entities.Material) (entities.Material, error) {
 	materialDB := i.ToServiceEntity(material)
-	return i.materialRepository.UpdateMaterial(materialDB)
+	var err error
+	materialDB, err = i.materialRepository.UpdateMaterial(materialDB)
+	if err != nil {
+		return entities.Material{}, err
+	}
+	material = i.ToBusinessEntity(materialDB)
+	return material, nil
 }
 
 func (i *MaterialGatewayImpl) DeleteMaterial(id string) error {
