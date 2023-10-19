@@ -42,6 +42,13 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/charge", handlers.ChargeHandler.GetAll).Methods("GET")
 	app.HandleFunc("/api/charge", handlers.ChargeHandler.Create).Methods("POST")
 
+	//product
+	app.HandleFunc("/api/product", handlers.ProductHandler.GetAll).Methods("GET")
+	app.HandleFunc("/api/product/{id}", handlers.ProductHandler.GetById).Methods("GET")
+	app.HandleFunc("/api/product", handlers.ProductHandler.Create).Methods("POST")
+	app.HandleFunc("/api/product", handlers.ProductHandler.Update).Methods("PUT")
+	app.HandleFunc("/api/product/{id}", handlers.ProductHandler.Delete).Methods("DELETE")
+
 	fmt.Println("Starting app in localhost:8080")
 	handler := cors.AllowAll().Handler(&app)
 	log.Fatal(http.ListenAndServe(":8080", handler))
