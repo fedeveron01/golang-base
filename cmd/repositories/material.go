@@ -33,6 +33,18 @@ func (r *MaterialRepository) FindAll() ([]gateway_entities.Material, error) {
 	return materials, nil
 }
 
+func (r *MaterialRepository) FindById(id uint) *gateway_entities.Material {
+	var material gateway_entities.Material
+	res := r.db.Find(&material, id).First(&material)
+	if res.Error != nil {
+		return nil
+	}
+	if material.ID == 0 {
+		return nil
+	}
+	return &material
+}
+
 func (r *MaterialRepository) FindByName(name string) *gateway_entities.Material {
 	var material gateway_entities.Material
 	r.db.Where("name = ?", name).First(&material)

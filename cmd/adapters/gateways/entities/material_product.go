@@ -8,4 +8,5 @@ type MaterialProduct struct {
 	MaterialId uint
 	Material   Material
 	ProductId  uint
+	Product    Product
 }

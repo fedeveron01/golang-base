@@ -79,7 +79,7 @@ func Start() HandlerContainer {
 	chargeUseCase := charge_usecase.NewChargeUsecase(chargeGateway)
 	employeeUseCase := employee_usecase.NewEmployeeUsecase(employeeGateway)
 	materialTypeUseCase := material_type_usecase.NewMaterialTypeUsecase(materialTypeGateway)
-	productUseCase := product_usecase.NewProductUsecase(productGateway)
+	productUseCase := product_usecase.NewProductUsecase(productGateway, materialGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}

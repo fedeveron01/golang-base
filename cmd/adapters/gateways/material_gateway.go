@@ -9,13 +9,6 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 )
 
-type MaterialGateway interface {
-	CreateMaterial(material entities.Material) error
-	FindAll() ([]entities.Material, error)
-	UpdateMaterial(material entities.Material) error
-	DeleteMaterial(id string) error
-}
-
 type MaterialGatewayImpl struct {
 	materialRepository repositories.MaterialRepository
 }
@@ -49,6 +42,15 @@ func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
 
 	}
 	return materials, err
+}
+
+func (i *MaterialGatewayImpl) FindById(id uint) *entities.Material {
+	materialDB := i.materialRepository.FindById(id)
+	if materialDB == nil {
+		return nil
+	}
+	material := i.ToBusinessEntity(*materialDB)
+	return &material
 }
 
 func (i *MaterialGatewayImpl) FindByName(name string) *entities.Material {
