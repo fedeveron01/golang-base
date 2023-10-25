@@ -27,6 +27,15 @@ func (r *MaterialRepository) CreateMaterial(material gateway_entities.Material) 
 	return material, nil
 }
 
+func (r *MaterialRepository) FindById(id uint) *gateway_entities.Material {
+	var material gateway_entities.Material
+	res := r.db.Where("id = ?", id).Find(&material)
+	if res.RowsAffected == 0 {
+		return nil
+	}
+	return &material
+}
+
 func (r *MaterialRepository) FindAll() ([]gateway_entities.Material, error) {
 	var materials []gateway_entities.Material
 	r.db.InnerJoins("MaterialType").Find(&materials)

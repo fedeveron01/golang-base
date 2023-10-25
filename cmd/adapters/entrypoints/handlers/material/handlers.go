@@ -9,7 +9,6 @@ import (
 
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	material_usecase "github.com/fedeveron01/golang-base/cmd/usecases/material"
 	"github.com/gorilla/mux"
@@ -115,10 +114,10 @@ func (p *MaterialHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	reqBody, _ := io.ReadAll(r.Body)
-	var material entities.Material
-	json.Unmarshal(reqBody, &material)
-
-	material, err := p.materialUseCase.UpdateMaterial(material)
+	var materialRequest MaterialRequest
+	json.Unmarshal(reqBody, &materialRequest)
+	materialEntity := ToMaterialEntity(materialRequest)
+	material, err := p.materialUseCase.UpdateMaterial(materialEntity)
 	if err != nil {
 		p.WriteErrorResponse(w, err)
 		return

@@ -7,11 +7,13 @@ import (
 	_ "github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/enums"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"gorm.io/gorm"
 )
 
 type MaterialGateway interface {
 	CreateMaterial(material entities.Material) error
 	FindAll() ([]entities.Material, error)
+	FindById(id uint) *entities.Material
 	UpdateMaterial(material entities.Material) (entities.Material, error)
 	DeleteMaterial(id string) error
 }
@@ -36,6 +38,15 @@ func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) (entiti
 	materialCreated := i.ToBusinessEntity(materialDBCreated)
 
 	return materialCreated, nil
+}
+
+func (i *MaterialGatewayImpl) FindById(id uint) *entities.Material {
+	materialsDB := i.materialRepository.FindById(id)
+	if materialsDB == nil {
+		return nil
+	}
+	material := i.ToBusinessEntity(*materialsDB)
+	return &material
 }
 
 func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
@@ -99,6 +110,9 @@ func (i *MaterialGatewayImpl) ToBusinessEntity(materialDB gateway_entities.Mater
 
 func (i *MaterialGatewayImpl) ToServiceEntity(material entities.Material) gateway_entities.Material {
 	materialDB := gateway_entities.Material{
+		Model: gorm.Model{
+			ID: material.ID,
+		},
 		Name:            material.Name,
 		Description:     material.Description,
 		Price:           material.Price,

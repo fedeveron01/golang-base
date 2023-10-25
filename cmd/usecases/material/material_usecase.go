@@ -17,6 +17,7 @@ type MaterialTypeGateway interface {
 }
 type MaterialGateway interface {
 	FindAll() ([]entities.Material, error)
+	FindById(id uint) *entities.Material
 	FindByName(name string) *entities.Material
 	CreateMaterial(material entities.Material) (entities.Material, error)
 	UpdateMaterial(material entities.Material) (entities.Material, error)
@@ -65,16 +66,13 @@ func (i *Implementation) FindAll() ([]entities.Material, error) {
 }
 func (i *Implementation) UpdateMaterial(material entities.Material) (entities.Material, error) {
 	if material.ID <= 0 {
-		return entities.Material{}, core_errors.NewInternalServerError("material id is required")
+		return entities.Material{}, core_errors.NewBadRequestError("material id is required")
 	}
-	/*found := i.materialGateway.FindById(material.ID)
-	if found == nil && found.ID != materialType.ID {
-		return entities.MaterialType{}, core_errors.NewInternalServerError("material not exist")
-	}*/
-	/*repeated := i.materialTypeGateway.FindByName(materialType.Name)
-	if repeated != nil && repeated.ID != materialType.ID {
-		return entities.MaterialType{}, core_errors.NewInternalServerError("materialType already exists")
-	}*/
+	found := i.materialGateway.FindById(material.ID)
+	if found == nil || found.ID != material.ID {
+		return entities.Material{}, core_errors.NewInternalServerError("material not exist")
+	}
+
 	if material.Name == "" {
 		return entities.Material{}, core_errors.NewBadRequestError("material name is required")
 	}
