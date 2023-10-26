@@ -40,15 +40,6 @@ func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) (entiti
 	return materialCreated, nil
 }
 
-func (i *MaterialGatewayImpl) FindById(id uint) *entities.Material {
-	materialsDB := i.materialRepository.FindById(id)
-	if materialsDB == nil {
-		return nil
-	}
-	material := i.ToBusinessEntity(*materialsDB)
-	return &material
-}
-
 func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
 	materialsDB, err := i.materialRepository.FindAll()
 	if err != nil {
@@ -60,6 +51,15 @@ func (i *MaterialGatewayImpl) FindAll() ([]entities.Material, error) {
 
 	}
 	return materials, err
+}
+
+func (i *MaterialGatewayImpl) FindById(id uint) *entities.Material {
+	materialDB := i.materialRepository.FindById(id)
+	if materialDB == nil {
+		return nil
+	}
+	material := i.ToBusinessEntity(*materialDB)
+	return &material
 }
 
 func (i *MaterialGatewayImpl) FindByName(name string) *entities.Material {

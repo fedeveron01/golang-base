@@ -53,7 +53,7 @@ func (r *SessionRepository) UpdateSession(session gateway_entities.Session) erro
 }
 
 func (r *SessionRepository) DeleteSession(id float64) error {
-	res := r.db.Delete(&gateway_entities.Session{}, id)
+	res := r.db.Unscoped().Delete(&gateway_entities.Session{}, id)
 	if res.Error != nil {
 		return res.Error
 	}

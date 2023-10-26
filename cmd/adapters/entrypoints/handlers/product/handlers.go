@@ -20,9 +20,7 @@ type ProductHandlerInterface interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
-	CreateMaterialAssignation(w http.ResponseWriter, r *http.Request)
-	ModifyMaterialAssignation(w http.ResponseWriter, r *http.Request)
-	DeleteMaterialAssignation(w http.ResponseWriter, r *http.Request)
+	AssignMaterialsToProduct(w http.ResponseWriter, r *http.Request)
 }
 
 type ProductHandler struct {
@@ -168,17 +166,31 @@ func (p *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// CreateMaterialAssignation Handle api/product/assignation POST request
-func (p *ProductHandler) CreateMaterialAssignation(w http.ResponseWriter, r *http.Request) {
-	//TODO: implement
-}
+// AssignMaterialsToProduct Handle api/product/assignation POST request
+func (p *ProductHandler) AssignMaterialsToProduct(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	if !p.IsAdmin(w, r) {
+		return
+	}
 
-// ModifyMaterialAssignation Handle api/product/assignation PUT request
-func (p *ProductHandler) ModifyMaterialAssignation(w http.ResponseWriter, r *http.Request) {
-	//TODO: implement
-}
+	language := r.Header.Get("Language")
+	if language == "" {
+		language = "en"
+	}
 
-// DeleteMaterialAssignation Handle api/product/assignation DELETE request
-func (p *ProductHandler) DeleteMaterialAssignation(w http.ResponseWriter, r *http.Request) {
-	//TODO: implement
+	reqBody, _ := io.ReadAll(r.Body)
+	var assignation MaterialsProductAssignationRequest
+	json.Unmarshal(reqBody, &assignation)
+
+	var err error
+	materialProducts, err := p.productUseCase.AssignMaterialsToProduct(assignation.ProductId, ToMaterialsProductEntity(assignation.Assignations))
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+
+	assignationResponse := ToAssignationsResponse(materialProducts, language)
+	json.NewEncoder(w).Encode(assignationResponse)
 }

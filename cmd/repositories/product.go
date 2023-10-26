@@ -73,3 +73,21 @@ func (r *ProductRepository) DeleteProduct(id uint) error {
 	r.db.Delete(&gateway_entities.Product{}, id)
 	return nil
 }
+
+func (r *ProductRepository) UpdateMaterialProducts(productId int64, materialProduct []gateway_entities.MaterialProduct) ([]gateway_entities.MaterialProduct, error) {
+	r.db.Unscoped().Where("product_id = ?", productId).Delete(&gateway_entities.MaterialProduct{})
+	if len(materialProduct) == 0 {
+		return materialProduct, nil
+	}
+	res := r.db.Create(&materialProduct)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return nil, core_errors.NewInternalServerError("material product update failed")
+	}
+
+	r.db.InnerJoins("Material").Preload("Material.MaterialType").Find(&materialProduct, "product_id = ?", productId)
+
+	return materialProduct, nil
+}

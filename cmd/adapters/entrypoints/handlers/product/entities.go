@@ -1,5 +1,15 @@
 package product_handler
 
+type MaterialsProductAssignationRequest struct {
+	ProductId    float64              `json:"productId"`
+	Assignations []AssignationRequest `json:"assignations"`
+}
+
+type AssignationRequest struct {
+	MaterialId float64 `json:"materialId"`
+	Quantity   int     `json:"quantity"`
+}
+
 type ProductResponse struct {
 	Id          float64 `json:"id"`
 	Name        string  `json:"name"`
@@ -24,7 +34,6 @@ type ProductWithAssignationsResponse struct {
 }
 
 type AssignationResponse struct {
-	Id       float64          `json:"id"`
 	Quantity int              `json:"quantity"`
 	Material MaterialResponse `json:"material"`
 }

@@ -77,6 +77,23 @@ func (e *ProductGatewayImpl) DeleteProduct(id uint) error {
 	return e.productRepository.DeleteProduct(id)
 }
 
+func (e *ProductGatewayImpl) UpdateMaterialProducts(productId uint, materialsProduct []entities.MaterialProduct) ([]entities.MaterialProduct, error) {
+	materialsProductDB := make([]gateway_entities.MaterialProduct, len(materialsProduct))
+	for i, materialProduct := range materialsProduct {
+		materialsProductDB[i] = gateway_entities.MaterialProduct{
+			ProductId:  productId,
+			MaterialId: materialProduct.Material.ID,
+			Quantity:   materialProduct.Quantity,
+		}
+	}
+	materialsProductDB, err := e.productRepository.UpdateMaterialProducts(int64(productId), materialsProductDB)
+	if err != nil {
+		return nil, err
+	}
+	materialsProduct = e.MaterialsProductToBusinessEntity(materialsProductDB)
+	return materialsProduct, nil
+}
+
 func (e *ProductGatewayImpl) ToBusinessEntity(product gateway_entities.Product) entities.Product {
 	productBusiness := entities.Product{
 		EntitiesBase: core.EntitiesBase{
