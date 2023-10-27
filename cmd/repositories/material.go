@@ -27,22 +27,19 @@ func (r *MaterialRepository) CreateMaterial(material gateway_entities.Material) 
 	return material, nil
 }
 
+func (r *MaterialRepository) FindById(id uint) *gateway_entities.Material {
+	var material gateway_entities.Material
+	res := r.db.Where("id = ?", id).Find(&material)
+	if res.RowsAffected == 0 {
+		return nil
+	}
+	return &material
+}
+
 func (r *MaterialRepository) FindAll() ([]gateway_entities.Material, error) {
 	var materials []gateway_entities.Material
 	r.db.InnerJoins("MaterialType").Find(&materials)
 	return materials, nil
-}
-
-func (r *MaterialRepository) FindById(id uint) *gateway_entities.Material {
-	var material gateway_entities.Material
-	res := r.db.Find(&material, id).First(&material)
-	if res.Error != nil {
-		return nil
-	}
-	if material.ID == 0 {
-		return nil
-	}
-	return &material
 }
 
 func (r *MaterialRepository) FindByName(name string) *gateway_entities.Material {
@@ -54,9 +51,15 @@ func (r *MaterialRepository) FindByName(name string) *gateway_entities.Material 
 	return &material
 }
 
-func (r *MaterialRepository) UpdateMaterial(material gateway_entities.Material) error {
-	r.db.Save(&material)
-	return nil
+func (r *MaterialRepository) UpdateMaterial(material gateway_entities.Material) (gateway_entities.Material, error) {
+	res := r.db.Save(&material)
+	if res.Error != nil {
+		return gateway_entities.Material{}, res.Error
+	}
+	if res.RowsAffected == 0 {
+		return gateway_entities.Material{}, core_errors.NewInternalServerError("material update failed")
+	}
+	return material, nil
 }
 
 func (r *MaterialRepository) DeleteMaterial(id string) error {

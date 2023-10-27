@@ -50,6 +50,9 @@ func ToMaterialsResponse(materials []entities.Material, language string) []Mater
 
 func ToMaterialEntity(request MaterialRequest) entities.Material {
 	return entities.Material{
+		EntitiesBase: core.EntitiesBase{
+			ID: uint(request.Id),
+		},
 		Name:            request.Name,
 		Description:     request.Description,
 		Price:           request.Price,

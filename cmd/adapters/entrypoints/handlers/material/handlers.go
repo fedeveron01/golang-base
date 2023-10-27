@@ -17,6 +17,7 @@ import (
 type MaterialHandlerInterface interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	GetAll(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
 }
 type MaterialHandler struct {
@@ -96,4 +97,31 @@ func (p *MaterialHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 	p.WriteResponse(w, "material deleted", http.StatusOK)
 	w.WriteHeader(http.StatusOK)
+}
+
+// Handle api/material
+func (p *MaterialHandler) Update(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	if !p.IsAdmin(w, r) {
+		return
+	}
+
+	language := r.Header.Get("Language")
+	if language == "" {
+		language = "en"
+	}
+
+	reqBody, _ := io.ReadAll(r.Body)
+	var materialRequest MaterialRequest
+	json.Unmarshal(reqBody, &materialRequest)
+	materialEntity := ToMaterialEntity(materialRequest)
+	material, err := p.materialUseCase.UpdateMaterial(materialEntity)
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+
+	json.NewEncoder(w).Encode(ToMaterialResponse(material, language))
 }
