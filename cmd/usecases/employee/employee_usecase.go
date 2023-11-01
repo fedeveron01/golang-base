@@ -63,9 +63,6 @@ func (i *Implementation) UpdateEmployee(employee entities.Employee) (entities.Em
 	if employee.LastName == "" {
 		return entities.Employee{}, core_errors.NewBadRequestError("employee lastname is not valid")
 	}
-	if employee.Charge.ID == 0 {
-		return entities.Employee{}, core_errors.NewBadRequestError("employee charge id is not valid")
-	}
 
 	oldEmployee, err := i.employeeGateway.FindById(int64(employee.ID))
 	if err != nil {
