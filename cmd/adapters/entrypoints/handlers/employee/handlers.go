@@ -6,6 +6,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
 	employee_usecase "github.com/fedeveron01/golang-base/cmd/usecases/employee"
 	"github.com/gorilla/mux"
+	"io"
 	"net/http"
 	"strconv"
 )
@@ -13,6 +14,7 @@ import (
 type EmployeeHandlerInterface interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
 	GetById(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
 }
 
 type EmployeeHandler struct {
@@ -30,13 +32,13 @@ func NewEmployeeHandler(sessionGateway gateways.SessionGateway, employeeUseCase 
 }
 
 // GetAll Handle api/employee
-func (p *EmployeeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	if !p.IsAuthorized(w, r) {
+func (e *EmployeeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
+	if !e.IsAuthorized(w, r) {
 		return
 	}
-	employees, err := p.employeeUseCase.FindAll()
+	employees, err := e.employeeUseCase.FindAll()
 	if err != nil {
-		p.WriteErrorResponse(w, err)
+		e.WriteErrorResponse(w, err)
 	}
 
 	employeesResponse := ToEmployeeResponses(employees)
@@ -44,18 +46,40 @@ func (p *EmployeeHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetById Handle api/employee/{id}
-func (g *EmployeeHandler) GetById(w http.ResponseWriter, r *http.Request) {
-	if !g.IsAuthorized(w, r) {
+func (e *EmployeeHandler) GetById(w http.ResponseWriter, r *http.Request) {
+	if !e.IsAuthorized(w, r) {
 		return
 	}
 	vars := mux.Vars(r)
 	id := vars["id"]
 	intId, _ := strconv.ParseInt(id, 10, 64)
-	employee, err := g.employeeUseCase.FindById(intId)
+	employee, err := e.employeeUseCase.FindById(intId)
 	if err != nil {
-		g.WriteErrorResponse(w, err)
+		e.WriteErrorResponse(w, err)
 		return
 	}
 	employeeResponse := ToEmployeeResponse(employee)
 	json.NewEncoder(w).Encode(employeeResponse)
+}
+
+// Update Handle api/employee PUT request
+func (e *EmployeeHandler) Update(w http.ResponseWriter, r *http.Request) {
+	if !e.IsAuthorized(w, r) {
+		return
+	}
+	if !e.IsAdmin(w, r) {
+		return
+	}
+	reqBody, _ := io.ReadAll(r.Body)
+	var employeeRequest EmployeeRequest
+	json.Unmarshal(reqBody, &employeeRequest)
+
+	employee, err := e.employeeUseCase.UpdateEmployee(ToEmployeeEntity(employeeRequest))
+	if err != nil {
+		e.WriteErrorResponse(w, err)
+		return
+	}
+	employeeResponse := ToEmployeeResponse(employee)
+	json.NewEncoder(w).Encode(employeeResponse)
+
 }

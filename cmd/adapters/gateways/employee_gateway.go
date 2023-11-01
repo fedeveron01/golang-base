@@ -5,6 +5,7 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"gorm.io/gorm"
 )
 
 type EmployeeGatewayImpl struct {
@@ -44,10 +45,16 @@ func (e *EmployeeGatewayImpl) CreateEmployee(employee entities.Employee) error {
 	return e.employeeRepository.CreateEmployee(employeeDB)
 }
 
-func (e *EmployeeGatewayImpl) UpdateEmployee(employee entities.Employee) error {
+func (e *EmployeeGatewayImpl) UpdateEmployee(employee entities.Employee) (entities.Employee, error) {
 
 	employeeDB := e.ToServiceEntity(employee)
-	return e.employeeRepository.UpdateEmployee(employeeDB)
+	res, err := e.employeeRepository.UpdateEmployee(employeeDB)
+	if err != nil {
+		return entities.Employee{}, err
+	}
+	employee = e.ToBusinessEntity(res)
+	return employee, err
+
 }
 
 func (e *EmployeeGatewayImpl) FindEmployeeByUserId(id uint) (entities.Employee, error) {
@@ -129,6 +136,9 @@ func (e *EmployeeGatewayImpl) ToBusinessEntity(employeeDB gateway_entities.Emplo
 
 func (e *EmployeeGatewayImpl) ToServiceEntity(employee entities.Employee) gateway_entities.Employee {
 	employeeDB := gateway_entities.Employee{
+		Model: gorm.Model{
+			ID: employee.ID,
+		},
 		Name:     employee.Name,
 		LastName: employee.LastName,
 		DNI:      employee.DNI,

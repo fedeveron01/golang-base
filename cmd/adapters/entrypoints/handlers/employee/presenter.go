@@ -1,6 +1,9 @@
 package employee_handler
 
-import "github.com/fedeveron01/golang-base/cmd/core/entities"
+import (
+	"github.com/fedeveron01/golang-base/cmd/core"
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
+)
 
 func ToEmployeeResponse(employee entities.Employee) EmployeeResponse {
 	return EmployeeResponse{
@@ -26,4 +29,18 @@ func ToEmployeeResponses(employees []entities.Employee) []EmployeeResponse {
 		employeeResponses = append(employeeResponses, ToEmployeeResponse(employee))
 	}
 	return employeeResponses
+}
+
+func ToEmployeeEntity(employeeRequest EmployeeRequest) entities.Employee {
+	return entities.Employee{
+		EntitiesBase: core.EntitiesBase{
+			ID: employeeRequest.Id},
+		Name:     employeeRequest.Name,
+		LastName: employeeRequest.LastName,
+		DNI:      employeeRequest.DNI,
+		Charge: entities.Charge{
+			EntitiesBase: core.EntitiesBase{
+				ID: employeeRequest.ChargeId},
+		},
+	}
 }

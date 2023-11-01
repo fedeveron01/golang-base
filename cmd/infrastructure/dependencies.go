@@ -77,7 +77,7 @@ func Start() HandlerContainer {
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway, materialTypeGateway)
 	userUseCase := user_usecase.NewUserUseCase(userGateway, sessionGateway, employeeGateway, chargeGateway)
 	chargeUseCase := charge_usecase.NewChargeUsecase(chargeGateway)
-	employeeUseCase := employee_usecase.NewEmployeeUsecase(employeeGateway)
+	employeeUseCase := employee_usecase.NewEmployeeUseCase(employeeGateway, chargeGateway)
 	materialTypeUseCase := material_type_usecase.NewMaterialTypeUsecase(materialTypeGateway)
 	productUseCase := product_usecase.NewProductUsecase(productGateway, materialGateway)
 
