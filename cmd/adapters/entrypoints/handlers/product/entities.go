@@ -7,7 +7,7 @@ type MaterialsProductAssignationRequest struct {
 
 type AssignationRequest struct {
 	MaterialId float64 `json:"materialId"`
-	Quantity   int     `json:"quantity"`
+	Quantity   float64 `json:"quantity"`
 }
 
 type ProductResponse struct {
@@ -34,7 +34,7 @@ type ProductWithAssignationsResponse struct {
 }
 
 type AssignationResponse struct {
-	Quantity int              `json:"quantity"`
+	Quantity float64          `json:"quantity"`
 	Material MaterialResponse `json:"material"`
 }
 

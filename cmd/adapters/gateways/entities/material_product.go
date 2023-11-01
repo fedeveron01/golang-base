@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type MaterialProduct struct {
 	gorm.Model
-	Quantity   int
+	Quantity   float64
 	MaterialId uint
 	Material   Material
 	ProductId  uint
