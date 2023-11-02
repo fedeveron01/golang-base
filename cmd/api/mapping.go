@@ -33,6 +33,7 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/user/logout", handlers.UserHandler.Logout).Methods("POST")
 	app.HandleFunc("/api/user/{id}", handlers.UserHandler.Logout).Methods("PUT")
 	app.HandleFunc("/api/user/activeDesactiveUser/{id}", handlers.UserHandler.ActiveDesactiveUser).Methods("PUT")
+	app.HandleFunc("/api/user", handlers.UserHandler.Update).Methods("PUT")
 
 	//employee
 	app.HandleFunc("/api/employee", handlers.EmployeeHandler.GetAll).Methods("GET")

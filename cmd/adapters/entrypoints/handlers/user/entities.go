@@ -5,6 +5,12 @@ type LoginRequest struct {
 	Password string
 }
 
+type UserRequest struct {
+	Id       int64
+	UserName string
+	Password string
+}
+
 type ActiveDesactiveUserRequest struct {
 	Inactive bool `json:"inactive" required:"true"`
 }
@@ -22,4 +28,9 @@ type TokenResponse struct {
 	Token      string
 	EmployeeId float64
 	Charge     string
+}
+
+type UserResponse struct {
+	Id       float64 `json:"id"`
+	UserName string  `json:"userName"`
 }

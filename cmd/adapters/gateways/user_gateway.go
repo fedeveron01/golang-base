@@ -74,9 +74,14 @@ func (i *UserGatewayImpl) FindUserByUsername(username string) entities.User {
 	return user
 }
 
-func (i *UserGatewayImpl) UpdateUser(user entities.User) error {
+func (i *UserGatewayImpl) UpdateUser(user entities.User) (entities.User, error) {
 	userDB := i.ToServiceEntity(user)
-	return i.userRepository.UpdateUser(userDB)
+	userResponse, err := i.userRepository.UpdateUser(userDB)
+	if err != nil {
+		return entities.User{}, err
+	}
+	user = i.ToBusinessEntity(userResponse)
+	return user, nil
 }
 
 func (i *UserGatewayImpl) DeleteUser(id string) error {

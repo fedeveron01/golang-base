@@ -20,6 +20,7 @@ type UserHandlerInterface interface {
 	Login(w http.ResponseWriter, r *http.Request)
 	Logout(w http.ResponseWriter, r *http.Request)
 	ActiveDesactiveUser(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request)
 }
 
 type UserHandler struct {
@@ -141,4 +142,37 @@ func (p *UserHandler) ActiveDesactiveUser(w http.ResponseWriter, r *http.Request
 		return
 	}
 	p.WriteResponse(w, "User updated", 200)
+}
+
+// Handle api/user PUT request
+func (p *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+
+	var userRequest UserRequest
+	reqBody, _ := io.ReadAll(r.Body)
+	err := json.Unmarshal(reqBody, &userRequest)
+	if err != nil {
+		p.WriteInternalServerError(w, err)
+		return
+	}
+
+	user := entities.User{
+		EntitiesBase: core.EntitiesBase{
+			ID: uint(userRequest.Id),
+		},
+		UserName: userRequest.UserName,
+		Password: userRequest.Password,
+	}
+
+	user, err = p.userUseCase.UpdateUser(user)
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+
+	userResponse := ToUserResponse(user)
+	json.NewEncoder(w).Encode(userResponse)
+
 }
