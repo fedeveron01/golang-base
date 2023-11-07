@@ -37,7 +37,7 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	//employee
 	app.HandleFunc("/api/employee", handlers.EmployeeHandler.GetAll).Methods("GET")
 	app.HandleFunc("/api/employee/{id}", handlers.EmployeeHandler.GetById).Methods("GET")
-
+	app.HandleFunc("/api/employee", handlers.EmployeeHandler.Update).Methods("PUT")
 	//charge
 	app.HandleFunc("/api/charge", handlers.ChargeHandler.GetAll).Methods("GET")
 	app.HandleFunc("/api/charge", handlers.ChargeHandler.Create).Methods("POST")

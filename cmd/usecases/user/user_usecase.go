@@ -31,23 +31,15 @@ type UserGateway interface {
 
 type SessionGateway interface {
 	CreateSession(session entities.Session) (entities.Session, error)
-	FindAll() ([]entities.Session, error)
-	UpdateSession(session entities.Session) error
 	DeleteSession(id float64) error
 }
 
 type EmployeeGateway interface {
-	CreateEmployee(employee entities.Employee) error
 	FindEmployeeByUserId(id uint) (entities.Employee, error)
-	FindAll() ([]entities.Employee, error)
-	UpdateEmployee(employee entities.Employee) error
-	DeleteEmployee(id string) error
 }
 
 type ChargeGateway interface {
-	FindByName(name string) (uint, error)
 	FindById(id uint) (entities.Charge, error)
-	CreateCharge(charge entities.Charge) (entities.Charge, error)
 }
 
 type Implementation struct {

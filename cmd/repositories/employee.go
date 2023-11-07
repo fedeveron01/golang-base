@@ -50,9 +50,13 @@ func (r *EmployeeRepository) CreateEmployee(employee gateway_entities.Employee) 
 	return nil
 }
 
-func (r *EmployeeRepository) UpdateEmployee(employee gateway_entities.Employee) error {
-	r.db.Save(&employee)
-	return nil
+func (r *EmployeeRepository) UpdateEmployee(employee gateway_entities.Employee) (gateway_entities.Employee, error) {
+	res := r.db.Save(&employee)
+	if res.Error != nil {
+		return gateway_entities.Employee{}, res.Error
+	}
+	r.db.InnerJoins("User").InnerJoins("Charge").Find(&employee).First(&employee)
+	return employee, nil
 }
 
 func (r *EmployeeRepository) DeleteEmployee(id string) error {

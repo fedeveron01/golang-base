@@ -1,5 +1,13 @@
 package employee_handler
 
+type EmployeeRequest struct {
+	Id       uint   `json:"id"`
+	Name     string `json:"name"`
+	LastName string `json:"lastName"`
+	DNI      string `json:"dni"`
+	ChargeId uint   `json:"chargeId"`
+}
+
 type EmployeeResponse struct {
 	Id       uint           `json:"id"`
 	Name     string         `json:"name"`
