@@ -83,9 +83,12 @@ func (r *UserRepository) FindUserByUsernameAndPassword(username string, password
 	return user, nil
 }
 
-func (r *UserRepository) UpdateUser(user gateway_entities.User) error {
-	r.db.Save(&user)
-	return nil
+func (r *UserRepository) UpdateUser(user gateway_entities.User) (gateway_entities.User, error) {
+	res := r.db.Save(&user)
+	if res.Error != nil {
+		return gateway_entities.User{}, res.Error
+	}
+	return user, nil
 }
 
 func (r *UserRepository) DeleteUser(id string) error {

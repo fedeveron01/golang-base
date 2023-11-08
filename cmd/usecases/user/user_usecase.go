@@ -13,7 +13,7 @@ import (
 type UserUseCase interface {
 	ActiveDesactiveUser(id int64, inactive bool) error
 	CreateUser(user entities.User, employee entities.Employee) error
-	UpdateUser(user entities.User) error
+	UpdateUser(user entities.User) (entities.User, error)
 	DeleteUser(id string) error
 	LoginUser(username string, password string) (string, error)
 	LogoutUser(sessionId float64) error
@@ -25,7 +25,7 @@ type UserGateway interface {
 		employee entities.Employee) (entities.User, error)
 	FindUserByUsernameAndPassword(username string, password string) (entities.User, error)
 	FindUserByUsername(username string) entities.User
-	UpdateUser(user entities.User) error
+	UpdateUser(user entities.User) (entities.User, error)
 	DeleteUser(id string) error
 }
 
@@ -67,7 +67,7 @@ func (i *Implementation) ActiveDesactiveUser(id int64, inactive bool) error {
 		return err
 	}
 	user.Inactive = inactive
-	err = i.userGateway.UpdateUser(user)
+	_, err = i.userGateway.UpdateUser(user)
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,34 @@ func (i *Implementation) CreateUser(user entities.User, employee entities.Employ
 	return nil
 }
 
-func (i *Implementation) UpdateUser(user entities.User) error {
+func (i *Implementation) UpdateUser(user entities.User) (entities.User, error) {
+	if user.UserName == "" {
+		return entities.User{}, core_errors.NewBadRequestError("username is empty")
+	}
+	if user.ID == 0 {
+		return entities.User{}, core_errors.NewBadRequestError("user id is empty")
+	}
+
+	repeatedUsername := i.userGateway.FindUserByUsername(user.UserName)
+	if repeatedUsername.ID != 0 && repeatedUsername.ID != user.ID {
+		return entities.User{}, core_errors.NewInternalServerError("username already exists")
+	}
+
+	actualUser, err := i.userGateway.FindUserById(int64(user.ID))
+	if err != nil {
+		return entities.User{}, err
+	}
+	if user.Password == "" {
+		user.Password = actualUser.Password
+	} else {
+		if len(user.Password) < 5 {
+			return entities.User{}, core_errors.NewBadRequestError("password must be at least 5 characters")
+		}
+		user.Password = encryptPassword(user.Password)
+	}
+
+	user.Inactive = actualUser.Inactive
+
 	return i.userGateway.UpdateUser(user)
 }
 
