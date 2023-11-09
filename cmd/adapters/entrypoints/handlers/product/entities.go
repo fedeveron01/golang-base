@@ -18,7 +18,6 @@ type ProductResponse struct {
 	Size        float64 `json:"size"`
 	ImageUrl    string  `json:"imageUrl"`
 	Price       float64 `json:"price"`
-	Stock       int     `json:"stock"`
 }
 
 type ProductWithAssignationsResponse struct {
@@ -29,7 +28,6 @@ type ProductWithAssignationsResponse struct {
 	Size         float64               `json:"size"`
 	ImageUrl     string                `json:"imageUrl"`
 	Price        float64               `json:"price"`
-	Stock        int                   `json:"stock"`
 	Assignations []AssignationResponse `json:"assignations"`
 }
 

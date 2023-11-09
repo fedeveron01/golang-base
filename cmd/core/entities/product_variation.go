@@ -2,8 +2,8 @@ package entities
 
 import "github.com/fedeveron01/golang-base/cmd/core"
 
-type PurchaseOrderDetail struct {
+type ProductVariation struct {
 	core.EntitiesBase
-	Quantity int
-	Material Material
+	Number float64
+	Stock  float64
 }
