@@ -60,45 +60,6 @@ func (e *EmployeeGatewayImpl) UpdateEmployee(employee entities.Employee) (entiti
 func (e *EmployeeGatewayImpl) FindEmployeeByUserId(id uint) (entities.Employee, error) {
 	employeeDB, err := e.employeeRepository.FindEmployeeByUserId(id)
 
-	// map production orders
-	productionOrders := make([]entities.ProductionOrder, len(employeeDB.ProductionOrders))
-	for i, productionOrderDB := range employeeDB.ProductionOrders {
-		productionOrderDetail := make([]entities.ProductionOrderDetail, len(productionOrderDB.ProductionOrderDetail))
-		for j, productionOrderDetailDB := range productionOrderDB.ProductionOrderDetail {
-			productionOrderDetail[j] = entities.ProductionOrderDetail{
-				Quantity: productionOrderDetailDB.Quantity,
-				Product: entities.Product{
-					Name: productionOrderDetailDB.Product.Name,
-				},
-			}
-		}
-		productionOrders[i] = entities.ProductionOrder{
-			StartDateTime:         productionOrderDB.StartDateTime,
-			EndDateTime:           productionOrderDB.EndDateTime,
-			ProductionOrderDetail: productionOrderDetail,
-		}
-
-	}
-
-	// map purchase orders
-	purchaseOrders := make([]entities.PurchaseOrder, len(employeeDB.PurchaseOrders))
-	for i, purchaseOrderDB := range employeeDB.PurchaseOrders {
-		purchaseOrderDetail := make([]entities.PurchaseOrderDetail, len(purchaseOrderDB.PurchaseOrderDetails))
-		for j, purchaseOrderDetailDB := range purchaseOrderDB.PurchaseOrderDetails {
-			purchaseOrderDetail[j] = entities.PurchaseOrderDetail{
-				Quantity: purchaseOrderDetailDB.Quantity,
-				Material: entities.Material{
-					Name: purchaseOrderDetailDB.Material.Name,
-				},
-			}
-		}
-		purchaseOrders[i] = entities.PurchaseOrder{
-			Number:               purchaseOrderDB.Number,
-			PurchaseOrderDetails: purchaseOrderDetail,
-		}
-
-	}
-
 	employee := e.ToBusinessEntity(employeeDB)
 
 	return employee, err

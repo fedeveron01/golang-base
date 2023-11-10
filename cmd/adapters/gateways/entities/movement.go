@@ -1,13 +1,17 @@
 package gateway_entities
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type Movement struct {
 	gorm.Model
-	Quantity           float64
-	MaterialId         uint
-	Material           Material
-	MovementTypeId     uint
-	ProductVariation   ProductVariation
-	ProductVariationId uint
+	Number         float64
+	Type           string
+	Total          float64
+	DateTime       time.Time
+	Description    string
+	MovementDetail []MovementDetail
+	EmployeeId     uint
 }

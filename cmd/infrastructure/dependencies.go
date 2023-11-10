@@ -47,8 +47,7 @@ func Start() HandlerContainer {
 	err = db.AutoMigrate(
 		gateway_entities.User{}, gateway_entities.Charge{}, gateway_entities.Employee{}, gateway_entities.Material{},
 		gateway_entities.MaterialProduct{}, gateway_entities.MaterialType{},
-		gateway_entities.Product{}, gateway_entities.ProductionOrder{}, gateway_entities.ProductionOrderDetail{},
-		gateway_entities.PurchaseOrder{}, gateway_entities.PurchaseOrderDetail{}, gateway_entities.Session{},
+		gateway_entities.Product{}, gateway_entities.Movement{}, gateway_entities.MovementDetail{}, gateway_entities.ProductVariation{},
 	)
 	if err != nil {
 		panic("failed to migrate database")
