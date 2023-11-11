@@ -2,10 +2,14 @@ package movement
 
 import (
 	"encoding/json"
+	"net/http"
+	"strconv"
+
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
 	"github.com/fedeveron01/golang-base/cmd/adapters/gateways"
+	core_errors "github.com/fedeveron01/golang-base/cmd/core/errors"
 	movement_usecase "github.com/fedeveron01/golang-base/cmd/usecases/movement"
-	"net/http"
+	"github.com/gorilla/mux"
 )
 
 type MovementHandlerInterface interface {
@@ -30,12 +34,29 @@ func NewMovementHandler(sessionGateway gateways.SessionGateway, movementUseCase 
 
 // GetAll Handle api/movement GET request
 func (p *MovementHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	panic("implement me angelo")
+
+	movements, err := p.movementUseCase.FindAll()
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+	}
+
+	json.NewEncoder(w).Encode(ToMovementsResponse(movements))
 }
 
 // GetById Handle api/movement/{id} GET request
 func (p *MovementHandler) GetById(w http.ResponseWriter, r *http.Request) {
-	panic("implement me angelo")
+	vars := mux.Vars(r)
+	id := vars["id"]
+	uid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		p.WriteErrorResponse(w, core_errors.NewBadRequestError("id is not valid"))
+		return
+	}
+	movement, err := p.movementUseCase.FindById(uint(uid))
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+	}
+	json.NewEncoder(w).Encode(ToMovementResponse(movement))
 }
 
 // Create Handle api/movement POST request

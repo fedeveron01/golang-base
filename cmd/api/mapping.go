@@ -27,6 +27,12 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/materialType", handlers.MaterialTypeHandler.Update).Methods("PUT")
 	app.HandleFunc("/api/materialType/{id}", handlers.MaterialTypeHandler.Delete).Methods("DELETE")
 
+	//movement
+	app.HandleFunc("/api/movement", handlers.MovementHandler.GetAll).Methods("GET")
+	app.HandleFunc("/api/movement/{id}", handlers.MovementHandler.GetById).Methods("GET")
+	/*app.HandleFunc("/api/movement", handlers.MovementHandler.Create).Methods("POST")
+	app.HandleFunc("/api/movement", handlers.MovementHandler.Update).Methods("PUT")*/
+
 	//user
 	app.HandleFunc("/api/user/signup", handlers.UserHandler.Signup).Methods("POST")
 	app.HandleFunc("/api/user/login", handlers.UserHandler.Login).Methods("POST")

@@ -1,8 +1,9 @@
 package movement
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"time"
+
+	"github.com/fedeveron01/golang-base/cmd/core/entities"
 )
 
 func ToMovement(movementRequest MovementRequest) entities.Movement {
@@ -38,6 +39,13 @@ func ToMovementResponse(movement entities.Movement) MovementResponse {
 		Description:     movement.Description,
 		MovementDetails: ToMovementDetailsResponse(movement.MovementDetail),
 	}
+}
+func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
+	var movementsResponse []MovementResponse
+	for _, movement := range movements {
+		movementsResponse = append(movementsResponse, ToMovementResponse(movement))
+	}
+	return movementsResponse
 }
 
 func ToMovementDetailsResponse(movementDetails []entities.MovementDetail) []MovementDetailResponse {

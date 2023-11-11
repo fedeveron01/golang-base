@@ -8,24 +8,51 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/repositories"
 )
 
-type MovementGateway interface {
-	Create(movement entities.Movement) error
-}
-
 type MovementGatewayImpl struct {
-	materialRepository repositories.MovementRepository
+	mavementRepository repositories.MovementRepository
 }
 
-func NewMovementGateway(materialRepository repositories.MovementRepository) *MovementGatewayImpl {
+// Create implements movement_usecase.MovementGateway.
+func (*MovementGatewayImpl) Create(movement entities.Movement) entities.Movement {
+	panic("unimplemented")
+}
+
+// CreateMovementDetailsTransaction implements movement_usecase.MovementGateway.
+func (*MovementGatewayImpl) CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail) ([]entities.MovementDetail, error) {
+	panic("unimplemented")
+}
+
+func NewMovementGateway(mavementRepository repositories.MovementRepository) *MovementGatewayImpl {
 	return &MovementGatewayImpl{
-		materialRepository: materialRepository,
+		mavementRepository: mavementRepository,
 	}
+}
+
+func (i *MovementGatewayImpl) FindAll() ([]entities.Movement, error) {
+	movementsDB, err := i.mavementRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	movements := make([]entities.Movement, len(movementsDB))
+	for index, movementDB := range movementsDB {
+		movements[index] = i.ToBusinessEntity(movementDB)
+	}
+	return movements, nil
+}
+
+func (i *MovementGatewayImpl) FindById(id uint) (entities.Movement, error) {
+	movementDB, err := i.mavementRepository.FindById(id)
+	if err == nil {
+		return entities.Movement{}, err
+	}
+	movement := i.ToBusinessEntity(movementDB)
+	return movement, nil
 }
 
 func (i *MovementGatewayImpl) CreateMovement(material entities.Movement) (entities.Movement, error) {
 
 	materialDB := i.ToServiceEntity(material)
-	materialDBCreated, err := i.materialRepository.CreateMovement(materialDB)
+	materialDBCreated, err := i.mavementRepository.CreateMovement(materialDB)
 	if err != nil {
 		return entities.Movement{}, err
 	}
@@ -60,6 +87,9 @@ func toServiceMovementDetail(movementDetail []entities.MovementDetail) []gateway
 
 func (i *MovementGatewayImpl) ToBusinessEntity(movement gateway_entities.Movement) entities.Movement {
 	return entities.Movement{
+		EntitiesBase: core.EntitiesBase{
+			ID: movement.ID,
+		},
 		Number:         int(movement.Number),
 		Type:           movement.Type,
 		Total:          movement.Total,

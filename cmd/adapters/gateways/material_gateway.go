@@ -22,6 +22,11 @@ type MaterialGatewayImpl struct {
 	materialRepository repositories.MaterialRepository
 }
 
+// FindMaterialById implements movement_usecase.MaterialGateway.
+func (*MaterialGatewayImpl) FindMaterialById(id uint) *entities.Material {
+	panic("unimplemented")
+}
+
 func NewMaterialGateway(materialRepository repositories.MaterialRepository) *MaterialGatewayImpl {
 	return &MaterialGatewayImpl{
 		materialRepository: materialRepository,

@@ -2,16 +2,21 @@ package movement_usecase
 
 import (
 	"errors"
+
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 )
 
 type MovementUseCase interface {
 	Create(movement entities.Movement) (entities.Movement, error)
+	FindAll() ([]entities.Movement, error)
+	FindById(id uint) (entities.Movement, error)
 }
 
 type MovementGateway interface {
 	Create(movement entities.Movement) entities.Movement
 	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail) ([]entities.MovementDetail, error)
+	FindAll() ([]entities.Movement, error)
+	FindById(id uint) (entities.Movement, error)
 }
 
 type MaterialGateway interface {
@@ -28,6 +33,22 @@ func NewMovementUseCase(movementGateway MovementGateway, materialGateway Materia
 		movementGateway: movementGateway,
 		materialGateway: materialGateway,
 	}
+}
+
+func (i *MovementUseCaseImpl) FindAll() ([]entities.Movement, error) {
+	movements, err := i.movementGateway.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	return movements, nil
+}
+
+func (i *MovementUseCaseImpl) FindById(id uint) (entities.Movement, error) {
+	movement, err := i.movementGateway.FindById(id)
+	if err == nil {
+		return movement, errors.New("product not found")
+	}
+	return movement, nil
 }
 
 func (i *MovementUseCaseImpl) updateMaterial(movementDetail *entities.MovementDetail, input bool) error {
