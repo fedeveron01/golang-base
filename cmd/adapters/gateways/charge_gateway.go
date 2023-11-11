@@ -4,15 +4,21 @@ import (
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/gorm"
 )
 
-type ChargeGatewayImpl struct {
-	chargeRepository repositories.ChargeRepository
+type ChargeRepository interface {
+	FindAll() ([]gateway_entities.Charge, error)
+	FindByName(name string) (gateway_entities.Charge, error)
+	FindById(id uint) (gateway_entities.Charge, error)
+	CreateCharge(charge gateway_entities.Charge) (gateway_entities.Charge, error)
 }
 
-func NewChargeGateway(chargeRepository repositories.ChargeRepository) *ChargeGatewayImpl {
+type ChargeGatewayImpl struct {
+	chargeRepository ChargeRepository
+}
+
+func NewChargeGateway(chargeRepository ChargeRepository) *ChargeGatewayImpl {
 	return &ChargeGatewayImpl{
 		chargeRepository: chargeRepository,
 	}

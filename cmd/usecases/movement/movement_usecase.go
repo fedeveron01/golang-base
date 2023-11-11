@@ -6,27 +6,31 @@ import (
 )
 
 type MovementUseCase interface {
-	Create(movement entities.Movement) (entities.Movement, error)
+	Create(movement entities.Movement, employeeId uint) (entities.Movement, error)
 }
 
 type MovementGateway interface {
-	Create(movement entities.Movement) entities.Movement
-	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail) ([]entities.MovementDetail, error)
+	Create(movement entities.Movement, employeeID uint) (entities.Movement, error)
 }
 
+type MovementDetailGateway interface {
+	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movementID uint) ([]entities.MovementDetail, error)
+}
 type MaterialGateway interface {
 	FindMaterialById(id uint) *entities.Material
 }
 
 type MovementUseCaseImpl struct {
-	movementGateway MovementGateway
-	materialGateway MaterialGateway
+	movementGateway       MovementGateway
+	movementDetailGateway MovementDetailGateway
+	materialGateway       MaterialGateway
 }
 
-func NewMovementUseCase(movementGateway MovementGateway, materialGateway MaterialGateway) *MovementUseCaseImpl {
+func NewMovementUseCase(movementGateway MovementGateway, movementDetailGateway MovementDetailGateway, materialGateway MaterialGateway) *MovementUseCaseImpl {
 	return &MovementUseCaseImpl{
-		movementGateway: movementGateway,
-		materialGateway: materialGateway,
+		movementGateway:       movementGateway,
+		movementDetailGateway: movementDetailGateway,
+		materialGateway:       materialGateway,
 	}
 }
 
@@ -40,7 +44,7 @@ func (i *MovementUseCaseImpl) updateMaterial(movementDetail *entities.MovementDe
 		material.Stock += movementDetail.Quantity
 	} else {
 		if material.Stock-movementDetail.Quantity < 0 {
-			return errors.New("insufficient stock")
+			return errors.New("insufficient stock in material " + material.Name)
 		}
 		material.Stock -= movementDetail.Quantity
 	}
@@ -50,13 +54,16 @@ func (i *MovementUseCaseImpl) updateMaterial(movementDetail *entities.MovementDe
 	return nil
 }
 
-func (i *MovementUseCaseImpl) Create(movement entities.Movement) (entities.Movement, error) {
+func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint) (entities.Movement, error) {
 	if movement.Type == "" {
 		return entities.Movement{}, errors.New("type is required")
 	}
+	if employeeID <= 0 {
+		return entities.Movement{}, errors.New("employee is required")
+	}
 
 	if movement.Type == "input" {
-		for _, movementDetail := range movement.MovementDetail {
+		for index, movementDetail := range movement.MovementDetail {
 			if movementDetail.Material.ID == 0 && movementDetail.ProductVariation.ID == 0 {
 				return entities.Movement{}, errors.New("material or product variation required")
 			}
@@ -65,17 +72,24 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement) (entities.Movem
 				if err != nil {
 					return entities.Movement{}, err
 				}
+				movement.MovementDetail[index] = movementDetail
 
 			}
 			if movementDetail.ProductVariation.ID != 0 {
 				panic("implement me please angelo")
 			}
+
 		}
 	}
-	movementCreated := i.movementGateway.Create(movement)
-
-	movementDetailsCreated, err := i.movementGateway.CreateMovementDetailsTransaction(movementCreated.MovementDetail)
+	movementDetails := movement.MovementDetail
+	movementCreated, err := i.movementGateway.Create(movement, employeeID)
 	if err != nil {
+		return entities.Movement{}, err
+	}
+
+	movementDetailsCreated, err := i.movementDetailGateway.CreateMovementDetailsTransaction(movementDetails, movementCreated.ID)
+	if err != nil {
+		return entities.Movement{}, err
 	}
 	movementCreated.MovementDetail = movementDetailsCreated
 	return movementCreated, nil

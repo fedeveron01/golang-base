@@ -4,6 +4,7 @@ type MovementRequest struct {
 	Type        string                  `json:"type"`
 	Description string                  `json:"description" optional:"true"`
 	Details     []MovementDetailRequest `json:"details"`
+	EmployeeID  uint                    `json:"employeeId"`
 }
 
 type MovementDetailRequest struct {

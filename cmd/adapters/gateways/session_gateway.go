@@ -4,7 +4,6 @@ import (
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 )
 
 type SessionGateway interface {
@@ -16,11 +15,19 @@ type SessionGateway interface {
 	DeleteSession(id float64) error
 }
 
+type SessionRepository interface {
+	CreateSession(session gateway_entities.Session) (gateway_entities.Session, error)
+	FindAll() ([]gateway_entities.Session, error)
+	FindSessionById(id float64) (gateway_entities.Session, error)
+	SessionIsExpired(id float64) bool
+	UpdateSession(session gateway_entities.Session) error
+	DeleteSession(id float64) error
+}
 type SessionGatewayImpl struct {
-	sessionRepository repositories.SessionRepository
+	sessionRepository SessionRepository
 }
 
-func NewSessionGateway(sessionRepository repositories.SessionRepository) *SessionGatewayImpl {
+func NewSessionGateway(sessionRepository SessionRepository) *SessionGatewayImpl {
 	return &SessionGatewayImpl{
 		sessionRepository: sessionRepository,
 	}

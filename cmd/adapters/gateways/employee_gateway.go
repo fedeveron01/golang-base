@@ -4,15 +4,23 @@ import (
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/gorm"
 )
 
-type EmployeeGatewayImpl struct {
-	employeeRepository repositories.EmployeeRepository
+type EmployeeRepository interface {
+	CreateEmployee(employee gateway_entities.Employee) error
+	FindAll() ([]gateway_entities.Employee, error)
+	FindById(id int64) (gateway_entities.Employee, error)
+	UpdateEmployee(employee gateway_entities.Employee) (gateway_entities.Employee, error)
+	FindEmployeeByUserId(id uint) (gateway_entities.Employee, error)
+	DeleteEmployee(id string) error
 }
 
-func NewEmployeeGateway(employeeRepository repositories.EmployeeRepository) *EmployeeGatewayImpl {
+type EmployeeGatewayImpl struct {
+	employeeRepository EmployeeRepository
+}
+
+func NewEmployeeGateway(employeeRepository EmployeeRepository) *EmployeeGatewayImpl {
 	return &EmployeeGatewayImpl{
 		employeeRepository: employeeRepository,
 	}

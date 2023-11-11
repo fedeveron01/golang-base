@@ -1,6 +1,7 @@
 package movement
 
 import (
+	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"time"
 )
@@ -26,6 +27,16 @@ func ToMovementDetail(movementDetailRequest MovementDetailRequest) entities.Move
 	return entities.MovementDetail{
 		Quantity: movementDetailRequest.Quantity,
 		Price:    movementDetailRequest.Price,
+		Material: &entities.Material{
+			EntitiesBase: core.EntitiesBase{
+				ID: movementDetailRequest.MaterialID,
+			},
+		},
+		ProductVariation: &entities.ProductVariation{
+			EntitiesBase: core.EntitiesBase{
+				ID: movementDetailRequest.ProductVariationID,
+			},
+		},
 	}
 }
 func ToMovementResponse(movement entities.Movement) MovementResponse {
@@ -49,10 +60,18 @@ func ToMovementDetailsResponse(movementDetails []entities.MovementDetail) []Move
 }
 
 func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDetailResponse {
+	var materialID uint
+	if movementDetail.Material != nil {
+		materialID = movementDetail.Material.ID
+	}
+	var productVariationID uint
+	if movementDetail.ProductVariation != nil {
+		productVariationID = movementDetail.ProductVariation.ID
+	}
 	return MovementDetailResponse{
 		ID:                 movementDetail.ID,
-		ProductVariationID: movementDetail.ProductVariation.ID,
-		MaterialID:         movementDetail.Material.ID,
+		ProductVariationID: productVariationID,
+		MaterialID:         materialID,
 		Quantity:           movementDetail.Quantity,
 		Price:              movementDetail.Price,
 	}

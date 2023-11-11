@@ -51,6 +51,9 @@ func ConfigureMappings(app mux.Router, handlers infrastructure.HandlerContainer)
 	app.HandleFunc("/api/product/{id}", handlers.ProductHandler.Delete).Methods("DELETE")
 	app.HandleFunc("/api/product/assignation", handlers.ProductHandler.AssignMaterialsToProduct).Methods("POST")
 
+	//movement
+	app.HandleFunc("/api/movement", handlers.MovementHandler.Create).Methods("POST")
+
 	fmt.Println("Starting app in localhost:8080")
 	handler := cors.AllowAll().Handler(&app)
 	log.Fatal(http.ListenAndServe(":8080", handler))

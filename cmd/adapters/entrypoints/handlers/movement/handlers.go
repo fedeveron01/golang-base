@@ -50,7 +50,7 @@ func (p *MovementHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	movement := ToMovement(movementRequest)
-	movement, err = p.movementUseCase.Create(movement)
+	movement, err = p.movementUseCase.Create(movement, movementRequest.EmployeeID)
 	if err != nil {
 		p.WriteErrorResponse(w, err)
 		return
