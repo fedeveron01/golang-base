@@ -14,7 +14,7 @@ type MovementGateway interface {
 }
 
 type MovementDetailGateway interface {
-	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, error)
+	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, entities.Movement, error)
 }
 type MaterialGateway interface {
 	FindMaterialById(id uint) *entities.Material
@@ -102,11 +102,11 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint
 	}
 	movementDetails := movement.MovementDetail
 
-	movementDetailsCreated, err := i.movementDetailGateway.CreateMovementDetailsTransaction(movementDetails, movement, employeeID)
+	movementDetailsCreated, movementCreated, err := i.movementDetailGateway.CreateMovementDetailsTransaction(movementDetails, movement, employeeID)
 	if err != nil {
 		return entities.Movement{}, err
 	}
-	movement.MovementDetail = movementDetailsCreated
-	return movement, nil
+	movementCreated.MovementDetail = movementDetailsCreated
+	return movementCreated, nil
 
 }

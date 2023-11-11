@@ -15,7 +15,7 @@ func NewMovementDetailRepository(database *gorm.DB) *MovementDetailRepository {
 	}
 }
 
-func (r *MovementDetailRepository) CreateMovementDetailsTransaction(movementDetails []gateway_entities.MovementDetail, movement gateway_entities.Movement) ([]gateway_entities.MovementDetail, error) {
+func (r *MovementDetailRepository) CreateMovementDetailsTransaction(movementDetails []gateway_entities.MovementDetail, movement gateway_entities.Movement) ([]gateway_entities.MovementDetail, *gateway_entities.Movement, error) {
 	tx := r.db.Begin()
 	tx.Create(&movement)
 	for _, movementDetail := range movementDetails {
@@ -24,16 +24,16 @@ func (r *MovementDetailRepository) CreateMovementDetailsTransaction(movementDeta
 			res := tx.Save(&movementDetail.Material)
 			if res.Error != nil {
 				tx.Rollback()
-				return nil, res.Error
+				return nil, nil, res.Error
 			}
 		}
 		movementDetail.ProductVariationId = nil
 		res := tx.Create(&movementDetail)
 		if res.Error != nil {
 			tx.Rollback()
-			return nil, res.Error
+			return nil, nil, res.Error
 		}
 	}
 	tx.Commit()
-	return movementDetails, nil
+	return movementDetails, &movement, nil
 }

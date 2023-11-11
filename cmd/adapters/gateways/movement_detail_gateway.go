@@ -8,7 +8,7 @@ import (
 )
 
 type MovementDetailRepository interface {
-	CreateMovementDetailsTransaction(movementDetails []gateway_entities.MovementDetail, movement gateway_entities.Movement) ([]gateway_entities.MovementDetail, error)
+	CreateMovementDetailsTransaction(movementDetails []gateway_entities.MovementDetail, movement gateway_entities.Movement) ([]gateway_entities.MovementDetail, *gateway_entities.Movement, error)
 }
 
 type MovementDetailGateway interface {
@@ -25,16 +25,18 @@ func NewMovementDetailGateway(movementDetailRepository MovementDetailRepository)
 	}
 }
 
-func (i *MovementDetailGatewayImpl) CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, error) {
+func (i *MovementDetailGatewayImpl) CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, entities.Movement, error) {
 	movementDetailsDB := i.toServiceMovementDetails(movementDetails, movement.ID)
 	movementDB := i.toServiceMovement(movement, employeeID)
 
-	movementDetailsDBCreated, err := i.movementDetailRepository.CreateMovementDetailsTransaction(movementDetailsDB, movementDB)
+	movementDetailsDBCreated, movementDBCreated, err := i.movementDetailRepository.CreateMovementDetailsTransaction(movementDetailsDB, movementDB)
 	if err != nil {
-		return nil, err
+		return nil, entities.Movement{}, err
 	}
+	movementCreated := i.toBusinessMovement(*movementDBCreated)
+
 	movementDetailsCreated := i.toBusinessMovementDetails(movementDetailsDBCreated)
-	return movementDetailsCreated, nil
+	return movementDetailsCreated, movementCreated, nil
 }
 
 func (i *MovementDetailGatewayImpl) toServiceMovementDetails(movementDetails []entities.MovementDetail, movementID uint) []gateway_entities.MovementDetail {
@@ -112,5 +114,18 @@ func (i *MovementDetailGatewayImpl) toServiceMovement(movement entities.Movement
 		DateTime:    movement.DateTime,
 		Description: movement.Description,
 		EmployeeId:  employeeID,
+	}
+}
+
+func (i *MovementDetailGatewayImpl) toBusinessMovement(movement gateway_entities.Movement) entities.Movement {
+	return entities.Movement{
+		EntitiesBase: core.EntitiesBase{
+			ID: movement.ID,
+		},
+		Number:      int(movement.Number),
+		Type:        movement.Type,
+		Total:       movement.Total,
+		DateTime:    movement.DateTime,
+		Description: movement.Description,
 	}
 }
