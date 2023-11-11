@@ -14,7 +14,7 @@ type MovementGateway interface {
 }
 
 type MovementDetailGateway interface {
-	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movementID uint) ([]entities.MovementDetail, error)
+	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, error)
 }
 type MaterialGateway interface {
 	FindMaterialById(id uint) *entities.Material
@@ -81,17 +81,32 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint
 
 		}
 	}
-	movementDetails := movement.MovementDetail
-	movementCreated, err := i.movementGateway.Create(movement, employeeID)
-	if err != nil {
-		return entities.Movement{}, err
-	}
+	if movement.Type == "output" {
+		for index, movementDetail := range movement.MovementDetail {
+			if movementDetail.Material.ID == 0 && movementDetail.ProductVariation.ID == 0 {
+				return entities.Movement{}, errors.New("material or product variation required")
+			}
+			if movementDetail.Material.ID != 0 {
+				err := i.updateMaterial(&movementDetail, false)
+				if err != nil {
+					return entities.Movement{}, err
+				}
+				movement.MovementDetail[index] = movementDetail
 
-	movementDetailsCreated, err := i.movementDetailGateway.CreateMovementDetailsTransaction(movementDetails, movementCreated.ID)
+			}
+			if movementDetail.ProductVariation.ID != 0 {
+				panic("implement me please angelo")
+			}
+
+		}
+	}
+	movementDetails := movement.MovementDetail
+
+	movementDetailsCreated, err := i.movementDetailGateway.CreateMovementDetailsTransaction(movementDetails, movement, employeeID)
 	if err != nil {
 		return entities.Movement{}, err
 	}
-	movementCreated.MovementDetail = movementDetailsCreated
-	return movementCreated, nil
+	movement.MovementDetail = movementDetailsCreated
+	return movement, nil
 
 }

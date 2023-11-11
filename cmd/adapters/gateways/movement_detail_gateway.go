@@ -8,7 +8,7 @@ import (
 )
 
 type MovementDetailRepository interface {
-	CreateMovementDetailsTransaction(movementDetails []gateway_entities.MovementDetail) ([]gateway_entities.MovementDetail, error)
+	CreateMovementDetailsTransaction(movementDetails []gateway_entities.MovementDetail, movement gateway_entities.Movement) ([]gateway_entities.MovementDetail, error)
 }
 
 type MovementDetailGateway interface {
@@ -25,30 +25,32 @@ func NewMovementDetailGateway(movementDetailRepository MovementDetailRepository)
 	}
 }
 
-func (i *MovementDetailGatewayImpl) CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movementID uint) ([]entities.MovementDetail, error) {
-	movementDetailsDB := toServiceMovementDetails(movementDetails, movementID)
-	movementDetailsDBCreated, err := i.movementDetailRepository.CreateMovementDetailsTransaction(movementDetailsDB)
+func (i *MovementDetailGatewayImpl) CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, error) {
+	movementDetailsDB := i.toServiceMovementDetails(movementDetails, movement.ID)
+	movementDB := i.toServiceMovement(movement, employeeID)
+
+	movementDetailsDBCreated, err := i.movementDetailRepository.CreateMovementDetailsTransaction(movementDetailsDB, movementDB)
 	if err != nil {
 		return nil, err
 	}
-	movementDetailsCreated := toBusinessMovementDetails(movementDetailsDBCreated)
+	movementDetailsCreated := i.toBusinessMovementDetails(movementDetailsDBCreated)
 	return movementDetailsCreated, nil
 }
 
-func toServiceMovementDetails(movementDetails []entities.MovementDetail, movementID uint) []gateway_entities.MovementDetail {
+func (i *MovementDetailGatewayImpl) toServiceMovementDetails(movementDetails []entities.MovementDetail, movementID uint) []gateway_entities.MovementDetail {
 	movementDetailsDB := make([]gateway_entities.MovementDetail, len(movementDetails))
 	for index, movementDetail := range movementDetails {
-		movementDetailsDB[index] = toServiceMovementDetail(movementDetail, movementID)
+		movementDetailsDB[index] = i.toServiceMovementDetail(movementDetail, movementID)
 	}
 	return movementDetailsDB
 }
 
-func toServiceMovementDetail(movementDetail entities.MovementDetail, movementID uint) gateway_entities.MovementDetail {
+func (i *MovementDetailGatewayImpl) toServiceMovementDetail(movementDetail entities.MovementDetail, movementID uint) gateway_entities.MovementDetail {
 	return gateway_entities.MovementDetail{
 		Model: gorm.Model{
 			ID: movementDetail.ID,
 		},
-		MaterialId: movementDetail.Material.ID,
+		MaterialId: &movementDetail.Material.ID,
 		Material: &gateway_entities.Material{
 			Model: gorm.Model{
 				ID: movementDetail.Material.ID,
@@ -60,21 +62,21 @@ func toServiceMovementDetail(movementDetail entities.MovementDetail, movementID 
 			RepositionPoint: movementDetail.Material.RepositionPoint,
 			MaterialTypeId:  movementDetail.Material.MaterialType.ID,
 		},
-		ProductVariationId: movementDetail.ProductVariation.ID,
+		ProductVariationId: &movementDetail.ProductVariation.ID,
 		Quantity:           movementDetail.Quantity,
 		MovementId:         movementID,
 	}
 }
 
-func toBusinessMovementDetails(movementDetails []gateway_entities.MovementDetail) []entities.MovementDetail {
+func (i *MovementDetailGatewayImpl) toBusinessMovementDetails(movementDetails []gateway_entities.MovementDetail) []entities.MovementDetail {
 	movementDetailsBusiness := make([]entities.MovementDetail, len(movementDetails))
 	for index, movementDetail := range movementDetails {
-		movementDetailsBusiness[index] = toBusinessMovementDetail(movementDetail)
+		movementDetailsBusiness[index] = i.toBusinessMovementDetail(movementDetail)
 	}
 	return movementDetailsBusiness
 }
 
-func toBusinessMovementDetail(movementDetail gateway_entities.MovementDetail) entities.MovementDetail {
+func (i *MovementDetailGatewayImpl) toBusinessMovementDetail(movementDetail gateway_entities.MovementDetail) entities.MovementDetail {
 	var material *entities.Material
 	var productVariation *entities.ProductVariation
 	if movementDetail.Material != nil && movementDetail.Material.ID != 0 {
@@ -96,5 +98,19 @@ func toBusinessMovementDetail(movementDetail gateway_entities.MovementDetail) en
 		Material:         material,
 		ProductVariation: productVariation,
 		Quantity:         movementDetail.Quantity,
+	}
+}
+
+func (i *MovementDetailGatewayImpl) toServiceMovement(movement entities.Movement, employeeID uint) gateway_entities.Movement {
+	return gateway_entities.Movement{
+		Model: gorm.Model{
+			ID: movement.ID,
+		},
+		Number:      float64(movement.Number),
+		Type:        movement.Type,
+		Total:       movement.Total,
+		DateTime:    movement.DateTime,
+		Description: movement.Description,
+		EmployeeId:  employeeID,
 	}
 }
