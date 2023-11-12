@@ -3,6 +3,7 @@ package movement_usecase
 import (
 	"errors"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	"log"
 )
 
 type MovementUseCase interface {
@@ -68,6 +69,10 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint
 				return entities.Movement{}, errors.New("material or product variation required")
 			}
 			if movementDetail.Material.ID != 0 {
+				if !movement.IsMaterialMovement {
+					return entities.Movement{}, errors.New("movement is not material movement")
+				}
+
 				err := i.updateMaterial(&movementDetail, true)
 				if err != nil {
 					return entities.Movement{}, err
@@ -76,7 +81,7 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint
 
 			}
 			if movementDetail.ProductVariation.ID != 0 {
-				panic("implement me please angelo")
+				log.Fatal("implement me please angelo")
 			}
 
 		}

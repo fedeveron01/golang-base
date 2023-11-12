@@ -97,6 +97,9 @@ func (i *MovementDetailGatewayImpl) toBusinessMovementDetail(movementDetail gate
 	}
 
 	return entities.MovementDetail{
+		EntitiesBase: core.EntitiesBase{
+			ID: movementDetail.ID,
+		},
 		Material:         material,
 		ProductVariation: productVariation,
 		Quantity:         movementDetail.Quantity,
@@ -108,12 +111,13 @@ func (i *MovementDetailGatewayImpl) toServiceMovement(movement entities.Movement
 		Model: gorm.Model{
 			ID: movement.ID,
 		},
-		Number:      float64(movement.Number),
-		Type:        movement.Type,
-		Total:       movement.Total,
-		DateTime:    movement.DateTime,
-		Description: movement.Description,
-		EmployeeId:  employeeID,
+		Number:             float64(movement.Number),
+		Type:               movement.Type,
+		Total:              movement.Total,
+		DateTime:           movement.DateTime,
+		IsMaterialMovement: movement.IsMaterialMovement,
+		Description:        movement.Description,
+		EmployeeId:         employeeID,
 	}
 }
 
@@ -122,10 +126,11 @@ func (i *MovementDetailGatewayImpl) toBusinessMovement(movement gateway_entities
 		EntitiesBase: core.EntitiesBase{
 			ID: movement.ID,
 		},
-		Number:      int(movement.Number),
-		Type:        movement.Type,
-		Total:       movement.Total,
-		DateTime:    movement.DateTime,
-		Description: movement.Description,
+		Number:             int(movement.Number),
+		Type:               movement.Type,
+		Total:              movement.Total,
+		IsMaterialMovement: movement.IsMaterialMovement,
+		DateTime:           movement.DateTime,
+		Description:        movement.Description,
 	}
 }

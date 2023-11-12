@@ -1,10 +1,11 @@
 package movement
 
 type MovementRequest struct {
-	Type        string                  `json:"type"`
-	Description string                  `json:"description" optional:"true"`
-	Details     []MovementDetailRequest `json:"details"`
-	EmployeeID  uint                    `json:"employeeId"`
+	Type               string                  `json:"type"`
+	Description        string                  `json:"description" optional:"true"`
+	Details            []MovementDetailRequest `json:"details"`
+	EmployeeID         uint                    `json:"employeeId"`
+	IsMaterialMovement bool                    `json:"isMaterialMovement"`
 }
 
 type MovementDetailRequest struct {
@@ -15,13 +16,14 @@ type MovementDetailRequest struct {
 }
 
 type MovementResponse struct {
-	ID              uint                     `json:"id"`
-	Number          int                      `json:"number"`
-	Type            string                   `json:"type"`
-	Total           float64                  `json:"total"`
-	DateTime        string                   `json:"dateTime"`
-	Description     string                   `json:"description"`
-	MovementDetails []MovementDetailResponse `json:"movementDetails"`
+	ID                 uint                     `json:"id"`
+	Number             int                      `json:"number"`
+	Type               string                   `json:"type"`
+	Total              float64                  `json:"total"`
+	DateTime           string                   `json:"dateTime"`
+	Description        string                   `json:"description"`
+	MovementDetails    []MovementDetailResponse `json:"movementDetails"`
+	IsMaterialMovement bool                     `json:"isMaterialMovement"`
 }
 
 type MovementDetailResponse struct {

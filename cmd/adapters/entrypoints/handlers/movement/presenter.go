@@ -8,10 +8,11 @@ import (
 
 func ToMovement(movementRequest MovementRequest) entities.Movement {
 	return entities.Movement{
-		Type:           movementRequest.Type,
-		DateTime:       time.Now(),
-		Description:    movementRequest.Description,
-		MovementDetail: ToMovementDetails(movementRequest.Details),
+		Type:               movementRequest.Type,
+		DateTime:           time.Now(),
+		Description:        movementRequest.Description,
+		IsMaterialMovement: movementRequest.IsMaterialMovement,
+		MovementDetail:     ToMovementDetails(movementRequest.Details),
 	}
 }
 
@@ -41,13 +42,14 @@ func ToMovementDetail(movementDetailRequest MovementDetailRequest) entities.Move
 }
 func ToMovementResponse(movement entities.Movement) MovementResponse {
 	return MovementResponse{
-		ID:              movement.ID,
-		Number:          movement.Number,
-		Type:            movement.Type,
-		Total:           movement.Total,
-		DateTime:        movement.DateTime.Format("2006-01-02 15:04:05"),
-		Description:     movement.Description,
-		MovementDetails: ToMovementDetailsResponse(movement.MovementDetail),
+		ID:                 movement.ID,
+		Number:             movement.Number,
+		Type:               movement.Type,
+		Total:              movement.Total,
+		IsMaterialMovement: movement.IsMaterialMovement,
+		DateTime:           movement.DateTime.Format("2006-01-02 15:04:05"),
+		Description:        movement.Description,
+		MovementDetails:    ToMovementDetailsResponse(movement.MovementDetail),
 	}
 }
 
