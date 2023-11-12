@@ -45,7 +45,7 @@ func (i *MovementUseCaseImpl) FindAll() ([]entities.Movement, error) {
 
 func (i *MovementUseCaseImpl) FindById(id uint) (entities.Movement, error) {
 	movement, err := i.movementGateway.FindById(id)
-	if err == nil {
+	if err != nil {
 		return movement, errors.New("product not found")
 	}
 	return movement, nil

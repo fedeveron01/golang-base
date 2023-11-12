@@ -42,7 +42,7 @@ func (i *MovementGatewayImpl) FindAll() ([]entities.Movement, error) {
 
 func (i *MovementGatewayImpl) FindById(id uint) (entities.Movement, error) {
 	movementDB, err := i.mavementRepository.FindById(id)
-	if err == nil {
+	if err != nil {
 		return entities.Movement{}, err
 	}
 	movement := i.ToBusinessEntity(movementDB)
@@ -78,8 +78,8 @@ func toServiceMovementDetail(movementDetail []entities.MovementDetail) []gateway
 		movementDetailDB = append(movementDetailDB, gateway_entities.MovementDetail{
 			Quantity:           v.Quantity,
 			Price:              v.Price,
-			MaterialId:         v.Material.ID,
-			ProductVariationId: v.ProductVariation.ID,
+			MaterialId:         &v.Material.ID,
+			ProductVariationId: &v.ProductVariation.ID,
 		})
 	}
 	return movementDetailDB
@@ -95,11 +95,11 @@ func (i *MovementGatewayImpl) ToBusinessEntity(movement gateway_entities.Movemen
 		Total:          movement.Total,
 		DateTime:       movement.DateTime,
 		Description:    movement.Description,
-		MovementDetail: toBusinessMovementDetail(movement.MovementDetail),
+		MovementDetail: toBusinessMovementDetailGet(movement.MovementDetail),
 	}
 }
 
-func toBusinessMovementDetail(movementDetail []gateway_entities.MovementDetail) []entities.MovementDetail {
+func toBusinessMovementDetailGet(movementDetail []gateway_entities.MovementDetail) []entities.MovementDetail {
 	var movementDetailDB []entities.MovementDetail
 	for _, v := range movementDetail {
 		var material *entities.Material
@@ -109,7 +109,17 @@ func toBusinessMovementDetail(movementDetail []gateway_entities.MovementDetail) 
 				EntitiesBase: core.EntitiesBase{
 					ID: v.Material.ID,
 				},
+				Name:            v.Material.Name,
+				Description:     v.Material.Description,
+				Stock:           v.Material.Stock,
+				RepositionPoint: v.Material.RepositionPoint,
+				MaterialType: entities.MaterialType{
+					EntitiesBase: core.EntitiesBase{
+						ID: v.Material.MaterialType.ID,
+					},
+				},
 			}
+
 		} else {
 			material = nil
 		}

@@ -57,10 +57,23 @@ func ToMovementDetailsResponse(movementDetails []entities.MovementDetail) []Move
 }
 
 func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDetailResponse {
+	var productVariationId *uint
+	if movementDetail.ProductVariation != nil {
+		productVariationId = &movementDetail.ProductVariation.ID
+	} else {
+		productVariationId = nil
+	}
+
+	var materialId *uint
+	if movementDetail.Material != nil {
+		materialId = &movementDetail.Material.ID
+	} else {
+		materialId = nil
+	}
 	return MovementDetailResponse{
 		ID:                 movementDetail.ID,
-		ProductVariationID: movementDetail.ProductVariation.ID,
-		MaterialID:         movementDetail.Material.ID,
+		ProductVariationID: productVariationId,
+		MaterialID:         materialId,
 		Quantity:           movementDetail.Quantity,
 		Price:              movementDetail.Price,
 	}

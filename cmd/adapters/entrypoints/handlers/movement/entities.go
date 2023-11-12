@@ -25,8 +25,8 @@ type MovementResponse struct {
 
 type MovementDetailResponse struct {
 	ID                 uint    `json:"id"`
-	ProductVariationID uint    `json:"productVariationId"`
-	MaterialID         uint    `json:"materialId"`
+	ProductVariationID *uint   `json:"productVariationId"`
+	MaterialID         *uint   `json:"materialId"`
 	Quantity           float64 `json:"quantity"`
 	Price              float64 `json:"price"`
 }

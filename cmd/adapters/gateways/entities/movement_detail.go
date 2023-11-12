@@ -7,8 +7,8 @@ type MovementDetail struct {
 	Quantity           float64
 	Price              float64
 	Material           *Material
-	MaterialId         uint
+	MaterialId         *uint
 	ProductVariation   *ProductVariation
-	ProductVariationId uint
+	ProductVariationId *uint
 	MovementId         uint
 }
