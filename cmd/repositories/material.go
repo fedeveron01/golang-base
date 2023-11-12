@@ -51,6 +51,15 @@ func (r *MaterialRepository) FindByName(name string) *gateway_entities.Material 
 	return &material
 }
 
+func (r *MaterialRepository) FindMaterialById(id uint) *gateway_entities.Material {
+	var material gateway_entities.Material
+	r.db.Preload("MaterialType").Where("id = ?", id).First(&material)
+	if material.ID == 0 {
+		return nil
+	}
+	return &material
+}
+
 func (r *MaterialRepository) UpdateMaterial(material gateway_entities.Material) (gateway_entities.Material, error) {
 	res := r.db.Save(&material)
 	if res.Error != nil {

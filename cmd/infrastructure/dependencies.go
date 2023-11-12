@@ -2,9 +2,12 @@ package infrastructure
 
 import (
 	"fmt"
+
 	material_type_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material_type"
+	movement_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/movement"
 	product_handler "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/product"
 	material_type_usecase "github.com/fedeveron01/golang-base/cmd/usecases/material_type"
+	movement_usecase "github.com/fedeveron01/golang-base/cmd/usecases/movement"
 	product_usecase "github.com/fedeveron01/golang-base/cmd/usecases/product"
 
 	"github.com/fedeveron01/golang-base/cmd/adapters/entrypoints"
@@ -35,6 +38,7 @@ type HandlerContainer struct {
 	ChargeHandler       charge_handler.ChargeHandlerInterface
 	EmployeeHandler     employee_handler.EmployeeHandlerInterface
 	ProductHandler      product_handler.ProductHandlerInterface
+	MovementHandler     movement_handler.MovementHandlerInterface
 }
 
 func Start() HandlerContainer {
@@ -47,8 +51,7 @@ func Start() HandlerContainer {
 	err = db.AutoMigrate(
 		gateway_entities.User{}, gateway_entities.Charge{}, gateway_entities.Employee{}, gateway_entities.Material{},
 		gateway_entities.MaterialProduct{}, gateway_entities.MaterialType{},
-		gateway_entities.Product{}, gateway_entities.ProductionOrder{}, gateway_entities.ProductionOrderDetail{},
-		gateway_entities.PurchaseOrder{}, gateway_entities.PurchaseOrderDetail{}, gateway_entities.Session{},
+		gateway_entities.Product{}, gateway_entities.Movement{}, gateway_entities.MovementDetail{}, gateway_entities.ProductVariation{},
 	)
 	if err != nil {
 		panic("failed to migrate database")
@@ -63,15 +66,19 @@ func Start() HandlerContainer {
 	userRepository := repositories.NewUserRepository(db)
 	materialTypeRepository := repositories.NewMaterialTypeRepository(db)
 	productRepository := repositories.NewProductRepository(db)
+	movementRepository := repositories.NewMovementRepository(db)
+	movementDetailRepository := repositories.NewMovementDetailRepository(db)
 
 	// inject gateways
-	materialGateway := gateways.NewMaterialGateway(*materialRepository)
-	userGateway := gateways.NewUserGateway(*userRepository)
-	sessionGateway := gateways.NewSessionGateway(*sessionRepository)
-	employeeGateway := gateways.NewEmployeeGateway(*employeeRepository)
-	chargeGateway := gateways.NewChargeGateway(*chargeRepository)
-	materialTypeGateway := gateways.NewMaterialTypeGateway(*materialTypeRepository)
-	productGateway := gateways.NewProductGateway(*productRepository)
+	materialGateway := gateways.NewMaterialGateway(materialRepository)
+	userGateway := gateways.NewUserGateway(userRepository)
+	sessionGateway := gateways.NewSessionGateway(sessionRepository)
+	employeeGateway := gateways.NewEmployeeGateway(employeeRepository)
+	chargeGateway := gateways.NewChargeGateway(chargeRepository)
+	materialTypeGateway := gateways.NewMaterialTypeGateway(materialTypeRepository)
+	productGateway := gateways.NewProductGateway(productRepository)
+	movementGateway := gateways.NewMovementGateway(movementRepository)
+	movementDetailGateway := gateways.NewMovementDetailGateway(movementDetailRepository)
 
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway, materialTypeGateway)
@@ -80,6 +87,7 @@ func Start() HandlerContainer {
 	employeeUseCase := employee_usecase.NewEmployeeUseCase(employeeGateway, chargeGateway)
 	materialTypeUseCase := material_type_usecase.NewMaterialTypeUsecase(materialTypeGateway)
 	productUseCase := product_usecase.NewProductUsecase(productGateway, materialGateway)
+	movementUseCase := movement_usecase.NewMovementUseCase(movementGateway, movementDetailGateway, materialGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}
@@ -91,6 +99,7 @@ func Start() HandlerContainer {
 	handlerContainer.EmployeeHandler = employee_handler.NewEmployeeHandler(sessionGateway, employeeUseCase)
 	handlerContainer.MaterialTypeHandler = material_type_handler.NewMaterialTypeHandler(sessionGateway, materialTypeUseCase)
 	handlerContainer.ProductHandler = product_handler.NewProductHandler(sessionGateway, productUseCase)
+	handlerContainer.MovementHandler = movement_handler.NewMovementHandler(sessionGateway, movementUseCase)
 
 	return handlerContainer
 

@@ -22,7 +22,6 @@ func ToProductResponse(product entities.Product) ProductResponse {
 		Size:        product.Size,
 		ImageUrl:    product.ImageUrl,
 		Price:       product.Price,
-		Stock:       product.Stock,
 	}
 }
 
@@ -35,7 +34,6 @@ func ToProductWithAssignationsResponse(product entities.Product, language string
 		Size:         product.Size,
 		ImageUrl:     product.ImageUrl,
 		Price:        product.Price,
-		Stock:        product.Stock,
 		Assignations: ToAssignationsResponse(product.MaterialProduct, language),
 	}
 }

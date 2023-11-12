@@ -17,7 +17,7 @@ func NewUserRepository(database *gorm.DB) *UserRepository {
 	}
 }
 
-func (r UserRepository) CreateCompleteUserWithEmployee(
+func (r *UserRepository) CreateCompleteUserWithEmployee(
 	user gateway_entities.User,
 	chargeID uint,
 	employee gateway_entities.Employee) (gateway_entities.User, error) {
@@ -41,7 +41,7 @@ func (r UserRepository) CreateCompleteUserWithEmployee(
 
 }
 
-func (r UserRepository) CreateUser(user gateway_entities.User) (gateway_entities.User, error) {
+func (r *UserRepository) CreateUser(user gateway_entities.User) (gateway_entities.User, error) {
 	var userDB gateway_entities.User
 	id := r.db.Create(&user)
 	if id.RowsAffected == 0 {
