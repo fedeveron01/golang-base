@@ -44,5 +44,5 @@ type ProductVariationResponse struct {
 }
 
 type MovementRequestByType struct {
-	IsMaterialMovement bool `json:"isMaterialMovement"`
+	IsInput bool `json:"isInput"`
 }

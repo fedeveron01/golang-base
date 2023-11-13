@@ -9,14 +9,14 @@ import (
 
 type MovementUseCase interface {
 	Create(movement entities.Movement, employeeId uint) (entities.Movement, error)
-	FindAllByType(isMaterialMovement bool) ([]entities.Movement, error)
+	FindAllByType(isInput bool) ([]entities.Movement, error)
 	FindAll() ([]entities.Movement, error)
 	FindById(id uint) (entities.Movement, error)
 }
 
 type MovementGateway interface {
 	Create(movement entities.Movement, employeeID uint) (entities.Movement, error)
-	FindAllByType(isMaterialMovement bool) ([]entities.Movement, error)
+	FindAllByType(isInput bool) ([]entities.Movement, error)
 	FindAll() ([]entities.Movement, error)
 	FindById(id uint) (entities.Movement, error)
 }
@@ -42,8 +42,8 @@ func NewMovementUseCase(movementGateway MovementGateway, movementDetailGateway M
 	}
 }
 
-func (i *MovementUseCaseImpl) FindAllByType(isMaterialMovement bool) ([]entities.Movement, error) {
-	movements, err := i.movementGateway.FindAllByType(isMaterialMovement)
+func (i *MovementUseCaseImpl) FindAllByType(isInput bool) ([]entities.Movement, error) {
+	movements, err := i.movementGateway.FindAllByType(isInput)
 	if err != nil {
 		return nil, err
 	}
