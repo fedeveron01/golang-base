@@ -64,7 +64,6 @@ func ToMovementDetailsResponse(movementDetails []entities.MovementDetail) []Move
 }
 
 func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDetailResponse {
-	var movementDetailResponse MovementDetailResponse
 	var materialID uint
 	if movementDetail.Material != nil {
 		materialID = movementDetail.Material.ID
@@ -73,26 +72,13 @@ func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDe
 	if movementDetail.ProductVariation != nil {
 		productVariationID = movementDetail.ProductVariation.ID
 	}
-
-	movementDetailResponse.ID = movementDetail.ID
-	movementDetailResponse.MaterialID = materialID
-	movementDetailResponse.ProductVariationID = productVariationID
-	movementDetailResponse.Quantity = movementDetail.Quantity
-	movementDetailResponse.Price = movementDetail.Price
-	//use this if you want to return the whole material
-	/*if movementDetail.Material != nil {
-		//import ToMaterialResponse from material/presenter.go
-		movementDetailResponse.Material = ToMaterialResponse( movementDetail.Material, "es")
-	}*/
-
-	/*return MovementDetailResponse{
+	return MovementDetailResponse{
 		ID:                 movementDetail.ID,
 		ProductVariationID: productVariationID,
 		MaterialID:         materialID,
 		Quantity:           movementDetail.Quantity,
 		Price:              movementDetail.Price,
-	}*/
-	return movementDetailResponse
+	}
 }
 
 func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
@@ -102,22 +88,3 @@ func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
 	}
 	return movementsResponse
 }
-
-/*func ToMaterialResponse(material entities.Material, language string) MaterialResponse {
-	return MaterialResponse{
-		Id:              float64(material.ID),
-		Name:            material.Name,
-		Description:     material.Description,
-		Price:           material.Price,
-		Stock:           material.Stock,
-		RepositionPoint: material.RepositionPoint,
-		MaterialType: MaterialTypeResponse{
-			Id:   float64(material.MaterialType.ID),
-			Name: material.MaterialType.Name,
-			UnitOfMeasurement: UnitOfMeasurementResponse{
-				Name:   material.MaterialType.UnitOfMeasurement.String(language),
-				Symbol: enums.GetSymbolByUnitOfMeasurementEnum(material.MaterialType.UnitOfMeasurement),
-			},
-		},
-	}
-}*/
