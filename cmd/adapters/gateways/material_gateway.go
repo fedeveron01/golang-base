@@ -6,7 +6,6 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	_ "github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/enums"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/gorm"
 )
 
@@ -18,19 +17,32 @@ type MaterialGateway interface {
 	DeleteMaterial(id string) error
 }
 
+type MaterialRepository interface {
+	CreateMaterial(material gateway_entities.Material) (gateway_entities.Material, error)
+	FindAll() ([]gateway_entities.Material, error)
+	FindById(id uint) *gateway_entities.Material
+	FindMaterialById(id uint) *gateway_entities.Material
+	FindByName(name string) *gateway_entities.Material
+	UpdateMaterial(material gateway_entities.Material) (gateway_entities.Material, error)
+	DeleteMaterial(id string) error
+}
+
 type MaterialGatewayImpl struct {
-	materialRepository repositories.MaterialRepository
+	materialRepository MaterialRepository
 }
 
-// FindMaterialById implements movement_usecase.MaterialGateway.
-func (*MaterialGatewayImpl) FindMaterialById(id uint) *entities.Material {
-	panic("unimplemented")
-}
-
-func NewMaterialGateway(materialRepository repositories.MaterialRepository) *MaterialGatewayImpl {
+func NewMaterialGateway(materialRepository MaterialRepository) *MaterialGatewayImpl {
 	return &MaterialGatewayImpl{
 		materialRepository: materialRepository,
 	}
+}
+func (i *MaterialGatewayImpl) FindMaterialById(id uint) *entities.Material {
+	materialDB := i.materialRepository.FindMaterialById(id)
+	if materialDB == nil {
+		return nil
+	}
+	material := i.ToBusinessEntity(*materialDB)
+	return &material
 }
 
 func (i *MaterialGatewayImpl) CreateMaterial(material entities.Material) (entities.Material, error) {

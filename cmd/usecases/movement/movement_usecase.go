@@ -2,37 +2,52 @@ package movement_usecase
 
 import (
 	"errors"
+	"log"
 
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 )
 
 type MovementUseCase interface {
-	Create(movement entities.Movement) (entities.Movement, error)
+	Create(movement entities.Movement, employeeId uint) (entities.Movement, error)
+	FindAllByType(isMaterialMovement bool) ([]entities.Movement, error)
 	FindAll() ([]entities.Movement, error)
 	FindById(id uint) (entities.Movement, error)
 }
 
 type MovementGateway interface {
-	Create(movement entities.Movement) entities.Movement
-	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail) ([]entities.MovementDetail, error)
+	Create(movement entities.Movement, employeeID uint) (entities.Movement, error)
+	FindAllByType(isMaterialMovement bool) ([]entities.Movement, error)
 	FindAll() ([]entities.Movement, error)
 	FindById(id uint) (entities.Movement, error)
 }
 
+type MovementDetailGateway interface {
+	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, entities.Movement, error)
+}
 type MaterialGateway interface {
 	FindMaterialById(id uint) *entities.Material
 }
 
 type MovementUseCaseImpl struct {
-	movementGateway MovementGateway
-	materialGateway MaterialGateway
+	movementGateway       MovementGateway
+	materialGateway       MaterialGateway
+	movementDetailGateway MovementDetailGateway
 }
 
-func NewMovementUseCase(movementGateway MovementGateway, materialGateway MaterialGateway) *MovementUseCaseImpl {
+func NewMovementUseCase(movementGateway MovementGateway, movementDetailGateway MovementDetailGateway, materialGateway MaterialGateway) *MovementUseCaseImpl {
 	return &MovementUseCaseImpl{
-		movementGateway: movementGateway,
-		materialGateway: materialGateway,
+		movementGateway:       movementGateway,
+		materialGateway:       materialGateway,
+		movementDetailGateway: movementDetailGateway,
 	}
+}
+
+func (i *MovementUseCaseImpl) FindAllByType(isMaterialMovement bool) ([]entities.Movement, error) {
+	movements, err := i.movementGateway.FindAllByType(isMaterialMovement)
+	if err != nil {
+		return nil, err
+	}
+	return movements, nil
 }
 
 func (i *MovementUseCaseImpl) FindAll() ([]entities.Movement, error) {
@@ -61,7 +76,7 @@ func (i *MovementUseCaseImpl) updateMaterial(movementDetail *entities.MovementDe
 		material.Stock += movementDetail.Quantity
 	} else {
 		if material.Stock-movementDetail.Quantity < 0 {
-			return errors.New("insufficient stock")
+			return errors.New("insufficient stock in material " + material.Name)
 		}
 		material.Stock -= movementDetail.Quantity
 	}
@@ -71,32 +86,61 @@ func (i *MovementUseCaseImpl) updateMaterial(movementDetail *entities.MovementDe
 	return nil
 }
 
-func (i *MovementUseCaseImpl) Create(movement entities.Movement) (entities.Movement, error) {
+func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint) (entities.Movement, error) {
 	if movement.Type == "" {
 		return entities.Movement{}, errors.New("type is required")
 	}
+	if employeeID <= 0 {
+		return entities.Movement{}, errors.New("employee is required")
+	}
 
 	if movement.Type == "input" {
-		for _, movementDetail := range movement.MovementDetail {
+		for index, movementDetail := range movement.MovementDetail {
 			if movementDetail.Material.ID == 0 && movementDetail.ProductVariation.ID == 0 {
 				return entities.Movement{}, errors.New("material or product variation required")
 			}
 			if movementDetail.Material.ID != 0 {
+				if !movement.IsMaterialMovement {
+					return entities.Movement{}, errors.New("movement is not material movement")
+				}
+
 				err := i.updateMaterial(&movementDetail, true)
 				if err != nil {
 					return entities.Movement{}, err
 				}
+				movement.MovementDetail[index] = movementDetail
+
+			}
+			if movementDetail.ProductVariation.ID != 0 {
+				log.Fatal("implement me please angelo")
+			}
+
+		}
+	}
+	if movement.Type == "output" {
+		for index, movementDetail := range movement.MovementDetail {
+			if movementDetail.Material.ID == 0 && movementDetail.ProductVariation.ID == 0 {
+				return entities.Movement{}, errors.New("material or product variation required")
+			}
+			if movementDetail.Material.ID != 0 {
+				err := i.updateMaterial(&movementDetail, false)
+				if err != nil {
+					return entities.Movement{}, err
+				}
+				movement.MovementDetail[index] = movementDetail
 
 			}
 			if movementDetail.ProductVariation.ID != 0 {
 				panic("implement me please angelo")
 			}
+
 		}
 	}
-	movementCreated := i.movementGateway.Create(movement)
+	movementDetails := movement.MovementDetail
 
-	movementDetailsCreated, err := i.movementGateway.CreateMovementDetailsTransaction(movementCreated.MovementDetail)
+	movementDetailsCreated, movementCreated, err := i.movementDetailGateway.CreateMovementDetailsTransaction(movementDetails, movement, employeeID)
 	if err != nil {
+		return entities.Movement{}, err
 	}
 	movementCreated.MovementDetail = movementDetailsCreated
 	return movementCreated, nil

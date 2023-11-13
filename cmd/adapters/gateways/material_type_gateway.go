@@ -5,15 +5,23 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/enums"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/gorm"
 )
 
-type MaterialTypeGatewayImpl struct {
-	materialTypeRepository repositories.MaterialTypeRepository
+type MaterialTypeRepository interface {
+	FindAll() ([]gateway_entities.MaterialType, error)
+	FindById(id uint) *gateway_entities.MaterialType
+	FindByName(name string) *gateway_entities.MaterialType
+	CreateMaterialType(materialType gateway_entities.MaterialType) (gateway_entities.MaterialType, error)
+	UpdateMaterialType(materialType gateway_entities.MaterialType) (gateway_entities.MaterialType, error)
+	DeleteMaterialType(id uint) error
 }
 
-func NewMaterialTypeGateway(materialTypeRepository repositories.MaterialTypeRepository) *MaterialTypeGatewayImpl {
+type MaterialTypeGatewayImpl struct {
+	materialTypeRepository MaterialTypeRepository
+}
+
+func NewMaterialTypeGateway(materialTypeRepository MaterialTypeRepository) *MaterialTypeGatewayImpl {
 	return &MaterialTypeGatewayImpl{
 		materialTypeRepository: materialTypeRepository,
 	}

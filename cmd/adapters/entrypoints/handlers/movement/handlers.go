@@ -14,6 +14,7 @@ import (
 
 type MovementHandlerInterface interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
+	GetAllByType(w http.ResponseWriter, r *http.Request)
 	GetById(w http.ResponseWriter, r *http.Request)
 	Create(w http.ResponseWriter, r *http.Request)
 }
@@ -36,6 +37,18 @@ func NewMovementHandler(sessionGateway gateways.SessionGateway, movementUseCase 
 func (p *MovementHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	movements, err := p.movementUseCase.FindAll()
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+	}
+
+	json.NewEncoder(w).Encode(ToMovementsResponse(movements))
+}
+
+// GetAll Handle api/movement GET request
+func (p *MovementHandler) GetAllByType(w http.ResponseWriter, r *http.Request) {
+	var movementRequestByType MovementRequestByType
+	err := json.NewDecoder(r.Body).Decode(&movementRequestByType)
+	movements, err := p.movementUseCase.FindAllByType(movementRequestByType.IsMaterialMovement)
 	if err != nil {
 		p.WriteErrorResponse(w, err)
 	}
@@ -71,7 +84,7 @@ func (p *MovementHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	movement := ToMovement(movementRequest)
-	movement, err = p.movementUseCase.Create(movement)
+	movement, err = p.movementUseCase.Create(movement, movementRequest.EmployeeID)
 	if err != nil {
 		p.WriteErrorResponse(w, err)
 		return

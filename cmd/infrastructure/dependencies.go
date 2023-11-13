@@ -67,16 +67,18 @@ func Start() HandlerContainer {
 	materialTypeRepository := repositories.NewMaterialTypeRepository(db)
 	productRepository := repositories.NewProductRepository(db)
 	movementRepository := repositories.NewMovementRepository(db)
+	movementDetailRepository := repositories.NewMovementDetailRepository(db)
 
 	// inject gateways
-	materialGateway := gateways.NewMaterialGateway(*materialRepository)
-	userGateway := gateways.NewUserGateway(*userRepository)
-	sessionGateway := gateways.NewSessionGateway(*sessionRepository)
-	employeeGateway := gateways.NewEmployeeGateway(*employeeRepository)
-	chargeGateway := gateways.NewChargeGateway(*chargeRepository)
-	materialTypeGateway := gateways.NewMaterialTypeGateway(*materialTypeRepository)
-	productGateway := gateways.NewProductGateway(*productRepository)
-	movementGateway := gateways.NewMovementGateway(*movementRepository)
+	materialGateway := gateways.NewMaterialGateway(materialRepository)
+	userGateway := gateways.NewUserGateway(userRepository)
+	sessionGateway := gateways.NewSessionGateway(sessionRepository)
+	employeeGateway := gateways.NewEmployeeGateway(employeeRepository)
+	chargeGateway := gateways.NewChargeGateway(chargeRepository)
+	materialTypeGateway := gateways.NewMaterialTypeGateway(materialTypeRepository)
+	productGateway := gateways.NewProductGateway(productRepository)
+	movementGateway := gateways.NewMovementGateway(movementRepository)
+	movementDetailGateway := gateways.NewMovementDetailGateway(movementDetailRepository)
 
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway, materialTypeGateway)
@@ -85,7 +87,7 @@ func Start() HandlerContainer {
 	employeeUseCase := employee_usecase.NewEmployeeUseCase(employeeGateway, chargeGateway)
 	materialTypeUseCase := material_type_usecase.NewMaterialTypeUsecase(materialTypeGateway)
 	productUseCase := product_usecase.NewProductUsecase(productGateway, materialGateway)
-	movementUseCase := movement_usecase.NewMovementUseCase(movementGateway, materialGateway)
+	movementUseCase := movement_usecase.NewMovementUseCase(movementGateway, movementDetailGateway, materialGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}

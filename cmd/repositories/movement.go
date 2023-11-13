@@ -33,6 +33,15 @@ func (r *MovementRepository) FindAll() ([]gateway_entities.Movement, error) {
 	return movements, nil
 }
 
+func (r *MovementRepository) FindAllByType(isMaterialMovement bool) ([]gateway_entities.Movement, error) {
+	var movements []gateway_entities.Movement
+	result := r.db.Find(&movements, "is_material_movement = ?", isMaterialMovement)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return movements, nil
+}
+
 func (r *MovementRepository) FindById(id uint) (movement gateway_entities.Movement, err error) {
 	res := r.db.Find(&movement, id).First(&movement)
 	if res.Error != nil {

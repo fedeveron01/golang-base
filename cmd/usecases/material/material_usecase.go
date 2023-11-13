@@ -85,9 +85,6 @@ func (i *Implementation) UpdateMaterial(material entities.Material) (entities.Ma
 	if len(material.Name) > 30 {
 		return entities.Material{}, core_errors.NewInternalServerError("material name must be greater than 30 characters")
 	}
-	if material.Description == "" {
-		return entities.Material{}, core_errors.NewBadRequestError("material description is required")
-	}
 	if material.Price < 0 {
 		return entities.Material{}, core_errors.NewBadRequestError("material price must be greater than or equal to 0")
 	}

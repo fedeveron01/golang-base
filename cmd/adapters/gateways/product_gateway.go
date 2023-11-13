@@ -5,15 +5,25 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	"github.com/fedeveron01/golang-base/cmd/core/enums"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/gorm"
 )
 
-type ProductGatewayImpl struct {
-	productRepository repositories.ProductRepository
+type ProductRepository interface {
+	FindAll() ([]gateway_entities.Product, error)
+	FindById(id uint) *gateway_entities.Product
+	FindByName(name string) *gateway_entities.Product
+	CreateProduct(product gateway_entities.Product) (gateway_entities.Product, error)
+
+	UpdateProduct(product gateway_entities.Product) (gateway_entities.Product, error)
+	DeleteProduct(id uint) error
+	UpdateMaterialProducts(productId int64, materialsProduct []gateway_entities.MaterialProduct) ([]gateway_entities.MaterialProduct, error)
 }
 
-func NewProductGateway(productRepository repositories.ProductRepository) *ProductGatewayImpl {
+type ProductGatewayImpl struct {
+	productRepository ProductRepository
+}
+
+func NewProductGateway(productRepository ProductRepository) *ProductGatewayImpl {
 	return &ProductGatewayImpl{
 		productRepository: productRepository,
 	}

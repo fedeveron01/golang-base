@@ -3,15 +3,18 @@ package movement
 import (
 	"time"
 
+	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	//. "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
 )
 
 func ToMovement(movementRequest MovementRequest) entities.Movement {
 	return entities.Movement{
-		Type:           movementRequest.Type,
-		DateTime:       time.Now(),
-		Description:    movementRequest.Description,
-		MovementDetail: ToMovementDetails(movementRequest.Details),
+		Type:               movementRequest.Type,
+		DateTime:           time.Now(),
+		Description:        movementRequest.Description,
+		IsMaterialMovement: movementRequest.IsMaterialMovement,
+		MovementDetail:     ToMovementDetails(movementRequest.Details),
 	}
 }
 
@@ -27,25 +30,29 @@ func ToMovementDetail(movementDetailRequest MovementDetailRequest) entities.Move
 	return entities.MovementDetail{
 		Quantity: movementDetailRequest.Quantity,
 		Price:    movementDetailRequest.Price,
+		Material: &entities.Material{
+			EntitiesBase: core.EntitiesBase{
+				ID: movementDetailRequest.MaterialID,
+			},
+		},
+		ProductVariation: &entities.ProductVariation{
+			EntitiesBase: core.EntitiesBase{
+				ID: movementDetailRequest.ProductVariationID,
+			},
+		},
 	}
 }
 func ToMovementResponse(movement entities.Movement) MovementResponse {
 	return MovementResponse{
-		ID:              movement.ID,
-		Number:          movement.Number,
-		Type:            movement.Type,
-		Total:           movement.Total,
-		DateTime:        movement.DateTime.Format("2006-01-02 15:04:05"),
-		Description:     movement.Description,
-		MovementDetails: ToMovementDetailsResponse(movement.MovementDetail),
+		ID:                 movement.ID,
+		Number:             movement.Number,
+		Type:               movement.Type,
+		Total:              movement.Total,
+		IsMaterialMovement: movement.IsMaterialMovement,
+		DateTime:           movement.DateTime.Format("2006-01-02 15:04:05"),
+		Description:        movement.Description,
+		MovementDetails:    ToMovementDetailsResponse(movement.MovementDetail),
 	}
-}
-func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
-	var movementsResponse []MovementResponse
-	for _, movement := range movements {
-		movementsResponse = append(movementsResponse, ToMovementResponse(movement))
-	}
-	return movementsResponse
 }
 
 func ToMovementDetailsResponse(movementDetails []entities.MovementDetail) []MovementDetailResponse {
@@ -57,24 +64,60 @@ func ToMovementDetailsResponse(movementDetails []entities.MovementDetail) []Move
 }
 
 func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDetailResponse {
-	var productVariationId *uint
+	var movementDetailResponse MovementDetailResponse
+	var materialID uint
+	if movementDetail.Material != nil {
+		materialID = movementDetail.Material.ID
+	}
+	var productVariationID uint
 	if movementDetail.ProductVariation != nil {
-		productVariationId = &movementDetail.ProductVariation.ID
-	} else {
-		productVariationId = nil
+		productVariationID = movementDetail.ProductVariation.ID
 	}
 
-	var materialId *uint
-	if movementDetail.Material != nil {
-		materialId = &movementDetail.Material.ID
-	} else {
-		materialId = nil
-	}
-	return MovementDetailResponse{
+	movementDetailResponse.ID = movementDetail.ID
+	movementDetailResponse.MaterialID = materialID
+	movementDetailResponse.ProductVariationID = productVariationID
+	movementDetailResponse.Quantity = movementDetail.Quantity
+	movementDetailResponse.Price = movementDetail.Price
+	//use this if you want to return the whole material
+	/*if movementDetail.Material != nil {
+		//import ToMaterialResponse from material/presenter.go
+		movementDetailResponse.Material = ToMaterialResponse( movementDetail.Material, "es")
+	}*/
+
+	/*return MovementDetailResponse{
 		ID:                 movementDetail.ID,
-		ProductVariationID: productVariationId,
-		MaterialID:         materialId,
+		ProductVariationID: productVariationID,
+		MaterialID:         materialID,
 		Quantity:           movementDetail.Quantity,
 		Price:              movementDetail.Price,
-	}
+	}*/
+	return movementDetailResponse
 }
+
+func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
+	var movementsResponse []MovementResponse
+	for _, movement := range movements {
+		movementsResponse = append(movementsResponse, ToMovementResponse(movement))
+	}
+	return movementsResponse
+}
+
+/*func ToMaterialResponse(material entities.Material, language string) MaterialResponse {
+	return MaterialResponse{
+		Id:              float64(material.ID),
+		Name:            material.Name,
+		Description:     material.Description,
+		Price:           material.Price,
+		Stock:           material.Stock,
+		RepositionPoint: material.RepositionPoint,
+		MaterialType: MaterialTypeResponse{
+			Id:   float64(material.MaterialType.ID),
+			Name: material.MaterialType.Name,
+			UnitOfMeasurement: UnitOfMeasurementResponse{
+				Name:   material.MaterialType.UnitOfMeasurement.String(language),
+				Symbol: enums.GetSymbolByUnitOfMeasurementEnum(material.MaterialType.UnitOfMeasurement),
+			},
+		},
+	}
+}*/

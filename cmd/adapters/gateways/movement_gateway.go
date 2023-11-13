@@ -5,31 +5,47 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	_ "github.com/fedeveron01/golang-base/cmd/core/entities"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
 )
 
+type MovementRepository interface {
+	CreateMovement(movement gateway_entities.Movement) (gateway_entities.Movement, error)
+	FindAll() ([]gateway_entities.Movement, error)
+	FindAllByType(isMaterialMovement bool) ([]gateway_entities.Movement, error)
+	FindById(id uint) (gateway_entities.Movement, error)
+}
+
+type MovementGateway interface {
+	Create(movement entities.Movement) (entities.Movement, error)
+	FindAll() ([]entities.Movement, error)
+	FindAllByType(isMaterialMovement bool) ([]entities.Movement, error)
+	FindById(id uint) (entities.Movement, error)
+}
+
 type MovementGatewayImpl struct {
-	mavementRepository repositories.MovementRepository
+	movementRepository MovementRepository
 }
 
-// Create implements movement_usecase.MovementGateway.
-func (*MovementGatewayImpl) Create(movement entities.Movement) entities.Movement {
-	panic("unimplemented")
-}
-
-// CreateMovementDetailsTransaction implements movement_usecase.MovementGateway.
-func (*MovementGatewayImpl) CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail) ([]entities.MovementDetail, error) {
-	panic("unimplemented")
-}
-
-func NewMovementGateway(mavementRepository repositories.MovementRepository) *MovementGatewayImpl {
+func NewMovementGateway(movementRepository MovementRepository) *MovementGatewayImpl {
 	return &MovementGatewayImpl{
-		mavementRepository: mavementRepository,
+		movementRepository: movementRepository,
 	}
 }
 
 func (i *MovementGatewayImpl) FindAll() ([]entities.Movement, error) {
-	movementsDB, err := i.mavementRepository.FindAll()
+	movementsDB, err := i.movementRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	movements := make([]entities.Movement, len(movementsDB))
+	for index, movementDB := range movementsDB {
+		movements[index] = i.ToBusinessEntity(movementDB)
+	}
+	return movements, nil
+}
+
+func (i *MovementGatewayImpl) FindAllByType(isMaterialMovement bool) ([]entities.Movement, error) {
+	movementsDB, err := i.movementRepository.FindAllByType(isMaterialMovement)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +57,7 @@ func (i *MovementGatewayImpl) FindAll() ([]entities.Movement, error) {
 }
 
 func (i *MovementGatewayImpl) FindById(id uint) (entities.Movement, error) {
-	movementDB, err := i.mavementRepository.FindById(id)
+	movementDB, err := i.movementRepository.FindById(id)
 	if err != nil {
 		return entities.Movement{}, err
 	}
@@ -49,19 +65,19 @@ func (i *MovementGatewayImpl) FindById(id uint) (entities.Movement, error) {
 	return movement, nil
 }
 
-func (i *MovementGatewayImpl) CreateMovement(material entities.Movement) (entities.Movement, error) {
-
-	materialDB := i.ToServiceEntity(material)
-	materialDBCreated, err := i.mavementRepository.CreateMovement(materialDB)
+func (i *MovementGatewayImpl) Create(movement entities.Movement, employeeID uint) (entities.Movement, error) {
+	movementDB := i.ToServiceEntity(movement, movement.ID)
+	movementDB.EmployeeId = employeeID
+	movementDB.MovementDetail = nil
+	movementDBCreated, err := i.movementRepository.CreateMovement(movementDB)
 	if err != nil {
 		return entities.Movement{}, err
 	}
-	materialCreated := i.ToBusinessEntity(materialDBCreated)
-
-	return materialCreated, nil
+	movementCreated := i.ToBusinessEntity(movementDBCreated)
+	return movementCreated, nil
 }
 
-func (i *MovementGatewayImpl) ToServiceEntity(movement entities.Movement) gateway_entities.Movement {
+func (i *MovementGatewayImpl) ToServiceEntity(movement entities.Movement, movementID uint) gateway_entities.Movement {
 	return gateway_entities.Movement{
 		Number:         float64(movement.Number),
 		Type:           movement.Type,
@@ -95,53 +111,80 @@ func (i *MovementGatewayImpl) ToBusinessEntity(movement gateway_entities.Movemen
 		Total:          movement.Total,
 		DateTime:       movement.DateTime,
 		Description:    movement.Description,
-		MovementDetail: toBusinessMovementDetailGet(movement.MovementDetail),
+		MovementDetail: i.toBusinessMovementDetails(movement.MovementDetail),
 	}
 }
 
-func toBusinessMovementDetailGet(movementDetail []gateway_entities.MovementDetail) []entities.MovementDetail {
-	var movementDetailDB []entities.MovementDetail
-	for _, v := range movementDetail {
-		var material *entities.Material
-		var productVariation *entities.ProductVariation
-		if v.Material != nil {
-			material = &entities.Material{
-				EntitiesBase: core.EntitiesBase{
-					ID: v.Material.ID,
-				},
-				Name:            v.Material.Name,
-				Description:     v.Material.Description,
-				Stock:           v.Material.Stock,
-				RepositionPoint: v.Material.RepositionPoint,
-				MaterialType: entities.MaterialType{
-					EntitiesBase: core.EntitiesBase{
-						ID: v.Material.MaterialType.ID,
-					},
-				},
-			}
-
-		} else {
-			material = nil
-		}
-		if v.ProductVariation != nil {
-			productVariation = &entities.ProductVariation{
-				EntitiesBase: core.EntitiesBase{
-					ID: v.ProductVariation.ID,
-				},
-			}
-		} else {
-			productVariation = nil
-		}
-
-		movementDetailDB = append(movementDetailDB, entities.MovementDetail{
-			EntitiesBase: core.EntitiesBase{
-				ID: v.ID,
-			},
-			Quantity:         v.Quantity,
-			Price:            v.Price,
-			Material:         material,
-			ProductVariation: productVariation,
-		})
+func (i *MovementGatewayImpl) toServiceMovementDetails(movementDetails []entities.MovementDetail, movementID uint) []gateway_entities.MovementDetail {
+	movementDetailsDB := make([]gateway_entities.MovementDetail, len(movementDetails))
+	for index, movementDetail := range movementDetails {
+		movementDetailsDB[index] = i.toServiceMovementDetail(movementDetail, movementID)
 	}
-	return movementDetailDB
+	return movementDetailsDB
+}
+
+func (i *MovementGatewayImpl) toServiceMovementDetail(movementDetail entities.MovementDetail, movementID uint) gateway_entities.MovementDetail {
+	var materialID uint
+	if movementDetail.Material != nil {
+		materialID = movementDetail.Material.ID
+	}
+	var productVariationID uint
+	if movementDetail.ProductVariation != nil {
+		productVariationID = movementDetail.ProductVariation.ID
+	}
+	return gateway_entities.MovementDetail{
+		MaterialId:         &materialID,
+		ProductVariationId: &productVariationID,
+		Quantity:           movementDetail.Quantity,
+		MovementId:         movementID,
+	}
+}
+
+func (i *MovementGatewayImpl) toBusinessMovementDetails(movementDetails []gateway_entities.MovementDetail) []entities.MovementDetail {
+	movementDetailsBusiness := make([]entities.MovementDetail, len(movementDetails))
+	for index, movementDetail := range movementDetails {
+		movementDetailsBusiness[index] = i.toBusinessMovementDetail(movementDetail)
+	}
+	return movementDetailsBusiness
+}
+
+func (i *MovementGatewayImpl) toBusinessMovementDetail(movementDetail gateway_entities.MovementDetail) entities.MovementDetail {
+	var material *entities.Material
+	var productVariation *entities.ProductVariation
+	if movementDetail.Material != nil && movementDetail.Material.ID != 0 {
+		material = &entities.Material{
+			EntitiesBase: core.EntitiesBase{
+				ID: movementDetail.Material.ID,
+			},
+			Name:            movementDetail.Material.Name,
+			Description:     movementDetail.Material.Description,
+			Price:           movementDetail.Material.Price,
+			Stock:           movementDetail.Material.Stock,
+			RepositionPoint: movementDetail.Material.RepositionPoint,
+			MaterialType: entities.MaterialType{
+				EntitiesBase: core.EntitiesBase{
+					ID: movementDetail.Material.MaterialType.ID,
+				},
+				Name:              movementDetail.Material.MaterialType.Name,
+				Description:       movementDetail.Material.MaterialType.Description,
+				UnitOfMeasurement: enums.StringToUnitOfMeasurementEnum(movementDetail.Material.MaterialType.UnitOfMeasurement),
+			},
+		}
+	}
+	if movementDetail.ProductVariation != nil && movementDetail.ProductVariation.ID != 0 {
+		productVariation = &entities.ProductVariation{
+			EntitiesBase: core.EntitiesBase{
+				ID: movementDetail.ProductVariation.ID,
+			},
+		}
+	}
+
+	return entities.MovementDetail{
+		EntitiesBase: core.EntitiesBase{
+			ID: movementDetail.ID,
+		},
+		Material:         material,
+		ProductVariation: productVariation,
+		Quantity:         movementDetail.Quantity,
+	}
 }

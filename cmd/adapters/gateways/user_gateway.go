@@ -5,15 +5,24 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	_ "github.com/fedeveron01/golang-base/cmd/core/entities"
-	"github.com/fedeveron01/golang-base/cmd/repositories"
 	"gorm.io/gorm"
 )
 
-type UserGatewayImpl struct {
-	userRepository repositories.UserRepository
+type UserRepository interface {
+	CreateUser(user gateway_entities.User) (gateway_entities.User, error)
+	CreateCompleteUserWithEmployee(user gateway_entities.User, chargeID uint, employee gateway_entities.Employee) (gateway_entities.User, error)
+	FindUserById(id int64) (gateway_entities.User, error)
+	FindUserByUsernameAndPassword(username string, password string) (gateway_entities.User, error)
+	FindUserByUsername(username string) gateway_entities.User
+	UpdateUser(user gateway_entities.User) (gateway_entities.User, error)
+	DeleteUser(id string) error
 }
 
-func NewUserGateway(userRepository repositories.UserRepository) *UserGatewayImpl {
+type UserGatewayImpl struct {
+	userRepository UserRepository
+}
+
+func NewUserGateway(userRepository UserRepository) *UserGatewayImpl {
 	return &UserGatewayImpl{
 		userRepository: userRepository,
 	}
