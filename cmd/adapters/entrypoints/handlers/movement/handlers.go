@@ -46,9 +46,9 @@ func (p *MovementHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 // GetAll Handle api/movement GET request
 func (p *MovementHandler) GetAllByType(w http.ResponseWriter, r *http.Request) {
-	var movementRequestByType MovementRequestByType
-	err := json.NewDecoder(r.Body).Decode(&movementRequestByType)
-	movements, err := p.movementUseCase.FindAllByType(movementRequestByType.IsInput)
+	vars := mux.Vars(r)
+	typeValue := vars["type"]
+	movements, err := p.movementUseCase.FindAllByType(typeValue)
 	if err != nil {
 		p.WriteErrorResponse(w, err)
 	}
