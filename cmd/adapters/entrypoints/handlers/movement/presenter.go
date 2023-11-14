@@ -79,7 +79,7 @@ func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDe
 		MaterialID:         materialID,
 		Quantity:           movementDetail.Quantity,
 		Price:              movementDetail.Price,
-		//Material:           ToMaterialResponse(movementDetail.Material),
+		Material:           ToMaterialResponse(*movementDetail.Material),
 	}
 }
 
@@ -91,18 +91,12 @@ func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
 	return movementsResponse
 }
 
-func ToMaterialResponse(material entities.Material, language string) MaterialResponse {
+func ToMaterialResponse(material entities.Material) MaterialResponse {
 	return MaterialResponse{
-		Name:            material.Name,
-		Stock:           material.Stock,
-		RepositionPoint: material.RepositionPoint,
-		MaterialType: MaterialTypeResponse{
-			Id:   float64(material.MaterialType.ID),
-			Name: material.MaterialType.Name,
-			UnitOfMeasurement: UnitOfMeasurementResponse{
-				Name:   material.MaterialType.UnitOfMeasurement.String(language),
-				Symbol: enums.GetSymbolByUnitOfMeasurementEnum(material.MaterialType.UnitOfMeasurement),
-			},
-		},
+		Name:              material.Name,
+		Description:       material.Description,
+		MaterialType:      material.MaterialType.Name,
+		Stock:             material.Stock,
+		UnitOfMeasurement: enums.EnumToUnitOfMeasurementStringInSpanish(material.MaterialType.UnitOfMeasurement),
 	}
 }

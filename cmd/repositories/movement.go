@@ -56,12 +56,12 @@ func (r *MovementRepository) FindById(id uint) (movement gateway_entities.Moveme
 	if movement.ID == 0 {
 		return movement, core_errors.NewNotFoundError("movement not found")
 	}
-	var MovementDetails []gateway_entities.MovementDetail
-	res = r.db.Find(&MovementDetails, "movement_id = ?", id).Joins("Material").Preload("Material.MaterialType").Find(&MovementDetails)
+	var movementDetails []gateway_entities.MovementDetail
+	res = r.db.Preload("Material.MaterialType").InnerJoins("Material").Find(&movementDetails, "movement_id = ?", id)
 	if res.Error != nil {
 		return movement, res.Error
 	}
-	movement.MovementDetail = MovementDetails
+	movement.MovementDetail = movementDetails
 
 	return movement, nil
 }

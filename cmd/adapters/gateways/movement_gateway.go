@@ -106,12 +106,13 @@ func (i *MovementGatewayImpl) ToBusinessEntity(movement gateway_entities.Movemen
 		EntitiesBase: core.EntitiesBase{
 			ID: movement.ID,
 		},
-		Number:         int(movement.Number),
-		Type:           movement.Type,
-		Total:          movement.Total,
-		DateTime:       movement.DateTime,
-		Description:    movement.Description,
-		MovementDetail: i.toBusinessMovementDetails(movement.MovementDetail),
+		Number:             int(movement.Number),
+		Type:               movement.Type,
+		Total:              movement.Total,
+		DateTime:           movement.DateTime,
+		IsMaterialMovement: movement.IsMaterialMovement,
+		Description:        movement.Description,
+		MovementDetail:     i.toBusinessMovementDetails(movement.MovementDetail),
 	}
 }
 

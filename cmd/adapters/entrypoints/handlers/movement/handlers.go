@@ -68,6 +68,7 @@ func (p *MovementHandler) GetById(w http.ResponseWriter, r *http.Request) {
 	movement, err := p.movementUseCase.FindById(uint(uid))
 	if err != nil {
 		p.WriteErrorResponse(w, err)
+		return
 	}
 	json.NewEncoder(w).Encode(ToMovementResponse(movement))
 }

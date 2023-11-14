@@ -40,10 +40,10 @@ type MovementDetailResponse struct {
 type MaterialResponse struct {
 	ID                uint    `json:"id"`
 	Name              string  `json:"name"`
-	MaterialResponse  string  `json:"description"`
-	UnitOfMeasurement string  `json:"unit"`
+	Description       string  `json:"description"`
+	MaterialType      string  `json:"materialType"`
+	UnitOfMeasurement string  `json:"unitOfMeasurement"`
 	Stock             float64 `json:"stock"`
-	IsMaterial        bool    `json:"isMaterial"`
 }
 
 type ProductVariationResponse struct {
