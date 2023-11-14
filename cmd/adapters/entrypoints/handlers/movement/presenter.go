@@ -5,6 +5,7 @@ import (
 
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
 	//. "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
 )
 
@@ -78,6 +79,7 @@ func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDe
 		MaterialID:         materialID,
 		Quantity:           movementDetail.Quantity,
 		Price:              movementDetail.Price,
+		//Material:           ToMaterialResponse(movementDetail.Material),
 	}
 }
 
@@ -87,4 +89,20 @@ func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
 		movementsResponse = append(movementsResponse, ToMovementResponse(movement))
 	}
 	return movementsResponse
+}
+
+func ToMaterialResponse(material entities.Material, language string) MaterialResponse {
+	return MaterialResponse{
+		Name:            material.Name,
+		Stock:           material.Stock,
+		RepositionPoint: material.RepositionPoint,
+		MaterialType: MaterialTypeResponse{
+			Id:   float64(material.MaterialType.ID),
+			Name: material.MaterialType.Name,
+			UnitOfMeasurement: UnitOfMeasurementResponse{
+				Name:   material.MaterialType.UnitOfMeasurement.String(language),
+				Symbol: enums.GetSymbolByUnitOfMeasurementEnum(material.MaterialType.UnitOfMeasurement),
+			},
+		},
+	}
 }
