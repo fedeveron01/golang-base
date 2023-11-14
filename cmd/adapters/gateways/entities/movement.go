@@ -1,8 +1,9 @@
 package gateway_entities
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Movement struct {

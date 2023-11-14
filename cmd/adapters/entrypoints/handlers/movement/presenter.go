@@ -1,9 +1,12 @@
 package movement
 
 import (
+	"time"
+
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
-	"time"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
+	//. "github.com/fedeveron01/golang-base/cmd/adapters/entrypoints/handlers/material"
 )
 
 func ToMovement(movementRequest MovementRequest) entities.Movement {
@@ -76,5 +79,24 @@ func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDe
 		MaterialID:         materialID,
 		Quantity:           movementDetail.Quantity,
 		Price:              movementDetail.Price,
+		Material:           ToMaterialResponse(*movementDetail.Material),
+	}
+}
+
+func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
+	var movementsResponse []MovementResponse
+	for _, movement := range movements {
+		movementsResponse = append(movementsResponse, ToMovementResponse(movement))
+	}
+	return movementsResponse
+}
+
+func ToMaterialResponse(material entities.Material) MaterialResponse {
+	return MaterialResponse{
+		Name:              material.Name,
+		Description:       material.Description,
+		MaterialType:      material.MaterialType.Name,
+		Stock:             material.Stock,
+		UnitOfMeasurement: enums.EnumToUnitOfMeasurementStringInSpanish(material.MaterialType.UnitOfMeasurement),
 	}
 }

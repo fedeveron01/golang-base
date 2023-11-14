@@ -5,14 +5,21 @@ import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 	_ "github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
 )
 
 type MovementRepository interface {
 	CreateMovement(movement gateway_entities.Movement) (gateway_entities.Movement, error)
+	FindAll() ([]gateway_entities.Movement, error)
+	FindAllByType(isInput bool) ([]gateway_entities.Movement, error)
+	FindById(id uint) (gateway_entities.Movement, error)
 }
 
 type MovementGateway interface {
 	Create(movement entities.Movement) (entities.Movement, error)
+	FindAll() ([]entities.Movement, error)
+	FindAllByType(isInput bool) ([]entities.Movement, error)
+	FindById(id uint) (entities.Movement, error)
 }
 
 type MovementGatewayImpl struct {
@@ -24,6 +31,40 @@ func NewMovementGateway(movementRepository MovementRepository) *MovementGatewayI
 		movementRepository: movementRepository,
 	}
 }
+
+func (i *MovementGatewayImpl) FindAll() ([]entities.Movement, error) {
+	movementsDB, err := i.movementRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	movements := make([]entities.Movement, len(movementsDB))
+	for index, movementDB := range movementsDB {
+		movements[index] = i.ToBusinessEntity(movementDB)
+	}
+	return movements, nil
+}
+
+func (i *MovementGatewayImpl) FindAllByType(isInput bool) ([]entities.Movement, error) {
+	movementsDB, err := i.movementRepository.FindAllByType(isInput)
+	if err != nil {
+		return nil, err
+	}
+	movements := make([]entities.Movement, len(movementsDB))
+	for index, movementDB := range movementsDB {
+		movements[index] = i.ToBusinessEntity(movementDB)
+	}
+	return movements, nil
+}
+
+func (i *MovementGatewayImpl) FindById(id uint) (entities.Movement, error) {
+	movementDB, err := i.movementRepository.FindById(id)
+	if err != nil {
+		return entities.Movement{}, err
+	}
+	movement := i.ToBusinessEntity(movementDB)
+	return movement, nil
+}
+
 func (i *MovementGatewayImpl) Create(movement entities.Movement, employeeID uint) (entities.Movement, error) {
 	movementDB := i.ToServiceEntity(movement, movement.ID)
 	movementDB.EmployeeId = employeeID
@@ -43,8 +84,21 @@ func (i *MovementGatewayImpl) ToServiceEntity(movement entities.Movement, moveme
 		Total:          movement.Total,
 		DateTime:       movement.DateTime,
 		Description:    movement.Description,
-		MovementDetail: i.toServiceMovementDetails(movement.MovementDetail, movementID),
+		MovementDetail: toServiceMovementDetail(movement.MovementDetail),
 	}
+}
+
+func toServiceMovementDetail(movementDetail []entities.MovementDetail) []gateway_entities.MovementDetail {
+	var movementDetailDB []gateway_entities.MovementDetail
+	for _, v := range movementDetail {
+		movementDetailDB = append(movementDetailDB, gateway_entities.MovementDetail{
+			Quantity:           v.Quantity,
+			Price:              v.Price,
+			MaterialId:         &v.Material.ID,
+			ProductVariationId: &v.ProductVariation.ID,
+		})
+	}
+	return movementDetailDB
 }
 
 func (i *MovementGatewayImpl) ToBusinessEntity(movement gateway_entities.Movement) entities.Movement {
@@ -52,12 +106,13 @@ func (i *MovementGatewayImpl) ToBusinessEntity(movement gateway_entities.Movemen
 		EntitiesBase: core.EntitiesBase{
 			ID: movement.ID,
 		},
-		Number:         int(movement.Number),
-		Type:           movement.Type,
-		Total:          movement.Total,
-		DateTime:       movement.DateTime,
-		Description:    movement.Description,
-		MovementDetail: i.toBusinessMovementDetails(movement.MovementDetail),
+		Number:             int(movement.Number),
+		Type:               movement.Type,
+		Total:              movement.Total,
+		DateTime:           movement.DateTime,
+		IsMaterialMovement: movement.IsMaterialMovement,
+		Description:        movement.Description,
+		MovementDetail:     i.toBusinessMovementDetails(movement.MovementDetail),
 	}
 }
 
@@ -102,6 +157,19 @@ func (i *MovementGatewayImpl) toBusinessMovementDetail(movementDetail gateway_en
 			EntitiesBase: core.EntitiesBase{
 				ID: movementDetail.Material.ID,
 			},
+			Name:            movementDetail.Material.Name,
+			Description:     movementDetail.Material.Description,
+			Price:           movementDetail.Material.Price,
+			Stock:           movementDetail.Material.Stock,
+			RepositionPoint: movementDetail.Material.RepositionPoint,
+			MaterialType: entities.MaterialType{
+				EntitiesBase: core.EntitiesBase{
+					ID: movementDetail.Material.MaterialType.ID,
+				},
+				Name:              movementDetail.Material.MaterialType.Name,
+				Description:       movementDetail.Material.MaterialType.Description,
+				UnitOfMeasurement: enums.StringToUnitOfMeasurementEnum(movementDetail.Material.MaterialType.UnitOfMeasurement),
+			},
 		}
 	}
 	if movementDetail.ProductVariation != nil && movementDetail.ProductVariation.ID != 0 {
@@ -113,6 +181,9 @@ func (i *MovementGatewayImpl) toBusinessMovementDetail(movementDetail gateway_en
 	}
 
 	return entities.MovementDetail{
+		EntitiesBase: core.EntitiesBase{
+			ID: movementDetail.ID,
+		},
 		Material:         material,
 		ProductVariation: productVariation,
 		Quantity:         movementDetail.Quantity,

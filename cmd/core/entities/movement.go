@@ -1,8 +1,9 @@
 package entities
 
 import (
-	"github.com/fedeveron01/golang-base/cmd/core"
 	"time"
+
+	"github.com/fedeveron01/golang-base/cmd/core"
 )
 
 type Movement struct {

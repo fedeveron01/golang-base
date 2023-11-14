@@ -1,5 +1,7 @@
 package movement
 
+//import material entity from core
+
 type MovementRequest struct {
 	Type               string                  `json:"type"`
 	Description        string                  `json:"description" optional:"true"`
@@ -27,11 +29,21 @@ type MovementResponse struct {
 }
 
 type MovementDetailResponse struct {
-	ID                 uint    `json:"id"`
-	ProductVariationID uint    `json:"productVariationId"`
-	MaterialID         uint    `json:"materialId"`
-	Quantity           float64 `json:"quantity"`
-	Price              float64 `json:"price"`
+	ID                 uint             `json:"id"`
+	ProductVariationID uint             `json:"productVariationId"`
+	MaterialID         uint             `json:"materialId"`
+	Material           MaterialResponse `json:"material"`
+	Quantity           float64          `json:"quantity"`
+	Price              float64          `json:"price"`
+}
+
+type MaterialResponse struct {
+	ID                uint    `json:"id"`
+	Name              string  `json:"name"`
+	Description       string  `json:"description"`
+	MaterialType      string  `json:"materialType"`
+	UnitOfMeasurement string  `json:"unitOfMeasurement"`
+	Stock             float64 `json:"stock"`
 }
 
 type ProductVariationResponse struct {
@@ -39,4 +51,8 @@ type ProductVariationResponse struct {
 	ProductID uint    `json:"productId"`
 	Number    int     `json:"number"`
 	Stock     float64 `json:"stock"`
+}
+
+type MovementRequestByType struct {
+	IsInput bool `json:"isInput"`
 }
