@@ -11,14 +11,14 @@ import (
 type MovementRepository interface {
 	CreateMovement(movement gateway_entities.Movement) (gateway_entities.Movement, error)
 	FindAll() ([]gateway_entities.Movement, error)
-	FindAllByType(isInput bool) ([]gateway_entities.Movement, error)
+	FindAllByType(typeValue string) ([]gateway_entities.Movement, error)
 	FindById(id uint) (gateway_entities.Movement, error)
 }
 
 type MovementGateway interface {
 	Create(movement entities.Movement) (entities.Movement, error)
 	FindAll() ([]entities.Movement, error)
-	FindAllByType(isInput bool) ([]entities.Movement, error)
+	FindAllByType(typeValue string) ([]entities.Movement, error)
 	FindById(id uint) (entities.Movement, error)
 }
 
@@ -44,8 +44,8 @@ func (i *MovementGatewayImpl) FindAll() ([]entities.Movement, error) {
 	return movements, nil
 }
 
-func (i *MovementGatewayImpl) FindAllByType(isInput bool) ([]entities.Movement, error) {
-	movementsDB, err := i.movementRepository.FindAllByType(isInput)
+func (i *MovementGatewayImpl) FindAllByType(typeValue string) ([]entities.Movement, error) {
+	movementsDB, err := i.movementRepository.FindAllByType(typeValue)
 	if err != nil {
 		return nil, err
 	}
