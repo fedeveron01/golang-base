@@ -27,7 +27,14 @@ func (r *MovementDetailRepository) CreateMovementDetailsTransaction(movementDeta
 				return nil, nil, res.Error
 			}
 		}
-		movementDetail.ProductVariationId = nil
+
+		if movementDetail.ProductVariation != nil && movementDetail.ProductVariation.ID != 0 {
+			res := tx.Save(&movementDetail.ProductVariation)
+			if res.Error != nil {
+				tx.Rollback()
+				return nil, nil, res.Error
+			}
+		}
 		res := tx.Create(&movementDetail)
 		movementDetails[i] = movementDetail
 		if res.Error != nil {
