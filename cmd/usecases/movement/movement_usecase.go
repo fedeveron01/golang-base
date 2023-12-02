@@ -2,8 +2,6 @@ package movement_usecase
 
 import (
 	"errors"
-	"log"
-
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
 )
 
@@ -21,6 +19,10 @@ type MovementGateway interface {
 	FindById(id uint) (entities.Movement, error)
 }
 
+type ProductVariationGateway interface {
+	FindById(id uint) *entities.ProductVariation
+}
+
 type MovementDetailGateway interface {
 	CreateMovementDetailsTransaction(movementDetails []entities.MovementDetail, movement entities.Movement, employeeID uint) ([]entities.MovementDetail, entities.Movement, error)
 }
@@ -29,16 +31,18 @@ type MaterialGateway interface {
 }
 
 type MovementUseCaseImpl struct {
-	movementGateway       MovementGateway
-	materialGateway       MaterialGateway
-	movementDetailGateway MovementDetailGateway
+	movementGateway         MovementGateway
+	materialGateway         MaterialGateway
+	movementDetailGateway   MovementDetailGateway
+	productVariationGateway ProductVariationGateway
 }
 
-func NewMovementUseCase(movementGateway MovementGateway, movementDetailGateway MovementDetailGateway, materialGateway MaterialGateway) *MovementUseCaseImpl {
+func NewMovementUseCase(movementGateway MovementGateway, movementDetailGateway MovementDetailGateway, materialGateway MaterialGateway, productVariationGateway ProductVariationGateway) *MovementUseCaseImpl {
 	return &MovementUseCaseImpl{
-		movementGateway:       movementGateway,
-		materialGateway:       materialGateway,
-		movementDetailGateway: movementDetailGateway,
+		movementGateway:         movementGateway,
+		materialGateway:         materialGateway,
+		movementDetailGateway:   movementDetailGateway,
+		productVariationGateway: productVariationGateway,
 	}
 }
 
@@ -86,6 +90,24 @@ func (i *MovementUseCaseImpl) updateMaterial(movementDetail *entities.MovementDe
 	return nil
 }
 
+func (i *MovementUseCaseImpl) updateProductVariation(movementDetail *entities.MovementDetail, input bool) error {
+	productVariation := i.productVariationGateway.FindById(movementDetail.ProductVariation.ID)
+	if productVariation == nil {
+		return errors.New("product variation not found")
+	}
+	if input {
+		productVariation.Stock += movementDetail.Quantity
+	} else {
+		if productVariation.Stock-movementDetail.Quantity < 0 {
+			return errors.New("insufficient stock in product variation " + productVariation.Name)
+		}
+		productVariation.Stock -= movementDetail.Quantity
+	}
+	movementDetail.ProductVariation = productVariation
+
+	return nil
+}
+
 func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint) (entities.Movement, error) {
 	if movement.Type == "" {
 		return entities.Movement{}, errors.New("type is required")
@@ -112,7 +134,14 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint
 
 			}
 			if movementDetail.ProductVariation.ID != 0 {
-				log.Fatal("implement me please angelo")
+				if movement.IsMaterialMovement {
+					return entities.Movement{}, errors.New("movement is not product movement")
+				}
+				err := i.updateProductVariation(&movementDetail, true)
+				if err != nil {
+					return entities.Movement{}, err
+				}
+				movement.MovementDetail[index] = movementDetail
 			}
 
 		}

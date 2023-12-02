@@ -10,6 +10,7 @@ func ToMaterialResponse(material entities.Material, language string) MaterialRes
 	return MaterialResponse{
 		Id:              float64(material.ID),
 		Name:            material.Name,
+		Number:          &material.Number,
 		Description:     material.Description,
 		Price:           material.Price,
 		Stock:           material.Stock,
@@ -31,6 +32,7 @@ func ToMaterialsResponse(materials []entities.Material, language string) []Mater
 		materialResponses = append(materialResponses, MaterialResponse{
 			float64(material.ID),
 			material.Name,
+			&material.Number,
 			material.Description,
 			MaterialTypeResponse{
 				Id:   float64(material.MaterialType.ID),
