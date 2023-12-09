@@ -105,7 +105,7 @@ func (i *MovementUseCaseImpl) updateProductVariation(movementDetail *entities.Mo
 		productVariation.Stock += movementDetail.Quantity
 	} else {
 		if productVariation.Stock-movementDetail.Quantity < 0 {
-			return errors.New("insufficient stock in product variation" + strconv.Itoa(int(productVariation.ID)))
+			return errors.New("insufficient stock in product variation " + strconv.Itoa(int(productVariation.ID)))
 		}
 		productVariation.Stock -= movementDetail.Quantity
 	}
