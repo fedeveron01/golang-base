@@ -68,6 +68,7 @@ func Start() HandlerContainer {
 	productRepository := repositories.NewProductRepository(db)
 	movementRepository := repositories.NewMovementRepository(db)
 	movementDetailRepository := repositories.NewMovementDetailRepository(db)
+	productVariationRepository := repositories.NewProductVariationRepository(db)
 
 	// inject gateways
 	materialGateway := gateways.NewMaterialGateway(materialRepository)
@@ -79,6 +80,7 @@ func Start() HandlerContainer {
 	productGateway := gateways.NewProductGateway(productRepository)
 	movementGateway := gateways.NewMovementGateway(movementRepository)
 	movementDetailGateway := gateways.NewMovementDetailGateway(movementDetailRepository)
+	productVariationGateway := gateways.NewProductVariationGateway(productVariationRepository)
 
 	// inject use cases
 	materialUseCase := material_usecase.NewMaterialUsecase(materialGateway, materialTypeGateway)
@@ -87,7 +89,7 @@ func Start() HandlerContainer {
 	employeeUseCase := employee_usecase.NewEmployeeUseCase(employeeGateway, chargeGateway)
 	materialTypeUseCase := material_type_usecase.NewMaterialTypeUsecase(materialTypeGateway)
 	productUseCase := product_usecase.NewProductUsecase(productGateway, materialGateway)
-	movementUseCase := movement_usecase.NewMovementUseCase(movementGateway, movementDetailGateway, materialGateway)
+	movementUseCase := movement_usecase.NewMovementUseCase(movementGateway, movementDetailGateway, materialGateway, productVariationGateway)
 
 	// inject handlers
 	handlerContainer := HandlerContainer{}

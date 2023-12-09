@@ -65,8 +65,20 @@ func (i *MovementDetailGatewayImpl) toServiceMovementDetail(movementDetail entit
 			MaterialTypeId:  movementDetail.Material.MaterialType.ID,
 		},
 		ProductVariationId: &movementDetail.ProductVariation.ID,
-		Quantity:           movementDetail.Quantity,
-		MovementId:         movementID,
+		ProductVariation: &gateway_entities.ProductVariation{
+			Model: gorm.Model{
+				ID: movementDetail.ProductVariation.ID,
+			},
+			Number: movementDetail.ProductVariation.Number,
+			Stock:  movementDetail.ProductVariation.Stock,
+			Product: gateway_entities.Product{
+				Model: gorm.Model{
+					ID: movementDetail.ProductVariation.Product.ID,
+				},
+			},
+		},
+		Quantity:   movementDetail.Quantity,
+		MovementId: movementID,
 	}
 }
 

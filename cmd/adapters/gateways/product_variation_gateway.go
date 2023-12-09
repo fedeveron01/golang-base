@@ -13,7 +13,9 @@ type ProductVariationGateway interface {
 }
 
 type ProductVariationRepository interface {
+	CreateProductVariation(productVariation gateway_entities.ProductVariation) (gateway_entities.ProductVariation, error)
 	FindById(id uint) *gateway_entities.ProductVariation
+	FindByProductIDAndNumber(productID uint, number float64) *gateway_entities.ProductVariation
 }
 
 type ProductVariationGatewayImpl struct {
@@ -26,8 +28,27 @@ func NewProductVariationGateway(productVariationRepository ProductVariationRepos
 	}
 }
 
+func (i *ProductVariationGatewayImpl) Create(productVariation entities.ProductVariation, productID uint) (entities.ProductVariation, error) {
+	productVariationDB := i.ToServiceEntity(productVariation, productID)
+	productVariationDB, err := i.productVariationRepository.CreateProductVariation(productVariationDB)
+	if err != nil {
+		return entities.ProductVariation{}, err
+	}
+	productVariation = i.ToBusinessEntity(productVariationDB)
+	return productVariation, nil
+}
+
 func (i *ProductVariationGatewayImpl) FindById(id uint) *entities.ProductVariation {
 	productVariationDB := i.productVariationRepository.FindById(id)
+	if productVariationDB == nil {
+		return nil
+	}
+	productVariation := i.ToBusinessEntity(*productVariationDB)
+	return &productVariation
+}
+
+func (i *ProductVariationGatewayImpl) FindByProductIDAndNumber(productID uint, number float64) *entities.ProductVariation {
+	productVariationDB := i.productVariationRepository.FindByProductIDAndNumber(productID, number)
 	if productVariationDB == nil {
 		return nil
 	}
@@ -42,6 +63,11 @@ func (i *ProductVariationGatewayImpl) ToBusinessEntity(productVariationDB gatewa
 		},
 		Number: productVariationDB.Number,
 		Stock:  productVariationDB.Stock,
+		Product: entities.Product{
+			EntitiesBase: core.EntitiesBase{
+				ID: productVariationDB.ProductID,
+			},
+		},
 	}
 }
 

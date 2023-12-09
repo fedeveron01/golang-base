@@ -21,7 +21,8 @@ type MovementGateway interface {
 }
 
 type ProductVariationGateway interface {
-	FindById(id uint) *entities.ProductVariation
+	Create(productVariation entities.ProductVariation, productID uint) (entities.ProductVariation, error)
+	FindByProductIDAndNumber(productID uint, number float64) *entities.ProductVariation
 }
 
 type MovementDetailGateway interface {
@@ -92,9 +93,13 @@ func (i *MovementUseCaseImpl) updateMaterial(movementDetail *entities.MovementDe
 }
 
 func (i *MovementUseCaseImpl) updateProductVariation(movementDetail *entities.MovementDetail, input bool) error {
-	productVariation := i.productVariationGateway.FindById(movementDetail.ProductVariation.ID)
+	productVariation := i.productVariationGateway.FindByProductIDAndNumber(movementDetail.ProductVariation.Product.ID, movementDetail.ProductVariation.Number)
 	if productVariation == nil {
-		return errors.New("product variation not found")
+		productVariationCreated, err := i.productVariationGateway.Create(*movementDetail.ProductVariation, movementDetail.ProductVariation.Product.ID)
+		productVariation = &productVariationCreated
+		if err != nil {
+			return err
+		}
 	}
 	if input {
 		productVariation.Stock += movementDetail.Quantity
@@ -119,7 +124,7 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint
 	isInput := movement.Type == "input"
 
 	for index, movementDetail := range movement.MovementDetail {
-		if movementDetail.Material.ID == 0 && movementDetail.ProductVariation.ID == 0 {
+		if movementDetail.Material.ID == 0 && movementDetail.ProductVariation.Product.ID == 0 {
 			return entities.Movement{}, errors.New("material or product variation required")
 		}
 		if movementDetail.Material.ID != 0 {
@@ -134,7 +139,7 @@ func (i *MovementUseCaseImpl) Create(movement entities.Movement, employeeID uint
 			movement.MovementDetail[index] = movementDetail
 
 		}
-		if movementDetail.ProductVariation.ID != 0 {
+		if movementDetail.ProductVariation.Product.ID != 0 {
 			if movement.IsMaterialMovement {
 				return entities.Movement{}, errors.New("movement is not product movement")
 			}
