@@ -21,6 +21,9 @@ func (r *MovementDetailRepository) CreateMovementDetailsTransaction(movementDeta
 	for i, movementDetail := range movementDetails {
 		movementDetail.MovementId = movement.ID
 		if movementDetail.Material != nil && movementDetail.Material.ID != 0 {
+			movementDetail.ProductVariation = nil
+			movementDetail.ProductVariationId = nil
+
 			res := tx.Save(&movementDetail.Material)
 			if res.Error != nil {
 				tx.Rollback()
