@@ -1,18 +1,20 @@
 package material_handler
 
 type MaterialRequest struct {
-	Id              float64 `json:"id"`
-	Name            string  `json:"name"`
-	Description     string  `json:"description"`
-	Price           float64 `json:"price"`
-	Stock           float64 `json:"stock"`
-	RepositionPoint float64 `json:"repositionPoint"`
-	MaterialTypeId  uint    `json:"materialTypeId"`
+	Id              float64  `json:"id"`
+	Name            string   `json:"name"`
+	Description     string   `json:"description"`
+	Price           float64  `json:"price"`
+	Number          *float64 `json:"number"`
+	Stock           float64  `json:"stock"`
+	RepositionPoint float64  `json:"repositionPoint"`
+	MaterialTypeId  uint     `json:"materialTypeId"`
 }
 
 type MaterialResponse struct {
 	Id              float64              `json:"id"`
 	Name            string               `json:"name"`
+	Number          *float64             `json:"number"`
 	Description     string               `json:"description"`
 	MaterialType    MaterialTypeResponse `json:"materialType"`
 	Price           float64              `json:"price"`

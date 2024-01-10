@@ -37,8 +37,11 @@ func ToMovementDetail(movementDetailRequest MovementDetailRequest) entities.Move
 			},
 		},
 		ProductVariation: &entities.ProductVariation{
-			EntitiesBase: core.EntitiesBase{
-				ID: movementDetailRequest.ProductVariationID,
+			Number: movementDetailRequest.Number,
+			Product: entities.Product{
+				EntitiesBase: core.EntitiesBase{
+					ID: movementDetailRequest.ProductID,
+				},
 			},
 		},
 	}
@@ -68,19 +71,26 @@ func ToMovementDetailResponse(movementDetail entities.MovementDetail) MovementDe
 	var materialID uint
 	if movementDetail.Material != nil {
 		materialID = movementDetail.Material.ID
+		return MovementDetailResponse{
+			ID:         movementDetail.ID,
+			MaterialID: &materialID,
+			Quantity:   movementDetail.Quantity,
+			Price:      movementDetail.Price,
+			Material:   ToMaterialResponse(*movementDetail.Material),
+		}
 	}
 	var productVariationID uint
 	if movementDetail.ProductVariation != nil {
 		productVariationID = movementDetail.ProductVariation.ID
+		return MovementDetailResponse{
+			ID:                 movementDetail.ID,
+			ProductVariationID: productVariationID,
+			Quantity:           movementDetail.Quantity,
+			Price:              movementDetail.Price,
+		}
 	}
-	return MovementDetailResponse{
-		ID:                 movementDetail.ID,
-		ProductVariationID: productVariationID,
-		MaterialID:         materialID,
-		Quantity:           movementDetail.Quantity,
-		Price:              movementDetail.Price,
-		Material:           ToMaterialResponse(*movementDetail.Material),
-	}
+	return MovementDetailResponse{}
+
 }
 
 func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
@@ -91,8 +101,8 @@ func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
 	return movementsResponse
 }
 
-func ToMaterialResponse(material entities.Material) MaterialResponse {
-	return MaterialResponse{
+func ToMaterialResponse(material entities.Material) *MaterialResponse {
+	return &MaterialResponse{
 		Name:              material.Name,
 		Description:       material.Description,
 		MaterialType:      material.MaterialType.Name,

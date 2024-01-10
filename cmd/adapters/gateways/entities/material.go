@@ -7,6 +7,7 @@ type Material struct {
 	Name            string
 	Description     string
 	Price           float64
+	Number          float64
 	Stock           float64
 	RepositionPoint float64
 	MaterialTypeId  uint

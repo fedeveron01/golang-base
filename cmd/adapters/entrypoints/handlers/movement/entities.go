@@ -11,10 +11,11 @@ type MovementRequest struct {
 }
 
 type MovementDetailRequest struct {
-	ProductVariationID uint    `json:"productVariationId" optional:"true"`
-	MaterialID         uint    `json:"materialId" optional:"true"`
-	Quantity           float64 `json:"quantity"`
-	Price              float64 `json:"price"`
+	ProductID  uint    `json:"productId" optional:"true"`
+	Number     float64 `json:"number" optional:"true"`
+	MaterialID uint    `json:"materialId" optional:"true"`
+	Quantity   float64 `json:"quantity"`
+	Price      float64 `json:"price"`
 }
 
 type MovementResponse struct {
@@ -29,12 +30,12 @@ type MovementResponse struct {
 }
 
 type MovementDetailResponse struct {
-	ID                 uint             `json:"id"`
-	ProductVariationID uint             `json:"productVariationId"`
-	MaterialID         uint             `json:"materialId"`
-	Material           MaterialResponse `json:"material"`
-	Quantity           float64          `json:"quantity"`
-	Price              float64          `json:"price"`
+	ID                 uint              `json:"id"`
+	ProductVariationID uint              `json:"productVariationId"`
+	MaterialID         *uint             `json:"materialId"`
+	Material           *MaterialResponse `json:"material"`
+	Quantity           float64           `json:"quantity"`
+	Price              float64           `json:"price"`
 }
 
 type MaterialResponse struct {
