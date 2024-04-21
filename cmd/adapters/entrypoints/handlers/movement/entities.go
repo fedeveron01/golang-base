@@ -39,12 +39,13 @@ type MovementDetailResponse struct {
 }
 
 type MaterialResponse struct {
-	ID                uint    `json:"id"`
-	Name              string  `json:"name"`
-	Description       string  `json:"description"`
-	MaterialType      string  `json:"materialType"`
-	UnitOfMeasurement string  `json:"unitOfMeasurement"`
-	Stock             float64 `json:"stock"`
+	ID                      uint    `json:"id"`
+	Name                    string  `json:"name"`
+	Description             string  `json:"description"`
+	MaterialType            string  `json:"materialType"`
+	UnitOfMeasurement       string  `json:"unitOfMeasurement"`
+	UnitOfMeasurementSymbol string  `json:"unitOfMeasurementSymbol"`
+	Stock                   float64 `json:"stock"`
 }
 
 type ProductVariationResponse struct {

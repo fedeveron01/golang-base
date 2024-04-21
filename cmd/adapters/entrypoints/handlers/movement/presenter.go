@@ -103,10 +103,12 @@ func ToMovementsResponse(movements []entities.Movement) []MovementResponse {
 
 func ToMaterialResponse(material entities.Material) *MaterialResponse {
 	return &MaterialResponse{
-		Name:              material.Name,
-		Description:       material.Description,
-		MaterialType:      material.MaterialType.Name,
-		Stock:             material.Stock,
-		UnitOfMeasurement: enums.EnumToUnitOfMeasurementStringInSpanish(material.MaterialType.UnitOfMeasurement),
+		ID:                      material.ID,
+		Name:                    material.Name,
+		Description:             material.Description,
+		MaterialType:            material.MaterialType.Name,
+		Stock:                   material.Stock,
+		UnitOfMeasurement:       enums.EnumToUnitOfMeasurementStringInSpanish(material.MaterialType.UnitOfMeasurement),
+		UnitOfMeasurementSymbol: enums.GetSymbolByUnitOfMeasurementEnum(material.MaterialType.UnitOfMeasurement),
 	}
 }
