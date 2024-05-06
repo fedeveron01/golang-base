@@ -109,15 +109,39 @@ func (e *ProductGatewayImpl) ToBusinessEntity(product gateway_entities.Product) 
 		EntitiesBase: core.EntitiesBase{
 			ID: product.ID,
 		},
-		Name:        product.Name,
-		Description: product.Description,
-		Color:       product.Color,
-		Size:        product.Size,
-		ImageUrl:    product.ImageUrl,
-		Price:       product.Price,
-		Stock:       product.Stock,
+		Name:             product.Name,
+		Description:      product.Description,
+		Color:            product.Color,
+		Size:             product.Size,
+		ImageUrl:         product.ImageUrl,
+		Price:            product.Price,
+		ProductVariation: ToProductVariationBusinessEntity(product.ProductVariation),
+		Stock:            getStock(product.ProductVariation),
 	}
 	return productBusiness
+}
+
+func getStock(productVariations []gateway_entities.ProductVariation) float64 {
+	stock := 0.0
+	for _, productVariation := range productVariations {
+		stock += productVariation.Stock
+	}
+	return stock
+}
+
+func ToProductVariationBusinessEntity(productVariations []gateway_entities.ProductVariation) []entities.ProductVariation {
+	productVariationsBusiness := make([]entities.ProductVariation, len(productVariations))
+	for i, productVariation := range productVariations {
+		productVariationsBusiness[i] = entities.ProductVariation{
+			EntitiesBase: core.EntitiesBase{
+				ID: productVariation.ID,
+			},
+			Number: productVariation.Number,
+			Stock:  productVariation.Stock,
+		}
+	}
+	return productVariationsBusiness
+
 }
 
 func (e *ProductGatewayImpl) ToServiceEntity(product entities.Product) gateway_entities.Product {
