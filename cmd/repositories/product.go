@@ -54,7 +54,9 @@ func (r *ProductRepository) FindById(id uint) *gateway_entities.Product {
 		return &product
 	}
 	product.MaterialProduct = materialProducts
-
+	var productVariations []gateway_entities.ProductVariation
+	res = r.db.Find(&productVariations, "product_id = ?", id)
+	product.ProductVariation = productVariations
 	return &product
 }
 

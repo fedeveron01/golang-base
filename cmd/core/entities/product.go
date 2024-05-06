@@ -10,7 +10,7 @@ type Product struct {
 	Size             float64
 	ImageUrl         string
 	Price            float64
-	Stock            int
+	Stock            float64
 	MaterialProduct  []MaterialProduct
 	ProductVariation []ProductVariation
 }

@@ -15,20 +15,26 @@ type ProductResponse struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Color       string  `json:"color"`
-	Size        float64 `json:"size"`
 	ImageUrl    string  `json:"imageUrl"`
 	Price       float64 `json:"price"`
 }
 
+type ProductVariationResponse struct {
+	Id     float64 `json:"id"`
+	Number float64 `json:"number"`
+	Stock  float64 `json:"stock"`
+}
 type ProductWithAssignationsResponse struct {
-	Id           float64               `json:"id"`
-	Name         string                `json:"name"`
-	Description  string                `json:"description"`
-	Color        string                `json:"color"`
-	Size         float64               `json:"size"`
-	ImageUrl     string                `json:"imageUrl"`
-	Price        float64               `json:"price"`
-	Assignations []AssignationResponse `json:"assignations"`
+	Id               float64                    `json:"id"`
+	Name             string                     `json:"name"`
+	Description      string                     `json:"description"`
+	Color            string                     `json:"color"`
+	Size             float64                    `json:"size"`
+	ImageUrl         string                     `json:"imageUrl"`
+	Price            float64                    `json:"price"`
+	Assignations     []AssignationResponse      `json:"assignations"`
+	ProductVariation []ProductVariationResponse `json:"productVariation"`
+	Stock            float64                    `json:"stock"`
 }
 
 type AssignationResponse struct {
@@ -43,7 +49,8 @@ type MaterialResponse struct {
 }
 
 type MaterialTypeResponse struct {
-	Id                float64 `json:"id"`
-	Name              string  `json:"name"`
-	UnitOfMeasurement string  `json:"unitOfMeasurement"`
+	Id                      float64 `json:"id"`
+	Name                    string  `json:"name"`
+	UnitOfMeasurement       string  `json:"unitOfMeasurement"`
+	UnitOfMeasurementSymbol string  `json:"unitOfMeasurementSymbol"`
 }

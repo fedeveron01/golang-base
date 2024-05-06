@@ -3,6 +3,7 @@ package product_handler
 import (
 	"github.com/fedeveron01/golang-base/cmd/core"
 	"github.com/fedeveron01/golang-base/cmd/core/entities"
+	"github.com/fedeveron01/golang-base/cmd/core/enums"
 )
 
 func ToProductsResponse(products []entities.Product) []ProductResponse {
@@ -19,22 +20,39 @@ func ToProductResponse(product entities.Product) ProductResponse {
 		Name:        product.Name,
 		Description: product.Description,
 		Color:       product.Color,
-		Size:        product.Size,
 		ImageUrl:    product.ImageUrl,
 		Price:       product.Price,
 	}
 }
 
+func ToProductVariationResponse(productVariation []entities.ProductVariation) []ProductVariationResponse {
+	var productVariationResponses []ProductVariationResponse
+	for _, productVariation := range productVariation {
+		productVariationResponses = append(productVariationResponses, toProductVariationResponse(productVariation))
+	}
+	return productVariationResponses
+}
+
+func toProductVariationResponse(productVariation entities.ProductVariation) ProductVariationResponse {
+	return ProductVariationResponse{
+		Id:     float64(productVariation.ID),
+		Number: productVariation.Number,
+		Stock:  productVariation.Stock,
+	}
+}
+
 func ToProductWithAssignationsResponse(product entities.Product, language string) ProductWithAssignationsResponse {
 	return ProductWithAssignationsResponse{
-		Id:           float64(product.ID),
-		Name:         product.Name,
-		Description:  product.Description,
-		Color:        product.Color,
-		Size:         product.Size,
-		ImageUrl:     product.ImageUrl,
-		Price:        product.Price,
-		Assignations: ToAssignationsResponse(product.MaterialProduct, language),
+		Id:               float64(product.ID),
+		Name:             product.Name,
+		Description:      product.Description,
+		Color:            product.Color,
+		Size:             product.Size,
+		ImageUrl:         product.ImageUrl,
+		Price:            product.Price,
+		Assignations:     ToAssignationsResponse(product.MaterialProduct, language),
+		ProductVariation: ToProductVariationResponse(product.ProductVariation),
+		Stock:            product.Stock,
 	}
 }
 
@@ -63,9 +81,10 @@ func ToMaterialResponse(material entities.Material, language string) MaterialRes
 
 func ToMaterialTypeResponse(materialType entities.MaterialType, language string) MaterialTypeResponse {
 	return MaterialTypeResponse{
-		Id:                float64(materialType.ID),
-		Name:              materialType.Name,
-		UnitOfMeasurement: materialType.UnitOfMeasurement.String(language),
+		Id:                      float64(materialType.ID),
+		Name:                    materialType.Name,
+		UnitOfMeasurement:       materialType.UnitOfMeasurement.String(language),
+		UnitOfMeasurementSymbol: enums.GetSymbolByUnitOfMeasurementEnum(materialType.UnitOfMeasurement),
 	}
 }
 
