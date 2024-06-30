@@ -16,7 +16,7 @@ func NewSessionRepository(database *gorm.DB) *SessionRepository {
 	}
 }
 
-var expirationDays = 7 * 24 * time.Hour
+var expirationDays = 5 * 24 * time.Hour
 
 func (r *SessionRepository) CreateSession(session gateway_entities.Session) (gateway_entities.Session, error) {
 	id := r.db.Create(&session)
