@@ -39,6 +39,15 @@ func (r *ProductRepository) FindByName(name string) *gateway_entities.Product {
 	return &product
 }
 
+func (r *ProductRepository) FindByNameAndColor(name string, color string) *gateway_entities.Product {
+	var product gateway_entities.Product
+	r.db.Where("name = ? AND color = ?", name, color).First(&product)
+	if product.ID == 0 {
+		return nil
+	}
+	return &product
+}
+
 func (r *ProductRepository) FindById(id uint) *gateway_entities.Product {
 	var product gateway_entities.Product
 	res := r.db.Find(&product, id).First(&product)
