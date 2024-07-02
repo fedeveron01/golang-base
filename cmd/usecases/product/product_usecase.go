@@ -18,6 +18,7 @@ type ProductGateway interface {
 	FindAll() ([]entities.Product, error)
 	FindById(id uint) *entities.Product
 	FindByName(name string) *entities.Product
+	FindByNameAndColor(name string, color string) *entities.Product
 	CreateProduct(productType entities.Product) (entities.Product, error)
 	UpdateProduct(productType entities.Product) (entities.Product, error)
 	DeleteProduct(id uint) error
@@ -66,7 +67,7 @@ func (i *Implementation) CreateProduct(product entities.Product) (entities.Produ
 	if len(product.Name) > 20 {
 		return entities.Product{}, core_errors.NewBadRequestError("product name must be at most 20 characters")
 	}
-	repeated := i.productGateway.FindByName(product.Name)
+	repeated := i.productGateway.FindByNameAndColor(product.Name, product.Color)
 	if repeated != nil {
 		return entities.Product{}, core_errors.NewInternalServerError("product already exists")
 	}
@@ -88,7 +89,7 @@ func (i *Implementation) UpdateProduct(product entities.Product) (entities.Produ
 		return entities.Product{}, core_errors.NewInternalServerError("product not exist")
 	}
 
-	repeated := i.productGateway.FindByName(product.Name)
+	repeated := i.productGateway.FindByNameAndColor(product.Name, product.Color)
 	if repeated != nil && repeated.ID != product.ID {
 		return entities.Product{}, core_errors.NewInternalServerError("product already exists")
 	}
