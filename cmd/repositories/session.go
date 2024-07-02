@@ -3,6 +3,7 @@ package repositories
 import (
 	gateway_entities "github.com/fedeveron01/golang-base/cmd/adapters/gateways/entities"
 	"gorm.io/gorm"
+	"time"
 )
 
 type SessionRepository struct {
@@ -14,6 +15,8 @@ func NewSessionRepository(database *gorm.DB) *SessionRepository {
 		db: database,
 	}
 }
+
+var expirationDays = 5 * 24 * time.Hour
 
 func (r *SessionRepository) CreateSession(session gateway_entities.Session) (gateway_entities.Session, error) {
 	id := r.db.Create(&session)
@@ -41,6 +44,10 @@ func (r *SessionRepository) SessionIsExpired(id float64) bool {
 	var session gateway_entities.Session
 	res := r.db.First(&session, uintId)
 	if res.Error != nil {
+		return true
+	}
+
+	if time.Now().After(session.CreatedAt.Add(expirationDays)) {
 		return true
 	}
 	return false
