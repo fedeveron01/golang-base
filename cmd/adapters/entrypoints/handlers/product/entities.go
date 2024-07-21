@@ -24,6 +24,7 @@ type ProductVariationResponse struct {
 	Number float64 `json:"number"`
 	Stock  float64 `json:"stock"`
 }
+
 type ProductWithAssignationsResponse struct {
 	Id               float64                    `json:"id"`
 	Name             string                     `json:"name"`
@@ -33,6 +34,17 @@ type ProductWithAssignationsResponse struct {
 	ImageUrl         string                     `json:"imageUrl"`
 	Price            float64                    `json:"price"`
 	Assignations     []AssignationResponse      `json:"assignations"`
+	ProductVariation []ProductVariationResponse `json:"productVariation"`
+	Stock            float64                    `json:"stock"`
+}
+
+type ProductWithVariationsResponse struct {
+	Id               float64                    `json:"id"`
+	Name             string                     `json:"name"`
+	Description      string                     `json:"description"`
+	Color            string                     `json:"color"`
+	ImageUrl         string                     `json:"imageUrl"`
+	Price            float64                    `json:"price"`
 	ProductVariation []ProductVariationResponse `json:"productVariation"`
 	Stock            float64                    `json:"stock"`
 }

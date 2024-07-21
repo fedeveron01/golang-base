@@ -11,7 +11,7 @@ import (
 type ProductRepository interface {
 	FindAll() ([]gateway_entities.Product, error)
 	FindById(id uint) *gateway_entities.Product
-	FindByName(name string) *gateway_entities.Product
+	FindByName(name string) []*gateway_entities.Product
 	FindByNameAndColor(name string, color string) *gateway_entities.Product
 	CreateProduct(product gateway_entities.Product) (gateway_entities.Product, error)
 	UpdateProduct(product gateway_entities.Product) (gateway_entities.Product, error)
@@ -51,13 +51,16 @@ func (e *ProductGatewayImpl) FindById(id uint) *entities.Product {
 	return &product
 }
 
-func (e *ProductGatewayImpl) FindByName(name string) *entities.Product {
-	productDB := e.productRepository.FindByName(name)
-	if productDB == nil {
+func (e *ProductGatewayImpl) FindByName(name string) []entities.Product {
+	productsDB := e.productRepository.FindByName(name)
+	if len(productsDB) == 0 {
 		return nil
 	}
-	product := e.ToBusinessEntity(*productDB)
-	return &product
+	products := make([]entities.Product, len(productsDB))
+	for i, productDB := range productsDB {
+		products[i] = e.ToBusinessEntity(*productDB)
+	}
+	return products
 }
 
 func (e *ProductGatewayImpl) FindByNameAndColor(name string, color string) *entities.Product {

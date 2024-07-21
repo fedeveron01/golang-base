@@ -25,6 +25,43 @@ func ToProductResponse(product entities.Product) ProductResponse {
 	}
 }
 
+func ToProductsByNameResponse(products [][]entities.Product) [][]ProductResponse {
+	var productResponses [][]ProductResponse
+	for _, product := range products {
+		productResponses = append(productResponses, ToProductsResponse(product))
+	}
+	return productResponses
+}
+
+func ToProductsByNameMapResponse(products map[string][]entities.Product) map[string][]ProductResponse {
+	productResponses := make(map[string][]ProductResponse)
+	for key, value := range products {
+		productResponses[key] = ToProductsResponse(value)
+	}
+	return productResponses
+}
+
+func ToProductsWhitVariationsResponse(products []entities.Product) []ProductWithVariationsResponse {
+	var productResponses []ProductWithVariationsResponse
+	for _, product := range products {
+		productResponses = append(productResponses, ToProductWithVariationsResponse(product))
+	}
+	return productResponses
+}
+
+func ToProductWithVariationsResponse(product entities.Product) ProductWithVariationsResponse {
+	return ProductWithVariationsResponse{
+		Id:               float64(product.ID),
+		Name:             product.Name,
+		Description:      product.Description,
+		Color:            product.Color,
+		ImageUrl:         product.ImageUrl,
+		Price:            product.Price,
+		ProductVariation: ToProductVariationResponse(product.ProductVariation),
+		Stock:            product.Stock,
+	}
+}
+
 func ToProductVariationResponse(productVariation []entities.ProductVariation) []ProductVariationResponse {
 	var productVariationResponses []ProductVariationResponse
 	for _, productVariation := range productVariation {
