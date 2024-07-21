@@ -101,7 +101,7 @@ func (p *ProductHandler) GetByName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(productsResponse)
 }
 
-// GroupedByName Handle api/product/groupedByName GET request
+// GroupedByName Handle api/product/byName GET request
 func (p *ProductHandler) GroupedByName(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
@@ -117,7 +117,7 @@ func (p *ProductHandler) GroupedByName(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(productsResponse)
 }
 
-// GroupedByNameMap Handle api/product/groupedByNameMap GET request
+// GroupedByNameMap Handle api/product/byNameMap GET request
 func (p *ProductHandler) GroupedByNameMap(w http.ResponseWriter, r *http.Request) {
 	if !p.IsAuthorized(w, r) {
 		return
