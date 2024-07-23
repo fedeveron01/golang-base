@@ -30,13 +30,21 @@ func (r *ProductRepository) FindAll() ([]gateway_entities.Product, error) {
 	return products, nil
 }
 
-func (r *ProductRepository) FindByName(name string) *gateway_entities.Product {
-	var product gateway_entities.Product
-	r.db.Where("name = ?", name).First(&product)
-	if product.ID == 0 {
+func (r *ProductRepository) FindByName(name string) []*gateway_entities.Product {
+    var products []gateway_entities.Product
+    r.db.Where("name = ?", name).Find(&products)
+	if len(products) == 0 {
 		return nil
 	}
-	return &product
+    var result []*gateway_entities.Product
+    for _, product := range products {
+        var productVariations []gateway_entities.ProductVariation
+        r.db.Find(&productVariations, "product_id = ?", product.ID)
+        p := product
+        p.ProductVariation = productVariations
+        result = append(result, &p)
+    }
+    return result
 }
 
 func (r *ProductRepository) FindByNameAndColor(name string, color string) *gateway_entities.Product {

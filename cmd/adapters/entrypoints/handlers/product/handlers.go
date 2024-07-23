@@ -17,6 +17,9 @@ import (
 type ProductHandlerInterface interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
 	GetById(w http.ResponseWriter, r *http.Request)
+	GetByName(w http.ResponseWriter, r *http.Request)
+	GroupedByName(w http.ResponseWriter, r *http.Request)
+	GroupedByNameMap(w http.ResponseWriter, r *http.Request)
 	Create(w http.ResponseWriter, r *http.Request)
 	Update(w http.ResponseWriter, r *http.Request)
 	Delete(w http.ResponseWriter, r *http.Request)
@@ -78,6 +81,56 @@ func (p *ProductHandler) GetById(w http.ResponseWriter, r *http.Request) {
 
 	productResponse := ToProductWithAssignationsResponse(product, language)
 	json.NewEncoder(w).Encode(productResponse)
+}
+
+// GetByName Handle api/product/name/{name} GET request
+func (p *ProductHandler) GetByName(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	vars := mux.Vars(r)
+	name := vars["name"]
+	products, err := p.productUseCase.FindByName(name)
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+
+	productsResponse := ToProductsWhitVariationsResponse(products)
+
+	json.NewEncoder(w).Encode(productsResponse)
+}
+
+// GroupedByName Handle api/product/byName GET request
+func (p *ProductHandler) GroupedByName(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	products, err := p.productUseCase.GroupedByName()
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+
+	productsResponse := ToProductsByNameResponse(products)
+
+	json.NewEncoder(w).Encode(productsResponse)
+}
+
+// GroupedByNameMap Handle api/product/byNameMap GET request
+func (p *ProductHandler) GroupedByNameMap(w http.ResponseWriter, r *http.Request) {
+	if !p.IsAuthorized(w, r) {
+		return
+	}
+	products, err := p.productUseCase.GroupedByNameMap()
+	if err != nil {
+		p.WriteErrorResponse(w, err)
+		return
+	}
+
+	productsResponse := ToProductsByNameMapResponse(products)
+
+	json.NewEncoder(w).Encode(productsResponse)
 }
 
 // Create Handle api/product POST request

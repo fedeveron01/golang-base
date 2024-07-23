@@ -8,6 +8,9 @@ import (
 type ProductUseCase interface {
 	FindAll() ([]entities.Product, error)
 	FindById(id uint) (entities.Product, error)
+	FindByName(name string) ([]entities.Product, error)
+	GroupedByName() ([][]entities.Product, error)
+	GroupedByNameMap() (map[string][]entities.Product, error)
 	CreateProduct(product entities.Product) (entities.Product, error)
 	UpdateProduct(product entities.Product) (entities.Product, error)
 	DeleteProduct(id uint) error
@@ -17,7 +20,7 @@ type ProductUseCase interface {
 type ProductGateway interface {
 	FindAll() ([]entities.Product, error)
 	FindById(id uint) *entities.Product
-	FindByName(name string) *entities.Product
+	FindByName(name string) []entities.Product
 	FindByNameAndColor(name string, color string) *entities.Product
 	CreateProduct(productType entities.Product) (entities.Product, error)
 	UpdateProduct(productType entities.Product) (entities.Product, error)
@@ -55,6 +58,44 @@ func (i *Implementation) FindById(id uint) (entities.Product, error) {
 		return entities.Product{}, core_errors.NewNotFoundError("product not found")
 	}
 	return *product, nil
+}
+
+func (i *Implementation) FindByName(name string) ([]entities.Product, error) {
+	products := i.productGateway.FindByName(name)
+	if products == nil {
+		return []entities.Product{}, core_errors.NewNotFoundError("product not found")
+	}
+	return products, nil
+}
+
+func (i *Implementation) GroupedByName() ([][]entities.Product, error) {
+	products, err := i.productGateway.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	grouped := make(map[string][]entities.Product)
+	for _, product := range products {
+		grouped[product.Name] = append(grouped[product.Name], product)
+	}
+	var result [][]entities.Product
+	for _, products := range grouped {
+		result = append(result, products)
+	}
+	return result, nil
+}
+
+func (i *Implementation) GroupedByNameMap() (map[string][]entities.Product, error) {
+	products, err := i.productGateway.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	grouped := make(map[string][]entities.Product)
+	for _, product := range products {
+		grouped[product.Name] = append(grouped[product.Name], product)
+	}
+
+	return grouped, nil
 }
 
 func (i *Implementation) CreateProduct(product entities.Product) (entities.Product, error) {
